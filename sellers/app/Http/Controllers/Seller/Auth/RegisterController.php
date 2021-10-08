@@ -125,7 +125,20 @@ class RegisterController extends Controller
             Store::where('id',$storeId)->update($imgData);
             $imgUpload          =   uploadFile($path,$imgName);
         }
-        if($sellerId){ return back()->with('success','You are registered successfully. After approval of Admin, you can access your seller account.'); }
+        if($sellerId){ 
+            $from       = $sellerId; 
+            $utype      = 2;
+            $to         = 1;
+            $ntype      = 'seller_request';
+            $title      = 'Seller Request';
+            $desc       = 'New seller request from '.$info['fname'];
+            $refId      = $sellerId;
+            $reflink    = 'new-sellers';
+            $notify     = 'admin';
+            addNotification($from,$utype,$to,$ntype,$title,$desc,$refId,$reflink,$notify);
+            return back()->with('success','You are registered successfully. After approval of Admin, you can access your seller account.'); 
+            
+        }
         else{ return back()->with('error','Something went wrong. Please try after some time.'); }
     }
     

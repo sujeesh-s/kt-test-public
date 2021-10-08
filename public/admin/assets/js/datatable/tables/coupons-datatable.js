@@ -117,13 +117,13 @@ $(document).ready(function () {
         //     }
         // });
     });
-    jQuery("#filterSel").on( 'change', function () {
-                          table.column( 7 )
-                    .search( "^" + $(this).val(), true, false, true )
-                    .draw();
+    // jQuery("#filterSel").on( 'change', function () {
+    //                       table.column( 7 )
+    //                 .search( "^" + $(this).val(), true, false, true )
+    //                 .draw();
                     
 
-            } );
+    //         } );
 
     $(".dt-bootstrap4 input[type=search]").attr("placeholder", "Search All");
     $(".action-search input, .search-by input").attr("disabled", "disabled");

@@ -236,8 +236,9 @@ class AdminController extends Controller
         { 
         $data['title']              =   'Create Admin';
         $data['menu']               =   'create-admin';
-        $data['modules']              =   Admin::where('is_deleted',NULL)->orWhere('is_deleted',0)->get();
-        $data['roles']              =   UserRole::where('is_deleted',NULL)->orWhere('is_deleted',0)->get();
+        $permanent = array(1,3,4,5,7);
+        $data['modules']              =   Admin::where('is_active',1)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
+        $data['roles']              =   UserRole::where('is_active',1)->whereNotIn('id', $permanent)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
         return view('admin.admins.create',$data);
         }
 
@@ -246,7 +247,8 @@ class AdminController extends Controller
         $data['title']              =   'Edit Admin';
         $data['menu']               =   'edit-admin';
         $data['admin']              =   Admin::where('id',$role_id)->first();
-        $data['roles']              =   UserRole::where('is_deleted',NULL)->orWhere('is_deleted',0)->get();
+        $permanent = array(1,3,4,5,7);
+        $data['roles']              =   UserRole::where('is_active',1)->whereNotIn('id', $permanent)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
         // dd($data);
         return view('admin.admins.edit',$data);
         }
@@ -277,7 +279,7 @@ class AdminController extends Controller
         foreach($validator->messages()->getMessages() as $k=>$row){  $error[$k] = $row[0];
         Session::flash('message', ['text'=>$row[0],'type'=>'danger']); }
         
-       return back()->withInput($request->all());
+       return back()->withErrors($validator)->withInput($request->all());
         }
 
         if($post->user['password']      ==  ''){ unset($post->user['password']); }
@@ -298,7 +300,7 @@ class AdminController extends Controller
         foreach($validator->messages()->getMessages() as $k=>$row){  $error[$k] = $row[0];
         Session::flash('message', ['text'=>$row[0],'type'=>'danger']); }
         
-       return back()->withInput($request->all());
+       return back()->withErrors($validator)->withInput($request->all());
         }
         
         $post->user['password']         =   Hash::make($post->user['password']);

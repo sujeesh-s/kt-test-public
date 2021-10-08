@@ -1,11 +1,11 @@
 $(document).ready(function () {
 
-    $(".sales tfoot th").each(function () {
+    $(".sales-table tfoot th").each(function () {
         var title = $(this).text();
         $(this).html('<input type="text" placeholder="' + title + '" />');
     });
 
-    var table = $(".sales").DataTable({
+    var table = $(".sales-table").DataTable({
         pageLength: 10,
         rowReorder: false,
         colReorder: true,

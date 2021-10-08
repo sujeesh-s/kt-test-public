@@ -6,6 +6,15 @@
 		<link href="{{URL::asset('admin/assets/plugins/datatable/responsive.bootstrap4.min.css')}}" rel="stylesheet" />
 		<link href="{{URL::asset('admin/assets/plugins/sweet-alert/jquery.sweet-modal.min.css')}}" rel="stylesheet" />
 		<link href="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.css')}}" rel="stylesheet" />
+		<style>
+		.radiospan {
+			font-size: 12px;
+   			 padding-top: 8px;
+		}
+		.radiospan checkbox {
+			width: 12px;
+		}
+		</style>
 @endsection
 @section('page-header')
 						<!--Page header-->
@@ -94,14 +103,14 @@
 
 															<div class="col" id="permissions">
 																<div class="mb-2"><b>Permissions</b></div>
-<div class="col-12 heading">
-<div class="row">
-<div class="col-6">Modules</div>
-<div class="col-2 citems">View</div>
-<div class="col-2 citems">Edit</div>
-<div class="col-2 citems">Delete</div>
-</div>
-</div>
+                    <div class="col-12 heading">
+					<div class="row">
+					<div class="col-6">Modules</div>
+					<div class="col-2 citems">View <span class="d-block radiospan"><input type="checkbox" id="view-all" class="mr-1" >All</span></div>
+					<div class="col-2 citems">Edit <span class="d-block radiospan"><input type="checkbox" id="edit-all" class="mr-1" >All</span></div>
+					<div class="col-2 citems">Delete <span class="d-block radiospan"><input type="checkbox" id="delete-all" class="mr-1" >All</span></div>
+					</div>
+					</div>
 															
 						
  @if($modules && count($modules) > 0)
@@ -116,7 +125,7 @@
                                 <div class="col-md-6 col-5 title">{{$pt['name']}}</div>
                                 <div class="col-2 title citems">
 									
-									<div class="switch">
+									<div class="switch viewbox">
     <input class=' switch-input status-btn ser_status' name="modules[{{$pt['id']}}]['view']" data-selid="{{$pt['id']}}" id="view-{{$pt['id']}}" value="1"  type="checkbox" @if($trows) @if($trows->view ==1) {{ "checked" }} @endif @endif />
     <label class="switch-paddle" for="view-{{$pt['id']}}">
     <span class="switch-active" aria-hidden="true">Active</span>
@@ -127,7 +136,7 @@
 								</div>
 								<div class="col-2 title citems">
 
-		<div class="switch">
+		<div class="switch editbox">
 		<input class='switch-input status-btn ser_status' name="modules[{{$pt['id']}}]['edit']" id="edit-{{$pt['id']}}" data-selid="{{$pt['id']}}" value="1"  type="checkbox" @if($trows) @if($trows->edit ==1) {{ "checked" }} @endif @endif />
 		<label class="switch-paddle" for="edit-{{$pt['id']}}">
 		<span class="switch-active" aria-hidden="true">Active</span>
@@ -137,7 +146,7 @@
 
 								</div>
 								<div class="col-2 title citems">
-									<div class="switch">
+									<div class="switch deletebox">
 		<input class=' switch-input status-btn ser_status' name="modules[{{$pt['id']}}]['delete']" id="delete-{{$pt['id']}}" data-selid="{{$pt['id']}}" value="1"  type="checkbox" @if($trows) @if($trows->delete ==1) {{ "checked" }} @endif @endif />
 		<label class="switch-paddle" for="delete-{{$pt['id']}}">
 		<span class="switch-active" aria-hidden="true">Active</span>
@@ -155,7 +164,7 @@
                                     <div class="row">
                                         <div class="col-md-6 col-5 sub-title module {{$nrow}}">{{$ch['name']}}</div>
                                        <div class="col-2 sub-title {{$nrow}} citems">
-                                       						<div class="switch">
+                                       						<div class="switch viewbox">
 		<input class='switch-input status-btn ser_status' name="modules[{{$ch['id']}}]['view']" id="ch-view-{{$ch['id']}}" data-selid="{{$ch['id']}}" value="1"  type="checkbox" @if($ctrows) @if($ctrows->view ==1) {{ "checked" }} @endif @endif />
 		<label class="switch-paddle" for="ch-view-{{$ch['id']}}">
 		<span class="switch-active" aria-hidden="true">Active</span>
@@ -165,7 +174,7 @@
 
 								</div>
 								<div class="col-2 sub-title {{$nrow}} citems">
-									<div class="switch">
+									<div class="switch editbox">
 		<input class='switch-input status-btn ser_status' name="modules[{{$ch['id']}}]['edit']" data-selid="{{$ch['id']}}" id="ch-edit-{{$ch['id']}}" value="1"  type="checkbox" @if($ctrows) @if($ctrows->edit ==1) {{ "checked" }} @endif @endif />
 		<label class="switch-paddle" for="ch-edit-{{$ch['id']}}">
 		<span class="switch-active" aria-hidden="true">Active</span>
@@ -175,7 +184,7 @@
 
 								</div>
 								<div class="col-2 sub-title {{$nrow}} citems">
-										<div class="switch">
+										<div class="switch deletebox">
 		<input class='switch-input status-btn ser_status' name="modules[{{$ch['id']}}]['delete']" id="ch-delete-{{$ch['id']}}" data-selid="{{$ch['id']}}" value="1"  type="checkbox" @if($ctrows) @if($ctrows->delete ==1) {{ "checked" }} @endif @endif />
 		<label class="switch-paddle" for="ch-delete-{{$ch['id']}}">
 		<span class="switch-active" aria-hidden="true">Active</span>
@@ -323,26 +332,53 @@ $(".ser_status").change(function() {
 		});
 	});
 
+$("#view-all").click(function(){
+	
+		if ($(this).is(':checked')){ 
+			
+        	$('.viewbox .status-btn').prop('checked', true);
+  		  }else {
+  		  	
+  		  	$('.viewbox .status-btn').prop('checked', false);
+  		  }
+	});
+	$("#edit-all").click(function(){
+	
+		if ($(this).is(':checked')){ 
+        	$('.editbox .status-btn').prop('checked', true);
+  		  }else {
+  		  	$('.editbox .status-btn').prop('checked', false);
+  		  }
+	});
+	$("#delete-all").click(function(){
+	
+		if ($(this).is(':checked')){ 
+        	$('.deletebox .status-btn').prop('checked', true);
+  		  }else {
+  		  	$('.deletebox .status-btn').prop('checked', false);
+  		  }
+	});
+	
 	});
 </script>
 
 <script type="text/javascript">
     $(document).ready(function(){
-            @if(Session::has('message'))
-            @if(session('message')['type'] =="success")
+            // @if(Session::has('message'))
+            // @if(session('message')['type'] =="success")
             
-            toastr.success("{{session('message')['text']}}"); 
-            @else
-            toastr.error("{{session('message')['text']}}"); 
-            @endif
-            @endif
+            // toastr.success("{{session('message')['text']}}"); 
+            // @else
+            // toastr.error("{{session('message')['text']}}"); 
+            // @endif
+            // @endif
             
-            @if ($errors->any())
-            @foreach ($errors->all() as $error)
-            toastr.error("{{$error}}"); 
+            // @if ($errors->any())
+            // @foreach ($errors->all() as $error)
+            // toastr.error("{{$error}}"); 
             
-            @endforeach
-            @endif
+            // @endforeach
+            // @endif
     });
     </script>
 

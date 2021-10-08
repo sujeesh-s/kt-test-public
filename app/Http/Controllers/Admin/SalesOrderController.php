@@ -19,6 +19,12 @@ use App\Models\SalesOrderCancel;
 use App\Models\SalesOrderCancelNote;
 use App\Models\SalesOrderStatusList;
 use App\Models\SalesOrderStatusHistory;
+use App\Models\SalesOrderRefundPayment;
+use App\Models\Auction;
+use App\Models\AuctionHist;
+use App\Models\SalesOrderReturn;
+use App\Models\SalesOrderReturnStatus;
+use App\Models\CustomerWallet_Model;
 use App\Models\Email;
 
 use Validator;
@@ -189,5 +195,110 @@ class SalesOrderController extends Controller
         $sales                      =   SalesOrder::get(['seller_id']); $sellerIds = [];
         if($sales){ foreach($sales  as  $row){ $sellerIds[] = $row->seller_id; } }else{ $sellerIds = [0]; }
         return SellerInfo::whereIn('seller_id',$sellerIds)->get();
+    }
+    
+    public function refundOrders(Request $request,$type='refund_request'){  //echo Auth::user()->id; die;
+        $post                       =   (object)$request->post(); 
+        if(isset($post->viewType))  {   $viewType = $post->viewType; }else{ $viewType = ''; }
+        $data['title']              =   'Sales Orders';
+        $data['menuGroup']          =   'salesGroup';
+        $data['menu']               =   'sales_request';
+        $data['start_date']         =   ''; $data['end_date'] =   ''; 
+        // $data['p_status'] =   ''; $data['o_status'] =   '';
+        $data['seller']             =   '';
+        $refunds                     =   SalesOrderRefundPayment::select('sales_orders.order_status','sales_orders.payment_status','sales_orders.order_id','sales_orders.cust_id','sales_order_refund_payments.*')->join('sales_orders','sales_orders.id','=','sales_order_refund_payments.sales_id')->where('sales_order_refund_payments.is_deleted',0)->where('sales_order_refund_payments.is_active',1)->where('sales_orders.payment_status','success');
+        // if($type == 'request')      {   $orders = $orders->where('order_status','pending'); }
+        // else if($type == 'ref_reqs'){   $orders = $orders->where('order_status','cancelled')->where('payment_status','success'); }
+        if(isset($post->start_date) &&  $post->start_date != ''){ 
+            $refunds                 =   $orders->whereDate('sales_order_refund_payments.created_at','>=',$post->start_date); 
+            $data['start_date']     =   $post->start_date;
+        }
+        if(isset($post->end_date)   &&  $post->end_date != ''){ 
+            $refunds                 =   $orders->whereDate('sales_order_refund_payments.created_at','<=',$post->end_date); 
+            $data['end_date']       =   $post->end_date;
+        }
+      
+        $data['sellers']            =   getDropdownData($this->getSalesSellers(),'seller_id','fname');
+        $data['orderStatusList']    =   getDropdownData(SalesOrderStatusList::where('is_active',1)->where('is_deleted',0)->orderBy('short','asc')->get(),'identifier','title');
+        $data['refunds']             =   $refunds->orderBy('id','desc')->get();
+        if($viewType == 'ajax') {   return view('admin.sales.refund_request.list.content',$data); }else{ return view('admin.sales.refund_request.page',$data); }        
+       
+    }
+    
+    function refund(Request $request, $id=0,$type='')
+     {
+        $post                       =   (object)$request->post();
+        $data['title']              =   'Sales Orders';
+        $data['menuGroup']          =   'salesGroup';
+        $data['menu']               =   'sales_order';
+        
+        $ord                        =   SalesOrderRefundPayment::where('id',$id)->where('is_deleted',0)->where('is_active',1)->first();
+        $data['order']              =   $ord;
+        $user_id                    =   $ord->order->cust_id;
+        $histories =  AuctionHist::where('user_id',$user_id)->where('sale_id',$ord->sales_id)->where('is_deleted',0)->where('is_active',1); 
+        $auctionwin = Auction::where('bid_allocated_to',$user_id)->where('sale_id',$ord->sales_id)->where('status','closed')->where('is_deleted',0)->where('is_active',1);
+        if($histories->count() > 0)
+        {
+            if($auctionwin->count() > 0)
+            {
+                $au_status=   'True';
+                $charge    =   $ord->order->bid_charge;
+            }
+            else
+            {
+                $au_status=   'False';
+                $charge    =   0;
+            }
+        }
+        else
+        {
+            $au_status =   'False';
+            $charge    =   0;
+        }
+        $data['au_status'] = $au_status;
+        $data['bidding_charge'] = $charge;
+        if($type == 'request')      {   return view('admin.sales.refund_request.view',$data); }
+    }
+    
+    function refundupdateStatus(Request $request){
+        $post                       =   (object)$request->post(); 
+        $refunddata  =  SalesOrderRefundPayment::where('id',$post->id)->where('is_deleted',0)->where('is_active',1)->first();
+        $user_id                    =   $refunddata->order->cust_id;
+        if($refunddata->source == 'cancel')
+        {
+            if($refunddata->refund_mode == '1')
+            {
+                CustomerWallet_Model::create(['user_id'=>$user_id,'source_id'=>$post->id,'source'=>'Cancel Order','credit'=>$refunddata->grand_total,'desc'=>$post->desc,'is_active'=>1]);
+            }
+            SalesOrder::where('id',$refunddata->sales_id)->update(['payment_status'=>$post->value]);
+            $stHistory                  =   ['sales_id'=>$refunddata->sales_id,'status'=>$post->value,'created_by'=>auth()->user()->id,'role_id'=>auth()->user()->role_id];
+             $stHistory['description']   =   $post->desc;    
+             SalesOrderStatusHistory::create($stHistory);
+        }
+        else
+        {
+            if($refunddata->refund_mode == '1')
+            {
+                CustomerWallet_Model::create(['user_id'=>$user_id,'source_id'=>$post->id,'source'=>'Return order','credit'=>$refunddata->grand_total,'desc'=>$post->desc,'is_active'=>1]);
+            }
+            SalesOrderReturn::where('id',$refunddata->ref_id)->update(['status'=>'refund_completed','payment_status'=>$post->value]);
+            SalesOrderReturnStatus::create(['sales_id'=>$refunddata->sales_id,'return_id'=>$refunddata->ref_id,'status'=>'refund_completed']);
+        }
+        $data['start_date']         =   ''; $data['end_date'] =   ''; 
+        $data['seller']             =   '';
+        $refunds                     =   SalesOrderRefundPayment::select('sales_orders.order_status','sales_orders.payment_status','sales_orders.order_id','sales_orders.cust_id','sales_order_refund_payments.*')->join('sales_orders','sales_orders.id','=','sales_order_refund_payments.sales_id')->where('sales_order_refund_payments.is_deleted',0)->where('sales_order_refund_payments.is_active',1)->where('sales_orders.payment_status','success');
+        if(isset($post->start_date) &&  $post->start_date != ''){ 
+            $refunds                 =   $orders->whereDate('sales_order_refund_payments.created_at','>=',$post->start_date); 
+            $data['start_date']     =   $post->start_date;
+        }
+        if(isset($post->end_date)   &&  $post->end_date != ''){ 
+            $refunds                 =   $orders->whereDate('sales_order_refund_payments.created_at','<=',$post->end_date); 
+            $data['end_date']       =   $post->end_date;
+        }
+      
+        $data['sellers']            =   getDropdownData($this->getSalesSellers(),'seller_id','fname');
+        $data['orderStatusList']    =   getDropdownData(SalesOrderStatusList::where('is_active',1)->where('is_deleted',0)->orderBy('short','asc')->get(),'identifier','title');
+        $data['refunds']             =   $refunds->orderBy('id','desc')->get();
+        return view($post->page.'.list.content',$data);
     }
 }

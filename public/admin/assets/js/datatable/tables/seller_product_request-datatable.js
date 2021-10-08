@@ -23,11 +23,28 @@ $(document).ready(function () {
         processing: true,
         scrollX: false,
         scrollCollapse: true,
-        serverSide: false,
+        serverSide: true,
         search: {
             caseInsensitive: true,
             smart: true
         },
+        ajax:{
+            url: $('#baseurl').val()+"/admin/seller/product/requests",
+            dataType: "json",
+            type: "POST",
+            data:{ "_token": $('#_token').val(), vType: 'ajax'},
+        },
+        columns: [
+            { data: "id" },
+            { data: "name" },
+            { data: "business" },
+            { data: "seller" },
+            { data: "cat" },
+            { data: "sub_cat" },
+            { data: "created_at" },
+            { data: "status" },
+            { data: "action" },
+        ],
         orderMulti: false,
         dom: "Blfrtip",
         stateSave: true,
@@ -76,7 +93,7 @@ $(document).ready(function () {
             },
             {
                 orderable: false,
-                targets: [0,9]
+                targets: [0,7]
             },
             {width: "7%", targets: 0},
             {width: "7%", targets: 1}
@@ -116,11 +133,12 @@ $(document).ready(function () {
                 }
             }
         }
-    }).columns([3,4,7]).visible(false);
-    table.columns().every(function () {
-        var that = this;
-
-    });
+    })
+//            .columns([3,4,7]).visible(false);
+//    table.columns().every(function () {
+//        var that = this;
+//
+//    });
 
     $(".dt-bootstrap4 input[type=search]").attr("placeholder", "Search All");
     $(".action-search input, .search-by input").attr("disabled", "disabled");

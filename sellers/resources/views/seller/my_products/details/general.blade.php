@@ -60,14 +60,25 @@
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('category_id','Category',['class'=>''])}} <span class="text-red">*</span>
-            {{Form::select('prd[category_id]',$categories,$catId,['id'=>'category_id','class'=>'form-control admin', 'placeholder'=>'Select Category'])}}
+            <!--{{Form::select('prd[category_id]',$categories,$catId,['id'=>'category_id','class'=>'form-control admin', 'placeholder'=>'Select Category'])}}-->
+            <select class="form-control select2 @error('category') is-invalid @enderror" id="categoryList" onchange="loadsubcat()"  name="prd[category_id]">
+            <option value="">Select</option>
+          
+            @foreach($categories as $key=>$cat )
+          
+            <option value="{{ $key }}" @if($key==$catId) {{ "selected" }} @endif>{{ $cat }}</option>
+            @endforeach
+            </select>
+            
             <span class="error"></span>
         </div>
     </div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('sub_category_id','Sub Category',['class'=>''])}} <span class="text-red">*</span>
-            {{Form::select('prd[sub_category_id]',$sub_cats,$subCatId,['id'=>'sub_category_id','class'=>'form-control admin', 'placeholder'=>'Select Sub Category'])}}
+            <!--{{Form::select('prd[sub_category_id]',$sub_cats,$subCatId,['id'=>'sub_category_id','class'=>'form-control admin', 'placeholder'=>'Select Sub Category'])}}-->
+            <input type="text" id="sub-category-id" placeholder="Type to filter" name="prd[sub_category_id]" autocomplete="off" value="@if(isset($subCatId)) {{ $subCatId }} @endif" hidden />
+            <input type="text" id="sub-category-drop" class="form-control " value="" placeholder="Select Subcategory" readonly style="background-color: #fff !important;">
             <span class="error"></span>
         </div>
     </div>
@@ -124,6 +135,46 @@
             {{ Form::checkbox('prd[daily_deals]',1,$daily_deals, array('id'=>'daily_deals')) }} <p>(Include this product under Daily deals product list)</p>
         </div>
     </div>
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('out_of_stock_selling','Out of stock selling',['class'=>'daily_deals form-label'])}} 
+            {{ Form::checkbox('prd[out_of_stock_selling]',1,$out_of_stock_selling, array('id'=>'out_of_stock_selling')) }} <p>(Continue selling when out of stock)</p>
+        </div>
+    </div>
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('tag_id','Tags',['class'=>''])}} 
+            {{Form::select('prd[tag_id]',$tags,$tagId,['id'=>'tag_id','class'=>'form-control admin', 'placeholder'=>'Select Tag'])}}
+            <span class="error"></span>
+        </div>
+    </div>
+    
+      <div class="col-lg-12 fl">
+        <div class="form-group">
+            {{Form::label('rltd_prds','Related Products',['class'=>''])}} 
+            <select class="form-control chosen-select" data-placeholder="Select Product" multiple  name="prd_id[]" id="prd_id" required >
+            @if($products && count($products) > 0)
+            @foreach($products as $row)
+            <option <?php if(in_array($row->id,$relatedprods)) { echo "selected"; } ?> value="{{ $row->id }}">{{ $row->name }}</option>
+            @endforeach
+            @endif
+            </select>
+            <span class="error"></span>
+        </div>
+    </div>   
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('commission','Profit Sharing',['class'=>'daily_deals form-label'])}} 
+            {{Form::number('prd[commission]',$commission,['id'=>'commission', 'class'=>'form-control','placeholder'=>'Profit Sharing','max'=>9999,'min'=>0])}}
+        </div>
+    </div>
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('commi_type','Commission Type',['class'=>''])}} 
+            {{Form::select('prd[commi_type]',['%'=>'%','amount'=>'Amount'],$commi_type,['id'=>'commi_type','class'=>'form-control admin', 'placeholder'=>'Select Type'])}}
+            <span class="error"></span>
+        </div>
+    </div>    
               
 
  <script type="text/javascript">
@@ -235,4 +286,97 @@ editor.setContents(JSON.parse($('#specification').val()), 'api');
 });
 
  </script>
+ <script type="text/javascript">
+
+$(document).ready(function(){
+$(".chosen-select").chosen({
+        no_results_text: "Oops, nothing found!"
+        });
+});
+    var instance = $('#sub-category-drop').comboTree({
+    collapse:true,
+    cascadeSelect:true,
+    isMultiple: false
+    });
+    loadsubcat('1');
+    var selectionIdList = new Array($("#sub-category-id").val());
+    instance.setSelection(selectionIdList);
+ function loadsubcat(clear='',selected='')
+    {
+        var category_id=$("#categoryList").val();
+        // alert(category_id);
+        if(clear!='1')
+        {
+            $("#sub-category-id").val('');
+        }
+        
+         $.ajax({
+            type: "POST",
+            url: '{{url("/auctions/subcategory")}}',
+            data: { "_token": "{{csrf_token()}}", category_id: category_id},
+            success: function (data) {
+            	var obj = JSON.parse(data);
+            
+            	console.log(obj);
+            	 var obj = JSON.parse(data);
+            if(obj.subdata.length >=1)
+            {
+               $('#sub-category-drop').attr("placeholder", "Select subcategory"); 
+            }
+            else
+            {
+                $('#sub-category-drop').attr("placeholder", "No subcategory to display"); 
+            }
+            instance.setSource(obj.subdata);
+            if($("#sub-category-id").val())
+            {
+                var selectionIdList = new Array($("#sub-category-id").val());
+                instance.setSelection(selectionIdList);
+
+            }
+            
+            }
+        });
+        
+        
+        
+    }
+    $('#sub-category-drop').on('change',function()
+        {
+            var selected_subcatid='';
+            //alert(selected_subcatid);
+            if(instance.getSelectedIds())
+            {
+                $("#sub-category-id").val(instance.getSelectedIds()[0]);
+            }
+            
+            if(selected_subcatid!=$("#sub-category-id").val())
+            {
+                var cat_id = $('#categoryList').val();
+            var subcat_id = $('#sub-category-id').val();
+            $.ajax({
+            url:"{{ route('taglist_ajax') }}",
+            type:"POST",
+            data: {
+            cat_id: cat_id,subcat_id:subcat_id
+            },
+            success:function (data) {
+            $('#tag').empty();
+            $.each(data.tags,function(index,tag){
+                //alert(subcategory.subcategory_id);
+            
+            $('#tag').append('<option value="'+tag.id+'">'+tag.tag_name+'</option>');
+            })
+            }
+            })
+            }
+            
+            
+           
+        });
+       
+$('.longdesc').richText();
+$('.maincontent').richText();
+
+</script>
                         

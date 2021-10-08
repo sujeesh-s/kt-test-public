@@ -85,7 +85,7 @@
             var id      =   this.id.replace('editBtn-','');  
             $.ajax({
                 type: "GET",
-               url: '{{url("admin/sales/order")}}/'+id+"/request",
+               url: '{{url("admin/sales/refund")}}/'+id+"/request",
                 success: function (data) {
                     $('.list-li').hide(); $('.view-li').fadeIn(700); $('#filters').hide();
                     $('#content_detail').html(data); $('#content_detail').fadeIn(700); $('#content_list').hide(); 
@@ -182,7 +182,7 @@
         $('body').on('click','.acceptBtn',function(){
             var id          =   this.id.replace('acceptBtn-',''); 
             var status      =   $(this).data('val');
-            var url         =   '{{url("admin/sales/order/updateStatus")}}';
+            var url         =   '{{url("admin/sales/order/refund/updateStatus")}}';
             var smsg        =   'Refund accepted successfully!';
             var desc        =   'Refund accepted by Admin'; 
             swal({
@@ -232,7 +232,9 @@
                 if(field == 'is_deleted'){ 
                   $('#active_filter').trigger('change'); toastr.success(smsg);
                 }else if(field == 'order_status'){
-                    $('#content_list').html(data); $('.bd-example-modal-sm').modal('hide'); toastr.success(smsg); statusEmail(id); return false;
+                    $('#content_list').html(data); $('.bd-example-modal-sm').modal('hide'); toastr.success(smsg); 
+                    //statusEmail(id); 
+                    return false;
                 }else{ 
                     if($('#active_filter').val() != ''){ $('#active_filter').trigger('change'); }
                     if (data.type == 'warning' || data.type == 'error'){ toastr.error(smsg); }else{ toastr.success(smsg); }

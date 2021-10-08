@@ -279,7 +279,7 @@
 																	</div> -->
 																	<div class="col">
 																		<div class="form-group">
-																			<label>Menu Icon <span class="text-red">*</span></label>
+																			<label>Menu Icon</label>
 																			
 																			{!! Form::text('menu_icon', null, ['class' => 'form-control','','id'=>'menu_icon']) !!}
 																		</div>
@@ -289,7 +289,7 @@
 																<div class="row">
 																	<div class="col">
 																		<div class="form-group">
-																			<label>Parent <span class="text-red">*</span></label>
+																			<label>Parent</label>
 																			<select class="form-control" name="parent" id="module_parent">
 																			<option value="0">None</option>
 
@@ -324,7 +324,7 @@
 														
 														<div class="row">
 															<div class="col d-flex justify-content-end">
-															<input class="btn btn-primary" type="submit" value="Save Changes">
+															<input class="btn btn-primary" type="submit"  id="frontval" value="Save Changes">
 															</div>
 														</div>
 													
@@ -385,7 +385,7 @@
 																	</div> -->
 																	<div class="col">
 																		<div class="form-group">
-																			<label>Menu Icon <span class="text-red">*</span></label>
+																			<label>Menu Icon </label>
 																			<p class="view_value" id="menu_icon_view"></p>
 																			
 																		</div>
@@ -501,6 +501,7 @@ label.view {
  <script src="{{URL::asset('admin/assets/js/datatable/tables/modules-datatable.js')}}"></script> 
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="{{URL::asset('admin/assets/js/datatable/datatables.min.js')}}"></script> 
+<script src="{{URL::asset('admin/assets/js/jquery.validate.min.js')}}"></script>
 <script type="text/javascript">
 
  function saveOrder() 
@@ -661,6 +662,48 @@ $("#userForm").trigger("reset");
         });
         
 
+$("#frontval").click(function(){
+
+$("#userForm").validate({
+rules: {
+
+module_name : {
+required: true
+},
+
+class: {
+required: true
+},
+link: {
+required: true
+}
+
+},
+
+messages : {
+module_name: {
+required: "Module Name is required."
+},
+class: {
+required: "Class is required."
+},
+link: {
+required: "Slug is required."
+}
+
+},
+ errorPlacement: function(error, element) {
+ 	 $("#errNm1").empty();
+            if (element.attr("name") == "ofr_code" ) {
+                $("#errNm1").text($(error).text());
+                
+            }else {
+               error.insertAfter(element)
+            }
+        },
+
+});
+});
 	});
 </script>
 

@@ -3,7 +3,10 @@
     @if($product)
     <div class="col-12 mb-4">
         @foreach($product->prdImage as $img)
-        <div class="col-md-3 col-sm-6 mb-3 fl"><img src="{{config('app.storage_url').$img->thumb}}" alt="Product Image" height="120px" /></div>
+        <div id="prdImg-{{$img->id}}" class="col-md-3 col-sm-6 mb-3 fl imgDiv">
+            <img class="prdImg" src="{{config('app.storage_url').$img->thumb}}" alt="Product Image" height="120px" />
+            <i id="del-img-{{$img->id}}" class="fa fa-trash del-img" aria-hidden="true"></i>
+        </div>
         @endforeach
     </div>
     @endif
@@ -19,7 +22,13 @@
                 <div class="form-group">
                     <img src="" alt="Image" id="image_{{$n_img}}_img" class="no-disp" height="90" />
                 </div>
-            </div> @php $n_img++; @endphp
+            </div>
+            <div class="col-lg-1 col-2 pl-0 mb-2 fl">
+                <div class="form-group">
+                    <label>&nbsp; &nbsp;</label><div class="clr"></div>
+                    <a id="del_img_{{$n_img}}" class="del_img del"><i class="fa fa-trash"></I></a>
+                </div>
+            </div>@php $n_img++; @endphp
             <div class="clr"></div>
         </div>
             <div class="clr"></div>

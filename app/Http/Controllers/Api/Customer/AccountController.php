@@ -39,6 +39,9 @@ use App\Models\SalesOrderShippingStatus;
 use App\Models\UsrNotification;
 use App\Models\SalesOrderRefundPayment;
 use App\Models\SalesOrderReturnShipment;
+use App\Models\Auction;
+use App\Models\AuctionHist;
+use App\Models\SettingOther;
 use Carbon\Carbon;
 use App\Rules\Name;
 use Validator;
@@ -251,99 +254,204 @@ class AccountController extends Controller
             else
                 { 
                     $lang =  $request->lang_id;
-                    $sales =  SalesOrder::where('cust_id',$user_id)->get(); 
+                    $sales =  SalesOrder::where('cust_id',$user_id)->orderBy('id','desc')->get(); 
                     if($sales->count() > 0)
                     {
                         foreach($sales  as $row)
                         {
+
+                            $sal_id = $row->id;
                             $all_items  =   SaleorderItems::where('sales_id',$row->id)->get();
-                            $ship       =   SalesOrderShippingStatus::where('sales_id',$row->id)->orderBy('created_at', 'desc')->first(); 
-                            $ord        =   SalesOrderCancel::where('sales_id',$row->id)->orderBy('created_at', 'desc')->first();
-                            $adddr      =   SalesOrderAddress::where('sales_id',$row->id)->first();
-                            $seller     =   SellerInfo::where('seller_id',$row->seller_id)->first();
-                            foreach($all_items  as $items)
+                                $ship       =   SalesOrderShippingStatus::where('sales_id',$row->id)->orderBy('created_at', 'desc')->first(); 
+                                $ord        =   SalesOrderCancel::where('sales_id',$row->id)->orderBy('created_at', 'desc')->first();
+                                $adddr      =   SalesOrderAddress::where('sales_id',$row->id)->first();
+                                $seller     =   SellerInfo::where('seller_id',$row->seller_id)->first();
+                            $histories =  AuctionHist::where('user_id',$user_id)->where('sale_id',$row->id)->where('is_deleted',0)->where('is_active',1)->orderBy('created_at', 'desc');
+                            $auctionwin = Auction::where('bid_allocated_to',$user_id)->where('sale_id',$row->id)->where('status','closed')->where('is_deleted',0)->where('is_active',1);
+                            if($histories->count() > 0)
                             {
-                                $prdId      =   $items->prd_id;
-                                $products   =   Product::where('id',$prdId)->first();
-                                $data['sale_id']           =   $row->id;
-                                $data['order_id']          =   $row->order_id;
-                                $data['sale_items_id']     =   $items->id;
-                                $data['product_id']        =   $prdId;
-                                $data['product_name']      =   $this->get_content($products->name_cnt_id,$lang);
-                                $data['actual_price']      =   $products->prdPrice->price;
-                                $data['sale_price']        =   $items->price;
-                                $data['currency']          =   getCurrency()->name;
-                                $data['product_image']     =   $this->get_product_image($products->id);
-                                $data['quantity']          =   $items->qty;
-                                $data['order_date']        =   date('Y-m-d',strtotime($row->created_at));
-                                $data['order_time']        =   date('g:i a',strtotime($row->created_at));
-                                // $data['delivery_status']   =   $row->shipping_status;
-                                $data['delivered_date']    =   '';
-                                $data['return_date']       =   '';
-                                if($ship)
+                                if($auctionwin->count() > 0)
                                 {
-                                     $data['delivery_status']   =   $ship->status;
-                                     if($ship->status == 'delivered')
-                                     {
-                                        $data['delivered_date']    =   date('Y-m-d',strtotime($ship->updated_at));;
-                                        $data['return_date']       =    date('Y-m-d',strtotime($ship->updated_at. ' + 2 days'));
-                                     }
+                                foreach($all_items  as $items)
+                                {
+                                    $prdId      =   $items->prd_id;
+                                    $products   =   Product::where('id',$prdId)->first();
+                                    // $data['ids']           =   $hist;
+                                    $data['sale_id']           =   $row->id;
+                                    $data['order_id']          =   $row->order_id;
+                                    $data['sale_items_id']     =   $items->id;
+                                    $data['product_id']        =   $prdId;
+                                    $data['product_name']      =   $this->get_content($products->name_cnt_id,$lang);
+                                    $data['actual_price']      =   $products->prdPrice->price;
+                                    $data['sale_price']        =   $items->price;
+                                    $data['currency']          =   getCurrency()->name;
+                                    $data['product_image']     =   $this->get_product_image($products->id);
+                                    $data['quantity']          =   $items->qty;
+                                    $data['order_date']        =   date('Y-m-d',strtotime($row->created_at));
+                                    $data['order_time']        =   date('g:i a',strtotime($row->created_at));
+                
+                                    $data['delivered_date']    =   '';
+                                    $data['return_date']       =   '';
+                                    if($ship)
+                                    {
+                                         $data['delivery_status']   =   $ship->status;
+                                         if($ship->status == 'delivered')
+                                         {
+                                            $data['delivered_date']    =   date('Y-m-d',strtotime($ship->updated_at));;
+                                            $data['return_date']       =    date('Y-m-d',strtotime($ship->updated_at. ' + 2 days'));
+                                         }
+                                    }
+                                    else
+                                    {
+                                        $data['delivery_status']   =   'Pending';
+                                    }
+                                  
+                                    $data['sold_by']        =   $seller->fname;
+                                    $data['track_order']    =   '';
+                                    $data['order_status']   =   $row->order_status;
+                                    $data['cancel_order_detail'] = array();
+                                    if($row->order_status == 'cancel_initiated')
+                                    {
+                                         if($ord)
+                                            {
+                                                $ordnote = SalesOrderCancelNote::where('cancel_id',$ord->id)->first();
+                                                $cdata['cancel_id']      =   $ord->id;
+                                                $cdata['cancel_title']   =   $ordnote->title;
+                                                $cdata['cancel_notes']   =   $ordnote->note;
+                                                 $data['cancel_order_detail'] =  $cdata;
+                                            }
+                                            else
+                                            {
+                                                 $data['cancel_order_detail'] =  [];
+                                            }
+                                           
+                                    }
+                                    
+                                    $return_order = SalesOrderReturn::where('sales_item_id',$items->id)->where('is_deleted',0)->first();
+                
+                                    if($return_order)
+                                    {
+                                        $rtrn['status']      =   $return_order->status;
+                                        $rtrn['id']          =   $return_order->id;
+                                        $rtrn['payment_status']     =   $return_order->payment_status;
+                                        $data['return_detail']       =       $rtrn;
+                                    }
+                                    else
+                                    {
+                                        $data['return_detail']       =       [];
+                                    }
+                                     $data['auction_status']=   'True';
+                                     $data['bid_charge']    =   $row->bid_charge;
+                                     $saddr['address_type'] = $adddr->stype->usr_addr_typ_name;
+                                     $saddr['name']         = $adddr->s_name; 
+                                     $saddr['phone']        = $adddr->s_phone; 
+                                     $saddr['email']        = $adddr->s_email; 
+                                     $saddr['address1']     = $adddr->s_address1; 
+                                     $saddr['address2']     = $adddr->s_address2; 
+                                     $saddr['zip_code']     = $adddr->s_zip_code;      
+                                     $saddr['country']      = $adddr->scountry->country_name; 
+                                     $saddr['state']        = $adddr->sstate->state_name; 
+                                     $saddr['city']         = $adddr->scity->city_name; 
+                                     $saddr['latitude']     = $adddr->s_latitude; 
+                                     $saddr['longitude']    = $adddr->s_longitude;
+                                     $data['shipping_address'] =  $saddr;
+                                    $val[] = $data;
+                                }
                                 }
                                 else
                                 {
-                                    $data['delivery_status']   =   'Pending';
+
                                 }
-                              
-                                $data['sold_by']        =   $seller->fname;
-                                $data['track_order']    =   '';
-                                $data['order_status']   =   $row->order_status;
-                                $data['payment_status'] =   $row->payment_status;
-                                $data['cancel_order_detail'] = array();
-                                if($row->order_status == 'cancel_initiated')
+                            }
+                            else
+                            {
+                                foreach($all_items  as $items)
                                 {
-                                     if($ord)
-                                        {
-                                            $ordnote = SalesOrderCancelNote::where('cancel_id',$ord->id)->first();
-                                            $cdata['cancel_id']      =   $ord->id;
-                                            $cdata['cancel_title']   =   $ordnote->title;
-                                            $cdata['cancel_notes']   =   $ordnote->note;
-                                            $data['cancel_order_detail'] =  $cdata;
-                                        }
-                                        else
-                                        {
-                                             $data['cancel_order_detail'] =  [];
-                                        }
-                                       
+                                    $prdId      =   $items->prd_id;
+                                    $products   =   Product::where('id',$prdId)->first();
+                                    // $data['ids']           =   $hist;
+                                    $data['sale_id']           =   $row->id;
+                                    $data['order_id']          =   $row->order_id;
+                                    $data['sale_items_id']     =   $items->id;
+                                    $data['product_id']        =   $prdId;
+                                    $data['product_name']      =   $this->get_content($products->name_cnt_id,$lang);
+                                    $data['actual_price']      =   $products->prdPrice->price;
+                                    $data['sale_price']        =   $items->price;
+                                    $data['currency']          =   getCurrency()->name;
+                                    $data['product_image']     =   $this->get_product_image($products->id);
+                                    $data['quantity']          =   $items->qty;
+                                    $data['order_date']        =   date('Y-m-d',strtotime($row->created_at));
+                                    $data['order_time']        =   date('g:i a',strtotime($row->created_at));
+                
+                                    $data['delivered_date']    =   '';
+                                    $data['return_date']       =   '';
+                                    if($ship)
+                                    {
+                                         $data['delivery_status']   =   $ship->status;
+                                         if($ship->status == 'delivered')
+                                         {
+                                            $data['delivered_date']    =   date('Y-m-d',strtotime($ship->updated_at));;
+                                            $data['return_date']       =    date('Y-m-d',strtotime($ship->updated_at. ' + 2 days'));
+                                         }
+                                    }
+                                    else
+                                    {
+                                        $data['delivery_status']   =   'Pending';
+                                    }
+                                  
+                                    $data['sold_by']        =   $seller->fname;
+                                    $data['track_order']    =   '';
+                                    $data['order_status']   =   $row->order_status;
+                                    $data['cancel_order_detail'] = array();
+                                    if($row->order_status == 'cancel_initiated')
+                                    {
+                                         if($ord)
+                                            {
+                                                $ordnote = SalesOrderCancelNote::where('cancel_id',$ord->id)->first();
+                                                $cdata['cancel_id']      =   $ord->id;
+                                                $cdata['cancel_title']   =   $ordnote->title;
+                                                $cdata['cancel_notes']   =   $ordnote->note;
+                                                 $data['cancel_order_detail'] =  $cdata;
+                                            }
+                                            else
+                                            {
+                                                 $data['cancel_order_detail'] =  [];
+                                            }
+                                           
+                                    }
+                                    
+                                    $return_order = SalesOrderReturn::where('sales_item_id',$items->id)->where('is_deleted',0)->first();
+                
+                                    if($return_order)
+                                    {
+                                        $rtrn['status']      =   $return_order->status;
+                                        $rtrn['id']          =   $return_order->id;
+                                        $rtrn['payment_status']     =   $return_order->payment_status;
+                                        $data['return_detail']       =       $rtrn;
+                                    }
+                                    else
+                                    {
+                                        $data['return_detail']       =       [];
+                                    }
+                                     $data['auction_status']=   'False';
+                                     $data['bid_charge']    =   0;
+                                     $saddr['address_type'] = $adddr->stype->usr_addr_typ_name;
+                                     $saddr['name']         = $adddr->s_name; 
+                                     $saddr['phone']        = $adddr->s_phone; 
+                                     $saddr['email']        = $adddr->s_email; 
+                                     $saddr['address1']     = $adddr->s_address1; 
+                                     $saddr['address2']     = $adddr->s_address2; 
+                                     $saddr['zip_code']     = $adddr->s_zip_code;      
+                                     $saddr['country']      = $adddr->scountry->country_name; 
+                                     $saddr['state']        = $adddr->sstate->state_name; 
+                                     $saddr['city']         = $adddr->scity->city_name; 
+                                     $saddr['latitude']     = $adddr->s_latitude; 
+                                     $saddr['longitude']    = $adddr->s_longitude;
+                                     $data['shipping_address'] =  $saddr;
+                                    $val[] = $data;
                                 }
+                            }
                                 
-                                $return_order = SalesOrderReturn::where('sales_item_id',$items->id)->where('is_deleted',0)->first();
-            
-                                if($return_order)
-                                {
-                                    $rtrn['status']      =   $return_order->status;
-                                    $rtrn['id']          =   $return_order->id;
-                                    $rtrn['payment_status']     =   $return_order->payment_status;
-                                    $data['return_detail']       =       $rtrn;
-                                }
-                                else
-                                {
-                                    $data['return_detail']       =       [];
-                                }
-                                 $saddr['address_type'] = $adddr->stype->usr_addr_typ_name;
-                                 $saddr['name']         = $adddr->s_name; 
-                                 $saddr['phone']        = $adddr->s_phone; 
-                                 $saddr['email']        = $adddr->s_email; 
-                                 $saddr['address1']     = $adddr->s_address1; 
-                                 $saddr['address2']     = $adddr->s_address2; 
-                                 $saddr['zip_code']     = $adddr->s_zip_code;      
-                                 $saddr['country']      = $adddr->scountry->country_name; 
-                                 $saddr['state']        = $adddr->sstate->state_name; 
-                                 $saddr['city']         = $adddr->scity->city_name; 
-                                 $saddr['latitude']     = $adddr->s_latitude; 
-                                 $saddr['longitude']    = $adddr->s_longitude;
-                                 $data['shipping_address'] =  $saddr;
-                                $val[] = $data;
-                             }
                         }
                     }
                     else
@@ -379,6 +487,26 @@ class AccountController extends Controller
                         $pay      =   SalesOrderPayment::where('sales_id',$request->sale_id)->first();
                         $seller   =   SellerInfo::where('seller_id',$sales->seller_id)->first();
                         $ship     =   SalesOrderShippingStatus::where('sales_id',$request->sale_id)->first();
+                        $histories =  AuctionHist::where('user_id',$user_id)->where('sale_id',$request->sale_id)->where('is_deleted',0)->where('is_active',1)->orderBy('created_at', 'desc');
+                        $auctionwin = Auction::where('bid_allocated_to',$user_id)->where('sale_id',$request->sale_id)->where('status','closed')->where('is_deleted',0)->where('is_active',1);
+                        if($histories->count() > 0)
+                        {
+                            if($auctionwin->count() > 0)
+                            {
+                                $au_status=   'True';
+                                $charge    =   $sales->bid_charge;
+                            }
+                            else
+                            {
+                                $au_status=   'False';
+                                $charge    =   0;
+                            }
+                        }
+                        else
+                        {
+                            $au_status =   'False';
+                            $charge    =   0;
+                        }
                         $ord      =   SalesOrderCancel::where('sales_id',$sales->id)->orderBy('created_at', 'desc')->first();
                         $data['order_id']          =   $sales->order_id;
                         $data['order_date']        =   date('Y-m-d',strtotime($sales->created_at));
@@ -455,6 +583,8 @@ class AccountController extends Controller
                             }
                             $data['products'][]       =       $prd;
                          }
+                         $data['auction_status']=   $au_status;
+                         $data['bid_charge']    =   $charge;
                          $adddr   =   SalesOrderAddress::where('sales_id',$request->sale_id)->first();
                          $baddr['address_type'] = $adddr->type->usr_addr_typ_name;
                          $baddr['name']         = $adddr->name; 
@@ -520,6 +650,26 @@ class AccountController extends Controller
                         $pay      =   SalesOrderPayment::where('sales_id',$request->sale_id)->first();
                         $seller   =   SellerInfo::where('seller_id',$sales->seller_id)->first();
                         $ship     =   SalesOrderShippingStatus::where('sales_id',$request->sale_id)->first();
+                        $histories =  AuctionHist::where('user_id',$user_id)->where('sale_id',$request->sale_id)->where('is_deleted',0)->where('is_active',1)->orderBy('created_at', 'desc');
+                        $auctionwin = Auction::where('bid_allocated_to',$user_id)->where('sale_id',$request->sale_id)->where('status','closed')->where('is_deleted',0)->where('is_active',1);
+                        if($histories->count() > 0)
+                        {
+                            if($auctionwin->count() > 0)
+                            {
+                                $au_status=   'True';
+                                $charge    =   $sales->bid_charge;
+                            }
+                            else
+                            {
+                                $au_status=   'False';
+                                $charge    =   0;
+                            }
+                        }
+                        else
+                        {
+                            $au_status =   'False';
+                            $charge    =   0;
+                        }
                         $data['order_id']          =   $sales->order_id;
                         $data['order_date']        =   date('Y-m-d',strtotime($sales->created_at));
                         $data['order_time']        =   date('g:i a',strtotime($sales->created_at));
@@ -564,6 +714,8 @@ class AccountController extends Controller
                             $prd['quantity']     =   $items->qty;
                             $data['products'][]  =       $prd;
                          }
+                         $data['auction_status']=   $au_status;
+                         $data['bid_charge']    =   $charge;
                          $adddr   =   SalesOrderAddress::where('sales_id',$request->sale_id)->first();
                          $baddr['address_type'] = $adddr->type->usr_addr_typ_name;
                          $baddr['name']         = $adddr->name; 
@@ -1465,8 +1617,7 @@ class AccountController extends Controller
                             else
                             {
                                 $amt = $prds->price * $prds->qty; 
-                                $orderreturn = SalesOrderReturn::create(['sales_id' => $formData['sale_id'],
-                                'user_id' => $user_id,'sales_item_id' => $prds->id,'prd_id' => $formData['product_id'],'qty' => $formData['quantity'],'amount' =>  $amt,'reason' =>  $formData['reason'],'desc' =>  $formData['message'],'issue_item'=>$formData['issue_item'],'status'=>"return_initiated"]);
+                                $orderreturn = SalesOrderReturn::create(['sales_id' => $formData['sale_id'],'seller_id' => $sales->seller_id,'user_id' => $user_id,'sales_item_id' => $prds->id,'prd_id' => $formData['product_id'],'qty' => $formData['quantity'],'amount' =>  $amt,'reason' =>  $formData['reason'],'desc' =>  $formData['message'],'issue_item'=>$formData['issue_item'],'status'=>"return_initiated"]);
                                 SalesOrderReturnStatus::create(['sales_id' => $formData['sale_id'],
                                 'return_id' => $orderreturn->id,
                                 'status' => 'return_initiated']);
@@ -1700,7 +1851,7 @@ class AccountController extends Controller
                 
         }else{ return invalidToken(); }
     }
-     public function return_shipment(Request $request)
+    public function return_shipment(Request $request)
     {
         if($user = validateToken($request->post('access_token')))
         {
@@ -1740,17 +1891,19 @@ class AccountController extends Controller
                         {
                             $filename='';
                         }
+                        $refundcharge = SettingOther::first();
                         SalesOrderReturn::where('id',$formData['return_id'])->update(['status'=>'shipment_initiated']);
                         SalesOrderReturnShipment::create(['return_id' => $formData['return_id'],'description' => $formData['shipment_detail'],'document' => 'app/public/shipment_bills/'.$filename]);
-
-                          SalesOrderRefundPayment::create([
-                         'ref_id' => $formData['return_id'],'source' =>'return','refund_mode' => $formData['refund_mode'],'bank_name' => $formData['bank_name'],'account_number' => $formData['account_number'],'branch_name' => $formData['branch_name'],'ifsc_code' => $formData['ifsc_code']]);
+                        $tot = $return->amount;
+                        $gtot = $tot - $refundcharge->refund_deduction;
+                        SalesOrderRefundPayment::create([
+                         'ref_id' => $formData['return_id'],'sales_id' => $return->sales_id,'source' =>'return','refund_mode' => $formData['refund_mode'],'total' => $tot,'refund_tax' => $refundcharge->refund_deduction,'grand_total' => $gtot,'bank_name' => $formData['bank_name'],'account_number' => $formData['account_number'],'branch_name' => $formData['branch_name'],'ifsc_code' => $formData['ifsc_code']]);
 
                          SalesOrderReturnStatus::create(['sales_id' => $return->sales_id,
                                 'return_id' => $formData['return_id'],
                                 'status' => 'shipment_initiated']);
 
-                        return array('httpcode'=>'200','status'=>'success','message'=>'Response sent','data'=>['message' =>'Your shipment details sent successfully!']);
+                        return array('httpcode'=>'200','status'=>'success','message'=>'Shipment submitted','data'=>['message' =>'Your shipment details sent successfully!']);
                     }
                     else
                     {

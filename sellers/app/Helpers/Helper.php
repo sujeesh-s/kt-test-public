@@ -61,33 +61,13 @@ if (!function_exists('geSiteName')) {
 }if (!function_exists('notifyCount')){
     function notifyCount($id){ return DB::table('users')->where('id',$id)->first()->notify; }
 }if (!function_exists('addNotification')){
-    function addNotification($type,$refId=''){
-        $admins                 =   DB::table('users')->where('active',1)->where('status',1)->whereIn('user_role',[1,2])->get(); $adminNotify = false;
-        if($type                ==  'register'){
-            $user               =   DB::table('users as U')->join('user_roles as R','U.user_role','=','R.id')->where('U.id',$refId)->first();
-            if($user && $user->user_role  ==  3){ 
-                $userData       =   DB::table('user_business_details')->select('shop_name','logo as icon_img')->where('user_id',$refId)->first();
-                if($userData){      DB::table('users')->where('id',$refId)->update(['fname'=>$userData->shop_name]); }
-            }else if($user && $user->user_role  ==  4){ 
-                $userData       =   DB::table('user_details')->select('avthar as icon_img')->where('user_id',$refId)->first();
-            }
-            if($userData){
-                if($userData->icon_img == NULL || $userData->icon_img == ''){ $icon = url("/storage/app/public/no-avatar.png"); }
-                else{ $icon     =   "/storage".$userData->icon_img; }
-                $msg            =   '<b>'.$user->fname.'</b> registered as '.$user->title.' at '.date('d M Y, g:i a', strtotime($user->created_at));
-                $data           =   ['user_id'=>$refId,'notify_type'=>$type,'title'=>'New Registration','description'=>$msg,'icon'=>$icon,'ref_id'=>$refId,'created_at'=>date('Y-m-d H:i:s')];
-                if(DB::table('notifications')->insert($data)){ $adminNotify = true; }
-            }
-        }else if($type          ==  'payment'){
-            $pay                =   DB::table('user_payments as P')->join('users as U','P.user_id','=','U.id')->where('P.id',$refId)->first();
-            if($pay){
-                $icon           =   "/public/assets/img/money2.png"; 
-                $msg            =   '<b>'.$pay->fname.'</b> done payment for '.$pay->pay_for.' at '.date('d M Y, g:i a', strtotime($pay->paid_on));
-                $data           =   ['user_id'=>$pay->user_id,'notify_type'=>$type,'title'=>'Payment','description'=>$msg,'icon'=>$icon,'ref_id'=>$refId,'created_at'=>date('Y-m-d H:i:s')];
-                if(DB::table('notifications')->insert($data)){ $adminNotify = true; }
-            }
+     function addNotification($from,$utype,$to,$ntype,$title,$desc,$refId,$reflink,$notify){
+        if($notify                ==  'admin'){
+             DB::table('admin_notifications')->insert(['notify_from'=>$from,'user_type'=>$utype,'notify_to'=>$to,'notify_type'=>$ntype,'title'=>$title,'description'=>$desc,'ref_id'=>$refId,'ref_link'=>$reflink,'created_at'=>date('Y-m-d H:i:s')]);
         }
-        if($adminNotify && $admins){ foreach($admins as $row){ DB::table('users')->where('id',$row->id)->update(['notify'=>($row->notify+1)]); } }
+        else if($notify                ==  'customer'){
+             DB::table('usr_notifications')->insert(['notify_from'=>$from,'user_type'=>$utype,'notify_to'=>$to,'notify_type'=>$ntype,'title'=>$title,'description'=>$desc,'ref_id'=>$refId,'ref_link'=>$reflink,'created_at'=>date('Y-m-d H:i:s')]);
+        }
     }
 }if (!function_exists('getNotifications')){
     function getNotifications(){
@@ -233,10 +213,10 @@ if (!function_exists('sidebarMenu')) {
           if(count($menu_list) >0){
             return $menu_list;
         }else {
-           return Modules::visibleModules(3); 
+           return array();  
         }  
         }else {
-           return Modules::visibleModules(3); 
+           return array(); 
         }
         
         
@@ -249,7 +229,7 @@ if (!function_exists('appVersion')) {
         return AppVersion::where('id', 1)->first()->admin_web; 
     }
     else{
-        return AppVersion::where('id', 1)->first()->admin_web; 
+        return AppVersion::where('id', 1)->first()->seller_web; 
     }
         
     }

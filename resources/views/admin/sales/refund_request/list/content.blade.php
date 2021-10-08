@@ -15,18 +15,18 @@
                                             <th class="wd-15p">Order ID</th>
                                             <th class="wd-15p">Customer</th>
                                             <th class="wd-15p">Request Date</th>
-                                            <th class="wd-25p">Total ({{$currency}})</th>
-                                            <th class="wd-25p">Tax ({{$currency}})</th>
-                                            <th class="wd-25p">Shipping ({{$currency}})</th>
-                                            <th class="wd-15p">Payment Method</th>
+                                            <th class="wd-25p">Refund Amount ({{$currency}})</th>
+                                            <th class="wd-25p">Source</th>
+                                          <!--   <th class="wd-25p">Refund Amount ({{$currency}})</th> -->
+                                        <!--     <th class="wd-15p">Pay Method</th> -->
                                             <th class="wd-15p">Payment Status</th>
                                             <th class="wd-15p">Order Status</th>
                                             <th class="wd-25p text-center notexport action-btn">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if($orders && count($orders) > 0) @php $n = 0; @endphp
-                                            @foreach($orders as $row) @php $n++; @endphp <?php // echo '<pre>'; print_r($row->calcel); echo '</pre>'; die; ?>
+                                        @if($refunds && count($refunds) > 0) @php $n = 0; @endphp
+                                            @foreach($refunds as $row) @php $n++; @endphp <?php // echo '<pre>'; print_r($row->calcel); echo '</pre>'; die; ?>
                                                 @php 
                                                 if($row->payment_status == 'pending'){ $pstat = 'primary'; }else if($row->payment_status == 'processing'){ $pstat = 'info'; }else if($row->payment_status == 'success'){ $pstat = 'success'; }else{ $pstat = 'default'; }
                                                 if($row->order_status == 'pending'){ $ostat = 'primary'; }else if($row->order_status == 'processing'){ $ostat = 'info'; }else if($row->order_status == 'canceled'){ $ostat = 'error'; }
@@ -35,18 +35,21 @@
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></td>
                                                     <td><a id="dtlBtn-{{$row->id}}" class="font-weight-bold viewDtl">{{$row->order_id}}</a></td> 
-                                                    <td>{{$row->address->name}}</td>
-                                                    <td>{{date('d M Y',strtotime($row->calcel->created_at))}}</td>
-                                                    <td>{{$row->total}}</td>
-                                                    <td>{{$row->tax}}</td>
-                                                    <td>{{$row->shipping_charge}}</td>
-                                                    <td>
-                                                        @foreach($row->payments as $pay)
-                                                        <div class="pay">{{$pay->payment_type}}</div>
-                                                        @endforeach
-                                                    </td>
+                                                    <td>{{$row->customerrr->name}}</td>
+                                                    <td>{{date('d M Y',strtotime($row->created_at))}}</td>
+                                                    <td>{{$row->grand_total}}</td>
+                                                    <td>{{ucfirst($row->source)}}</td>
+                                                  <!--   <td>{{$row->source}}</td> -->
+                                                  
                                                     <td><span class="badge badge-{{$pstat}} mt-2">{{ucfirst($row->payment_status)}}</span></td>
-                                                    <td><span class="badge badge-{{$ostat}} mt-2">{{ucfirst($row->order_status)}}</span></td>
+                                                    <?php if($row->source == 'return')
+                                                    { ?>
+                                                        <td><span class="badge badge-{{$ostat}} mt-2">{{ucfirst($row->returninfo->status)}}</span></td>
+                                                    <?php }
+                                                    else
+                                                    { ?>
+                                                        <td><span class="badge badge-{{$ostat}} mt-2">{{ucfirst($row->order_status)}}</span></td>
+                                                    <?php } ?>
                                                     <td class="text-center">
                                                         <button id="acceptBtn-{{$row->id}}" class="mr-2 btn btn-success btn-sm acceptBtn" data-val="refunded"><i class="fa fa-check mr-1"></i>Accept</button>
                                                         <button id="editBtn-{{$row->id}}" class="mr-2 btn btn-success btn-sm editBtn"><i class="fa fa-eye mr-1"></i>View</button>

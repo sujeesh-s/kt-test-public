@@ -125,3 +125,10 @@ font-size: 15px;
 .price_filter .ui-widget-header {
     background: #705ec8 url(images/ui-bg_dots-small_35_35414f_2x2.png) 50% 50% repeat !important;
 }   
+.imgup {
+    padding:3px;
+}
+.pr_hide,.ch_hide {
+    display:none;
+}
+.fa.del-img{ position: absolute; top: 0; right: 15px; font-size: 27px; color: #ff0000;  }

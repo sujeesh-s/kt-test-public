@@ -53,8 +53,15 @@ class LoginController extends Controller
         ]);
     
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password], $request->get('remember'))) {
+            
+            if(Admin::where('id', Auth::guard('admin')->user()->id)->first()->is_active == 1){ return redirect()->intended('/admin/dashboard'); }
+                else{
+                    Auth::guard('admin')->logout(); $request->session()->flush(); $request->session()->regenerate();
+                    //return redirect('/login')->withInput($request->only('email', 'remember'))->with('message',' The seller is not approved yet. ');
+                    return back()->withInput($request->only('email', 'remember'))->with('message',' This account is inactive.');
+                }
     
-            return redirect()->intended('/admin/dashboard');
+            
         }
         return back()->withInput($request->only('email', 'remember'))->with('message',' These credentials do not match our records. ');
     }

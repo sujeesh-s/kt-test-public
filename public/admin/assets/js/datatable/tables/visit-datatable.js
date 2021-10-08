@@ -6,7 +6,7 @@ $(document).ready(function () {
     });
 
     var table = $(".visit-table").DataTable({
-        ordering: false,
+        ordering: true,
         pageLength: 10,
         rowReorder: false,
         colReorder: true,

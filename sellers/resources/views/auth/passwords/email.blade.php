@@ -47,7 +47,7 @@
 										</div>
 									</form>
 										<div class="pt-4 text-center">
-											<div class="font-weight-normal fs-16"><a class="btn-link font-weight-normal text-white-80" href="{{ url('admin/login')}}">Back to login page</a></div>
+											<div class="font-weight-normal fs-16"><a class="btn-link font-weight-normal text-white-80" href="{{ url('/login')}}">Back to login page</a></div>
 										</div>
 									</div>
 								</div>

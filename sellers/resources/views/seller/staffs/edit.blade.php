@@ -35,16 +35,7 @@
 						<div class="row flex-lg-nowrap">
 							<div class="col-12">
 
-								@if(Session::has('message'))
-
-								<div class="alert alert-{{session('message')['type']}}" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>{{session('message')['text']}}</div>
-								@endif
-								@if ($errors->any())
-								@foreach ($errors->all() as $error)
-
-								<div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>{{$error}}</div>
-								@endforeach
-								@endif
+							
 								<div class="row flex-lg-nowrap">
 									<div class="col-12 mb-3">
 										<div class="e-panel card">
@@ -66,11 +57,17 @@
                     <label for="fname">First name <span class="text-red">*</span></label>
                     <input type="text" class="form-control" name="user[fname]" id="fname" placeholder="First name" value="{{ $seller->fname }}" required>
                     <span class="error"></span>
+                    @error('fname')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="lname">Last name</label>
                     <input type="text" class="form-control" name="user[lname]" id="lname" placeholder="Last name" value="{{ $seller->lname }}" required>
                     <span class="error"></span>
+                    @error('lname')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
             <div class="form-row">
@@ -78,12 +75,18 @@
                     <label for="email">Email <span class="text-red">*</span></label>
                     <input type="email" class="form-control" name="user[email]" id="email" placeholder="Email" value="{{$seller->staffMst->teleEmail->value}}" required>
                     <span class="error"></span>
+                     @error('email')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="phone">Phone <span class="text-red">*</span></label>
                  
                     <input type="text" class="form-control" name="user[phone]" id="phone" placeholder="Phone" value="{{$seller->staffMst->telePhone->value}}" required>
                     <span class="error"></span>
+                    @error('phone')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
           
@@ -93,6 +96,9 @@
                     <label for="password">Password <span class="text-red">*</span></label>
                     <input type="password" class="form-control" name="user[password]" id="password" placeholder="Password" value="" >
                     <span class="error"></span>
+                      @error('password')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="avatar">Avatar</label>
@@ -263,13 +269,137 @@
 		<script src="{{URL::asset('admin/assets/js/datatables.js')}}"></script>
 	<!-- INTERNAL Popover js -->
 		<script src="{{URL::asset('admin/assets/js/popover.js')}}"></script>
-
+	<script src="{{URL::asset('admin/assets/js/jquery.validate.min.js')}}"></script>
 		<!-- INTERNAL Sweet alert js -->
 		<script src="{{URL::asset('admin/assets/plugins/sweet-alert/jquery.sweet-modal.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/sweet-alert.js')}}"></script>
 <script type="text/javascript">
+
+
+if (window.File && window.FileList && window.FileReader) {
+    $("#avatar").on("change", function(e) {
+        $(".pip1").remove();
+      var files = e.target.files,
+        filesLength = files.length;
+      for (var i = 0; i < filesLength; i++) {
+        var f = files[i]
+        var fileReader = new FileReader();
+        fileReader.onload = (function(e) {
+          var file = e.target;
+          // $("<span class=\"pip1\">" +
+          //   "<input type=\"file\" id=\"havefil\" hidden name=\"havefil[]\" value=\"" + e.target.result + "\"/>"+
+          //   "<img class=\"imageThumb1\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
+          //   "<br/>" +
+          //   "</span>").insertAfter("#avatar");
+          // $(".remove").click(function(){
+          //   $(this).parent(".pip").remove();
+          // });
+
+          $("#avatar_img").attr("src",e.target.result);
+
+          // <span class=\"remove\">Remove image</span>Old code here
+          /*$("<img></img>", {
+            class: "imageThumb",
+            src: e.target.result,
+            title: file.name + " | Click to remove"
+          }).insertAfter("#avatar").click(function(){$(this).remove();});*/
+
+        });
+        fileReader.readAsDataURL(f);
+      }
+    });
+  } else {
+    alert("Your browser doesn't support to File API")
+  }
+  
 	jQuery(document).ready(function(){
+	    
+	    
+jQuery.validator.addMethod("phone", function (phone_number, element) {
+        phone_number = phone_number.replace(/\s+/g, "");
+        return this.optional(element) || phone_number.length > 9 &&
+              phone_number.match(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
+    }, "Invalid phone number");
+
+jQuery.validator.addMethod("lettersonly", function(value, element) 
+{
+return this.optional(element) || /^[a-z ]+$/i.test(value);
+}, "Please enter valid name.");
+
+$("#save_btn").click(function(){
+
+$("#adminForm").validate({
+	ignore: [],
+rules: {
+
+"user[fname]" : {
+required: true,
+lettersonly: true
+},
+"user[lname]" : {
+required: true,
+lettersonly: true
+},
+
+"user[email]": {
+required: true,
+email: true
+},
+"user[phone]": {
+
+required: true,
+phone:true,
+number: true,
+},
+
+"user[role_id]" : {
+required: true
+},
+
+
+},
+
+messages : {
+"user[fname]": {
+required: "First name is required."
+},
+"user[lname]": {
+required: "Last name is required."
+},
+
+
+"user[email]": {
+required: "Email is required."
+},
+"user[phone]": {
+required: "Phone number is required."
+},
+
+"user[role_id]": {
+required: "Role is required."
+}
+
+},
+
+
+ errorPlacement: function(error, element) {
+ 	 // $("#errNm1").empty();$("#errNm2").empty();
+ 	 console.log($(error).text());
+            if (element.attr("name") == "subcat_id" ) {
+            	console.log("innnnnn");
+                $("#errNm1").text($(error).text());
+                
+            }else if (element.attr("name") == "product_id" ) {
+                $("#errNm2").text($(error).text());
+                
+            }else {
+               error.insertAfter(element)
+            }
+        },
+
+});
+});
 
 jQuery(".editmodule").click(function(){
 

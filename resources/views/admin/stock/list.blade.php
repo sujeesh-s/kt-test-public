@@ -220,5 +220,54 @@
         });
     }
 </script>
+
+
+<script>
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    }); 
+    $(document).ready(function(){ 
+       
+        
+        
+        
+        $('body').on('change','#seller',function(){  
+            $('#table_body').append($('#loader').html()); $('#attribute').addClass('blur'); 
+            $.ajax({
+                type: "POST",
+                url: '{{url("admin/seller/product-stocks-filter")}}',
+                data: {seller: this.value, start_date: $('#start_date').val(),end_date: $('#end_date').val(),product: $('#product').val(),viewType: 'ajax'},
+                success: function (data) {
+                    $('#content_detail').html(data); 
+                } 
+            });
+        });
+
+
+       
+        
+        
+        
+        $('body').on('click','.plus-minus-toggle', function() {
+            $(this).toggleClass('collapsed');
+            $('#filtersec').toggle('slow');
+        });
+
+    });
+
+   
+    
+    
+    function readURL(input) { 
+        if (input.files && input.files[0]) { 
+            var reader = new FileReader();
+            reader.onload = function (e) { $('#adminForm #'+input.id+'Img').attr('src', e.target.result); $('#adminForm #'+input.id+'Img').show(); }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 @endsection
 @endsection

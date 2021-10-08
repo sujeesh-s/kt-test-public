@@ -98,9 +98,9 @@ class StaffController extends Controller
              $validEmail             =   StaffTelecom::ValidateUnique('email',$post->user['email'],$staffId);
         $validPhone             =   StaffTelecom::ValidateUnique('phone',$post->user['phone'],$staffId);
       
-        if($validEmail){ Session::flash('message', ['text'=>"Email already exist.",'type'=>'danger']);  return redirect()->back(); }
-        if($validPhone){ Session::flash('message', ['text'=>"Phone number already exist.",'type'=>'danger']);  return redirect()->back(); }
-
+        if($validEmail){ Session::flash('message', ['text'=>"Email already exist.",'type'=>'danger']);   return back()->withErrors(['email'=>'Email already exist.'])->withInput($request->all()); }
+        if($validPhone){ Session::flash('message', ['text'=>"Phone number already exist.",'type'=>'danger']);   return back()->withErrors(['phone'=>'Phone number already exist.'])->withInput($request->all()); }
+        
             $sell_arr = array();
             if($post->user['password']      ==  ''){ unset($post->user['password']); }
         else{ 
@@ -127,8 +127,8 @@ class StaffController extends Controller
         
         $rules                  =   [
         
-        'email'                 =>  'required|unique:admins|email|max:100',
-        'phone'                 =>  'required|numeric|unique:admins',
+        'email'                 =>  'required|unique:usr_staff_mst|email|max:100',
+        'phone'                 =>  'required|numeric',
         'role_id'                 =>  'required',
         ];
         $validator              =   Validator::make($user,$rules);
@@ -136,13 +136,13 @@ class StaffController extends Controller
         foreach($validator->messages()->getMessages() as $k=>$row){  $error[$k] = $row[0];
         Session::flash('message', ['text'=>$row[0],'type'=>'danger']); }
         
-       
+        return back()->withErrors($validator)->withInput($request->all());
         }
          $validEmail             =   StaffTelecom::ValidateUnique('email',$post->user['email'],0);
         $validPhone             =   StaffTelecom::ValidateUnique('phone',$post->user['phone'],0);
       
-        if($validEmail){ Session::flash('message', ['text'=>"Email already exist.",'type'=>'danger']);  return redirect()->back(); }
-        if($validPhone){ Session::flash('message', ['text'=>"Phone number already exist.",'type'=>'danger']);  return redirect()->back(); }
+        if($validEmail){ Session::flash('message', ['text'=>"Email already exist.",'type'=>'danger']);   return back()->withErrors(['email'=>'Email already exist.'])->withInput($request->all()); }
+        if($validPhone){ Session::flash('message', ['text'=>"Phone number already exist.",'type'=>'danger']);   return back()->withErrors(['phone'=>'Phone number already exist.'])->withInput($request->all()); }
         
 
         $post->user['created_at']       =   date('Y-m-d H:i:s');

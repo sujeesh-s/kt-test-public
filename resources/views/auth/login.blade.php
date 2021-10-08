@@ -68,10 +68,10 @@
 										</div>
                                         </form>
 									</div>
-									<div class="custom-btns text-center">
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>
-									</div>
+									<!--<div class="custom-btns text-center">-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>-->
+									<!--</div>-->
 								</div>
 							</div>
 						</div>

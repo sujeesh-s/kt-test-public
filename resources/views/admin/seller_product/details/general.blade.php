@@ -154,7 +154,33 @@
             {{Form::select('prd[tag_id]',$tags,$tagId,['id'=>'tag_id','class'=>'form-control admin', 'placeholder'=>'Select Tag'])}}
             <span class="error"></span>
         </div>
-    </div>              
+    </div> 
+     <div class="col-lg-12 fl">
+        <div class="form-group">
+            {{Form::label('rltd_prds','Related Products',['class'=>''])}} 
+            <select class="form-control chosen-select" data-placeholder="Select Product" multiple  name="prd_id[]" id="prd_id"  >
+            @if($products && count($products) > 0)
+            @foreach($products as $row)
+            <option <?php if(in_array($row->id,$relatedprods)) { echo "selected"; } ?> value="{{ $row->id }}">{{ $row->name }}</option>
+            @endforeach
+            @endif
+            </select>
+            <span class="error"></span>
+        </div>
+    </div>   
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('commission','Profit Sharing',['class'=>'daily_deals form-label'])}} 
+            {{Form::number('prd[commission]',$commission,['id'=>'commission', 'class'=>'form-control','placeholder'=>'Profit Sharing','max'=>9999,'min'=>0])}}
+        </div>
+    </div>
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('commi_type','Commission Type',['class'=>''])}} 
+            {{Form::select('prd[commi_type]',['%'=>'%','amount'=>'Amount'],$commi_type,['id'=>'commi_type','class'=>'form-control admin'])}}
+            <span class="error"></span>
+        </div>
+    </div> 
 
  <script type="text/javascript">
      
@@ -267,7 +293,11 @@ editor.setContents(JSON.parse($('#specification').val()), 'api');
  </script>
  <script type="text/javascript">
 
-
+$(document).ready(function(){
+$(".chosen-select").chosen({
+        no_results_text: "Oops, nothing found!"
+        });
+});
     var instance = $('#sub-category-drop').comboTree({
     collapse:true,
     cascadeSelect:true,

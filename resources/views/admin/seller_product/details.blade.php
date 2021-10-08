@@ -5,7 +5,7 @@ if($product){
     $catId          =   $product->category_id;      $subCatId       =   $product->sub_category_id;  $brandId        =       $product->brand_id; $tagId        =       $product->tag_id;
     $commi          =   $product->commission;       $approved       =   $product->is_approved;      $apprDate       =       $product->approved_at;
     $status         =   $product->is_active;      if(isset($product->tax)){  $taxId          =   $product->tax->id; }else{ $taxId          =0; }           if(isset($prices)) { $price          =       $prices->price; $sPrice         =   $prices->sale_price; $stDate         =       $prices->sale_start_date; $edDate         =   $prices->sale_end_date;   }else { $price          =      0; $sPrice         =   0; $stDate         =       ""; $edDate         =  "";  } 
-    $adminPrd       =   $product->admin_prd_id;             
+    $adminPrd       =   $product->admin_prd_id; $commission       =   $product->commission;  $commi_type       =   $product->commi_type;            
        
     $prdName        =   getContent($product->name_cnt_id,$langId);      $sDesc              =       getContent($product->short_desc_cnt_id,$langId);
     $desc           =   getContent($product->desc_cnt_id,$langId);      $content            =       getContent($product->content_cnt_id,$langId);
@@ -16,25 +16,38 @@ if($product){
     if(isset($dimensions)){  $weight  =   $dimensions->weight; $length  =   $dimensions->length; $width  =   $dimensions->width; $height  =   $dimensions->height; }else{ 
         $weight  =   $length  =   $width  =   $height  =  ''; } 
 }else{ 
-    $weight  =   $length  =   $width  =   $height  =  '';
+    $weight  =   $length  =   $width  =   $height  =  ''; $commission = 0; $commi_type = '%';
     $adminPrd = $id =   0; $commi = $prdType = $prdName = $catId = $subCatId = $tagId = $brandId = $sDesc = $desc = $content = $price = $sPrice = $taxId = $stDate = $edDate = $specification = ''; 
     $status         =   1;  $featured   = $daily_deals      = $out_of_stock_selling    = 0; $sellerId = $seller->seller_id; $sellCkd = true; $adminCkd = false; $prdAssAttrs = []; $id = 0;
 }
 if($prdType == 2)   {   $conficLi = ''; }else{ $conficLi = 'no-disp'; } 
 if(isset($variationHist)){
 $attr_data = json_decode($variationHist->attr_data);
+
 $price_data = json_decode($variationHist->price_data);
 $stock_data = json_decode($variationHist->stock_data);
 $sku_data = json_decode($variationHist->sku_data);
+$var_weight = json_decode($variationHist->weight);
+$var_length = json_decode($variationHist->length);
+$var_width = json_decode($variationHist->width);
+$var_height = json_decode($variationHist->height);
 $dynamic_prod_names = json_decode($variationHist->dynamic_prod_names);
 
 if(isset($attr_data)){ $attr_1_name = $attr_data->attr_1; }else{ $attr_1_name = ""; }
 if(isset($attr_data)){ $attr_1_value = $attr_data->attr_1_value; }else{ $attr_1_value = ""; }
 if(isset($attr_data->attr_2)){ $attr_2_name = $attr_data->attr_2; }else { $attr_2_name =""; }
 if(isset($attr_data->attr_2_value)){ $attr_2_value = $attr_data->attr_2_value; }else{ $attr_2_value =""; }
+if(isset($attr_data->attr_1_img)){ $attr_1_img = $attr_data->attr_1_img; }else{ $attr_1_img = ""; }
+if(isset($attr_data->attr_2_img)){ $attr_2_img = $attr_data->attr_2_img; }else{ $attr_2_img = ""; }
 $attr_price = $price_data; $attr_price= json_decode(json_encode($attr_price), true);
 $attr_stock= $stock_data; $attr_stock= json_decode(json_encode($attr_stock), true);
 $attr_sku = $sku_data; $attr_sku= json_decode(json_encode($attr_sku), true);
+$attr_weight= json_decode(json_encode($var_weight), true);
+// dd($variationHist);
+$attr_length= json_decode(json_encode($var_length), true);
+$attr_width= json_decode(json_encode($var_width), true);
+$attr_height = json_decode(json_encode($var_height), true);
+
 $var_list = $dynamic_prod_names;
 
 }else{
@@ -45,7 +58,13 @@ $attr_2_value = "";
 $attr_price = "";
 $attr_stock= "";
 $attr_sku = "";
-$var_list = "";  
+$attr_weight = "";
+$attr_length = "";
+$attr_width = "";
+$attr_height = "";
+$var_list = ""; 
+$attr_1_img = "";
+$attr_2_img = ""; 
 }
 ?>
 <div class="page-header">

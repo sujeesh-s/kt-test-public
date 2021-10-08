@@ -48,6 +48,7 @@
                                         <tr>
                                             <th class="wd-15p notexport"></th>
                                             <th class="wd-15p">Product Name</th>
+                                            <th class="wd-15p">Business Name</th>
                                             <th class="wd-15p">Seller Name</th>
                                             <th class="wd-15p">Category</th>
                                             <th class="wd-20p">Sub Category</th>
@@ -65,6 +66,7 @@
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></td>
                                                     <td><a style="cursor: pointer;" class="pointer viewBtn" id="viewBtn-{{$row->id}}">{{$row->name}}</a></td>
+                                                    <td>{{$row->store($row->seller_id)->business_name}}</td>
                                                     <td>{{$row->seller->fname}}</td>
                                                     <td>{{$row->category->cat_name}}</td>
                                                     <td>{{$row->subCategory->subcategory_name}}</td>

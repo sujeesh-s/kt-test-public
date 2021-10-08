@@ -29,6 +29,7 @@ use App\Models\ProductDaily;
 use App\Models\PrdAssignedTag;
 use App\Models\PrdReview;
 use App\Models\PrdShock_Sale;
+use App\Models\PrdShockingSaleProduct;
 use App\Models\PrdPrice;
 use App\Models\Prd_Recent_View;
 use App\Models\Productvisitor;
@@ -414,6 +415,14 @@ class ProductController extends Controller
                 
                     $prd_list['product_id']=$prod_data->id;
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
+                    if($prod_data->product_type == 2)
+                    { 
+                        $prd_list['product_type']="config";
+                    }
+                    else
+                    {
+                        $prd_list['product_type']="simple";
+                    }
                     $prd_list['sku']=$prod_data->sku;
                     $prd_list['seller']=$prod_data->Store($prod_data->seller_id)->store_name;
                     $prd_list['seller_id']=$prod_data->seller_id;
@@ -436,20 +445,40 @@ class ProductController extends Controller
                     $prd_list['long_description']=$this->get_content($prod_data->desc_cnt_id,$lang);
                     $prd_list['content']=$this->get_content($prod_data->content_cnt_id,$lang);
                     $prd_list['specification']=$this->get_content($prod_data->spec_cnt_id,$lang);
+                    if($prod_data->product_type == 1)
+                    {    
                     $actual_price = number_format($prod_data->prdPrice->price,2);
                     $prd_list['actual_price_quote']= $actual_price;
                     $prd_list['actual_price']= $prod_data->prdPrice->price;
                     $sale_price =$this->get_sale_price($prod_data->id);
                     $prd_list['sale_price']=(float)$sale_price;
                     $prd_list['in_stock']=$prod_data->prdStock($prod_data->id);
-                    $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
+                    if($prod_data->is_out_of_stock==0)
+                        {
+                            $prd_list['is_out_of_stock']=false;
+                        }
+                        else
+                        {
+                            $prd_list['is_out_of_stock']=true;
+                        }
+                        if($prod_data->out_of_stock_selling==0)
+                        {
+                            $prd_list['out_of_stock_selling']=false;
+                        }
+                        else
+                        {
+                            $prd_list['out_of_stock_selling']=true;
+                        }
+                    
+                    }
                     $prd_list['in_wishlist']=$wishlist;
                     $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 
                     $prd_list['image']=$this->get_product_image($prod_data->id);
-                    $prd_list['attributes']=$this->get_product_attributes($prod_data->id,$lang); 
+                     
                     $prd_list['rating']=$this->get_rates($prod_data->id);
                     $products=$prd_list;
-                    
+                    $associative_prd=[];
+                   
                      //ASSOCIATIVE products
                     if($prod_data->product_type == 2)
                     {    
@@ -458,7 +487,14 @@ class ProductController extends Controller
                         {
                             foreach($prd_ass as $rows)
                             {
-                            $associative_prd[]=$this->related_product($rows->ass_prd_id,$lang);
+                            $product_visibility= Product::where('id',$rows->ass_prd_id)->where('is_active',1)->where('is_deleted',0)->where('visible',0)->where('is_approved',1)->first();
+                            if($product_visibility){
+                            //$associative_prd[]=$this->ass_related_product($rows->ass_prd_id,$lang);
+                            
+                                $associative_prd[]=$this->ass_related_product1($product_visibility->id,$lang);
+                            
+                            
+                             }
                             }
                         }
                         else
@@ -587,13 +623,13 @@ class ProductController extends Controller
             }
             else
             {
-               return response()->json(['httpcode'=>200,'status'=>'success','message'=>'Product not found']); 
+               return response()->json(['httpcode'=>404,'status'=>'error','message'=>'Product not found']); 
             }
 
         }
         else
         {
-            return response()->json(['status'=>'error','message'=>'Enter valid Product id']);
+            return response()->json(['httpcode'=>400,'status'=>'error','message'=>'Enter valid Product id']);
         }
     }
 
@@ -647,7 +683,9 @@ class ProductController extends Controller
                     $d_list['rating']=$this->get_rates($daily->prd_id);
                     $d_list['tag']=$this->get_product_tag($product_id->id,$lang);
                     $d_list['image']=$this->get_product_image($product_id->id);
+                    if($product_id->product_type==2){
                     $d_list['attributes']=$this->get_product_attributes($product_id->id,$lang);
+                    }
 
 
                     $daily_product[]=$d_list;
@@ -671,6 +709,8 @@ class ProductController extends Controller
         $user_id=null;
         $user = [];
         $validator=  Validator::make($request->all(),[
+            'shock_sale_id'=>['required','numeric'],
+            'product_id'=>['required','numeric'],
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
             'page_url'=>['required']
@@ -690,16 +730,18 @@ class ProductController extends Controller
         $shock_data=[];
            // $current_date=date('Y-m-d H:i:s');
             $current_date=Carbon::now();
-            $shock = PrdShock_Sale::join('prd_shock_sale_products','prd_shock_sale.id','=','prd_shock_sale_products.shock_sale_id')
-            ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->whereDate('prd_shock_sale.start_time','<=',$current_date)->whereDate('prd_shock_sale.end_time','>=',$current_date)
+            $shock = PrdShockingSaleProduct::join('prd_shock_sale','prd_shock_sale_products.shock_sale_id','=','prd_shock_sale.id')
+            ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->where('prd_shock_sale_products.shock_sale_id',$request->shock_sale_id)->where('prd_shock_sale_products.prd_id',$request->product_id)
             ->where('prd_shock_sale_products.is_active',1)->where('prd_shock_sale_products.is_deleted',0)
-            ->select('prd_shock_sale.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->
+            ->select('prd_shock_sale.*','prd_shock_sale_products.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->
             first();
+            //print_r($shock);die;
             if($shock)
             {
                 $store_active = Store::where('is_active',1)->where('seller_id',$shock->seller_id)->first();
                     if($store_active)
                     {
+                        //$prd_data=Product::where('id',$shock->prd_id)->first();
                 $usr_visit =UserVisit::create([
                             'org_id' =>1,
                             'device_id'=>$request->device_id,
@@ -746,7 +788,10 @@ class ProductController extends Controller
                 $shock_list['rating']=$this->get_rates($shock->prd_id);
                 $shock_list['seller']=$shock->Store($shock->Product->seller_id)->store_name;
                 $shock_list['image']=$this->get_product_image($shock->prd_id);
+                if($shock->Product->product_type==2)
+                {
                 $shock_list['attributes']=$this->get_product_attributes($shock->prd_id,$lang); 
+                }
                 
                  $shock_data[]=$shock_list;
                     }
@@ -840,7 +885,9 @@ class ProductController extends Controller
                 $auction_list['seller_id']=$rows->Product->seller_id;
                 $auction_list['no_of_bids']=$rows->AuctionHist($rows->id);
                 $auction_list['image']=$this->get_product_image($rows->product_id);
+                if($rows->Product->product_type==2){
                 $auction_list['attributes']=$this->get_product_attributes($rows->product_id,$lang); 
+                }
                 $start=Carbon::now();
                 $end=Carbon::parse($rows->auct_end);
                 $difference=$start->diffInDays($end);
@@ -1907,7 +1954,148 @@ class ProductController extends Controller
             else{ $data     =   []; } return $data;
         
     }
-
+   
+   function ass_related_product($prd_id,$lang){
+        $data     =   [];
+        
+        $prod_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('visible',0)->where('id',$prd_id)->first();
+            if($prod_data)   {    
+                $store_active = Store::where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();
+                    if($store_active)
+                    {
+                    $prd_list['product_id']=$prod_data->id;
+                    $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
+                    $prd_list['category_id']=$prod_data->category_id;
+                    $prd_list['category_name']=$this->get_content($prod_data->category->cat_name_cid,$lang);
+                    $prd_list['subcategory_id']=$prod_data->sub_category_id;
+                    $prd_list['subcategory_name']=$this->get_content($prod_data->subCategory->sub_name_cid,$lang);
+                    if($prod_data->brand_id)
+                    {
+                    $prd_list['brand_id']=$prod_data->brand_id;
+                    $prd_list['brand_name']=$this->get_content($prod_data->brand->brand_name_cid,$lang);
+                    }
+                    else
+                    {
+                    $prd_list['brand_id']='';
+                    $prd_list['brand_name']='';
+                    }
+                    $prd_list['short_description']=$this->get_content($prod_data->short_desc_cnt_id,$lang);
+                    $prd_list['long_description']=$this->get_content($prod_data->desc_cnt_id,$lang);
+                    $prd_list['content']=$this->get_content($prod_data->content_cnt_id,$lang);
+                    $prd_list['attributes']=$this->get_product_attributes($prod_data->id,$lang);
+                    $prd_list['available_attributes']=$this->get_product_attributes($prod_data->id,$lang);
+                    
+                    $prd_list['actual_price']=$prod_data->prdPrice->price;
+                    $prd_list['sale_price']=$this->get_sale_price($prod_data->id);
+                    
+                    // $actual_price = number_format($prod_data->prdPrice->price,2);
+                    // $prd_list['actual_price_quote']= $actual_price;
+                    // $prd_list['actual_price']= $prod_data->prdPrice->price;
+                    // $sale_price =$this->get_sale_price($prod_data->prd_id);
+                    // $prd_list['sale_price']=$sale_price;
+                    
+                    $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
+                    $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 
+                    $prd_list['rating']=$this->get_rates($prod_data->id);
+                    $prd_list['image']=$this->get_product_image($prod_data->id); 
+                    $data             =   $prd_list;
+                    }
+             }
+            else{ $data     =   []; } return $data;
+        
+    }
+    function ass_related_product1($prd_id,$lang){
+        $data     =   [];
+        
+        $prod_data       =   AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->groupBy('prd_id')->get();
+            if(count($prod_data)>0)   { 
+                foreach($prod_data as $row)  {
+                    $attr_list['attr_id']=$row->attr_id;
+                   $attr_list['product_id']=$row->prd_id;
+                    //$attr_list['attr_id']=$row->attr_id;
+                    $attr_list['attr_name']=$this->get_content($row->PrdAttr->name_cnt_id,$lang);
+                   // $attr_list['attr_type']=$row->PrdAttr->type;
+                   // $attr_list['attr_data_type']=$row->PrdAttr->data_type;
+                   // $attr_list['attr_value_name']=$this->get_content($row->PrdAttr_value->name_cnt_id,$lang);
+                    $attr_list['attr_value']=$row->attr_value;
+                    $attr_list['image']=config('app.storage_url').$row->attrValue->image;
+                    
+                    
+                    
+                    $attr_list['image']=config('app.storage_url').$row->attrValue->image;
+                    $attr_list['attr_value1'][] =$this->inner_attribute($prd_id,$row->attr_id,$lang);
+                    if(empty($attr_list['attr_value1'][1]))
+                    {
+                        $actual_price = number_format($row->prdPrice->price,2);
+                    $attr_list['actual_price_quote']= $actual_price;
+                    $attr_list['actual_price']= $row->prdPrice->price;
+                    $sale_price =$this->get_sale_price($row->prd_id);
+                    $attr_list['sale_price']=$sale_price;
+                    $attr_list['stock']=$row->prdStock($row->prd_id);
+                    $attr_list['sku']=$row->Product->sku;
+                    if($row->Product->is_out_of_stock==0)
+                        {
+                            $attr_list['is_out_of_stock']=false;
+                        }
+                        else
+                        {
+                            $attr_list['is_out_of_stock']=true;
+                        }
+                        if($row->Product->out_of_stock_selling==0)
+                        {
+                            $attr_list['out_of_stock_selling']=false;
+                        }
+                        else
+                        {
+                            $attr_list['out_of_stock_selling']=true;
+                        }
+                    }
+                    $data             =   $attr_list;
+                }
+             }
+            else{ $data     =   []; } return $data;
+        
+    }
+    
+    function inner_attribute($prd_id,$attr_id,$lang)
+    {
+        $data=[];
+        $rowss = AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->where('attr_id','!=',$attr_id)->first();
+                     if($rowss)
+                    {
+                        
+                        $atr_inn['attr_id']=$rowss->attr_id;    
+                        $atr_inn['attr_name']= $this->get_content($rowss->PrdAttr->name_cnt_id,$lang);
+                        $atr_inn['attr_value']= $rowss->attr_value;
+                        $atr_inn['image']=config('app.storage_url').$rowss->attrValue->image;
+                        $actual_price = number_format($rowss->prdPrice->price,2);
+                        $atr_inn['actual_price_quote']= $actual_price;
+                        $atr_inn['actual_price']= $rowss->prdPrice->price;
+                        $sale_price =$this->get_sale_price($rowss->prd_id);
+                        $atr_inn['sale_price']=$sale_price;
+                        $atr_inn['stock']=$rowss->prdStock($rowss->prd_id);
+                        $atr_inn['sku']=$rowss->Product->sku;
+                        if($rowss->Product->is_out_of_stock==0)
+                        {
+                            $atr_inn['is_out_of_stock']=false;
+                        }
+                        else
+                        {
+                            $atr_inn['is_out_of_stock']=true;
+                        }
+                        if($rowss->Product->out_of_stock_selling==0)
+                        {
+                            $atr_inn['out_of_stock_selling']=false;
+                        }
+                        else
+                        {
+                            $atr_inn['out_of_stock_selling']=true;
+                        }
+                        $data             =   $atr_inn;
+                        
+                        
+                    }return $data;
+    }
     function related_product($prd_id,$lang){
         $data     =   [];
         
@@ -1935,8 +2123,16 @@ class ProductController extends Controller
                     $prd_list['short_description']=$this->get_content($prod_data->short_desc_cnt_id,$lang);
                     $prd_list['long_description']=$this->get_content($prod_data->desc_cnt_id,$lang);
                     $prd_list['content']=$this->get_content($prod_data->content_cnt_id,$lang);
+                    if($prod_data->product_type==1)
+                    {
                     $prd_list['actual_price']=number_format($prod_data->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($prod_data->id);
+                    }
+                    else
+                    {
+                    $prd_list['actual_price']='';
+                    $prd_list['sale_price']='';
+                    }
                     $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
                     $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 
                     $prd_list['rating']=$this->get_rates($prod_data->id);
@@ -2068,13 +2264,21 @@ class ProductController extends Controller
         $prod_data       =   AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->get();
             if(count($prod_data)>0)   { 
                 foreach($prod_data as $row)  {
-                    $attr_list['id']=$row->id;
+                   // $attr_list['id']=$row->id;
                     //$attr_list['attr_id']=$row->attr_id;
                     $attr_list['attr_name']=$this->get_content($row->PrdAttr->name_cnt_id,$lang);
-                    $attr_list['attr_type']=$row->PrdAttr->type;
-                    $attr_list['attr_data_type']=$row->PrdAttr->data_type;
-                    $attr_list['attr_value_name']=$this->get_content($row->PrdAttr_value->name_cnt_id,$lang);
+                   // $attr_list['attr_type']=$row->PrdAttr->type;
+                   // $attr_list['attr_data_type']=$row->PrdAttr->data_type;
+                   // $attr_list['attr_value_name']=$this->get_content($row->PrdAttr_value->name_cnt_id,$lang);
                     $attr_list['attr_value']=$row->attr_value;
+                    
+                    $actual_price = number_format($row->prdPrice->price,2);
+                    $attr_list['actual_price_quote']= $actual_price;
+                    $attr_list['actual_price']= $row->prdPrice->price;
+                    $sale_price =$this->get_sale_price($row->prd_id);
+                    $attr_list['sale_price']=$sale_price;
+                    
+                    $attr_list['image']=config('app.storage_url').$row->attrValue->image;
                     $data[]             =   $attr_list;
                 }
              }

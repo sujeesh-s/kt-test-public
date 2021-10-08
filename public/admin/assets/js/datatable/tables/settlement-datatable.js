@@ -77,7 +77,7 @@ $(document).ready(function () {
             },
             {
                 orderable: false,
-                targets: [0,1]
+                targets: [0]
             },
             {width: "7%", targets: 0},
             {width: "7%", targets: 1}

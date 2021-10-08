@@ -62,28 +62,45 @@ class AuctionUpdateController extends Controller
               $sale_arr['payment_status'] = "processing_refund";
               $sale_arr['updated_at'] = date("Y-m-d H:i:s");
                   SaleOrder::where("id",$bid_v['sale_id'])->update($sale_arr);
+                  $sale_info = SaleOrder::where("id",$bid_v['sale_id'])->first();
                 
                   $refund_arr = array();
                   $refund_arr['auction_id'] =$row->id;
                   $refund_arr['user_id'] =$bid_v['user_id'];
                   $refund_arr['sale_id'] =$bid_v['sale_id'];
-                  $refund_arr['paid_amount'] =$bid_v['bid_price'];
+                  $refund_arr['paid_amount'] =$sale_info->g_total;
 
-                  $refund_amt = (($bid_v['bid_price'] * $refund_charges['refund_deduction'])/100);
-                  $refund_amt = $bid_v['bid_price'] - round($refund_amt,2);
+                //   $refund_amt = (($bid_v['bid_price'] * $refund_charges['refund_deduction'])/100);
+                //   $refund_amt = $bid_v['bid_price'] - round($refund_amt,2);
+                 $refund_amt = ($sale_info->g_total - $refund_charges['bid_charge']);
+                  
 
                   $refund_arr['refund_amount'] =$refund_amt;
-                  $refund_arr['refund_percentage'] = $refund_charges['refund_deduction'];
+                //   $refund_arr['refund_percentage'] = $refund_charges['refund_deduction'];
+                     $refund_arr['refund_charge'] = $refund_charges['bid_charge'];
                   $refund_arr['status'] = "pending";
                   AuctionRefundHist::create($refund_arr);
                 }
                 
               }
-              $auct_arr = array();
-              $auct_arr['bid_allocated_to'] = $winner->user_id;
-              $auct_arr['status'] = "processing";
-              $auct_arr['updated_at'] = date("Y-m-d H:i:s");
-              Auction::where("id",$row->id)->update($auct_arr);
+                $auct_arr = array();
+                $auct_arr['bid_allocated_to'] = $winner->user_id;
+                $auct_arr['sale_id'] = $winner->sale_id;
+                $auct_arr['status'] = "processing";
+                $auct_arr['updated_at'] = date("Y-m-d H:i:s");
+              
+                $from    = 1; 
+                $utype   = 1;
+                $to      = 1; 
+                $ntype= 'auction';
+                $title = 'Auction';
+                $desc = 'The winner of '.$row->auction_code.' auction is'.$winner->user_id;
+                $refId = $row->id;
+                $reflink = 'auctions/log';
+                $notify = 'admin';
+                addNotification($from,$utype,$to,$ntype,$title,$desc,$refId,$reflink,$notify);
+                
+                Auction::where("id",$row->id)->update($auct_arr);
             }
           }
         

@@ -39,14 +39,14 @@
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('latitude','Latitude',['class'=>''])}}
-            {{Form::text('store[latitude]',$latitude,['id'=>'latitude','class'=>'form-control','placeholder'=>'Latitude'])}}
+            {{Form::number('store[latitude]',$latitude,['id'=>'latitude','class'=>'form-control','placeholder'=>'Latitude','step' => '0.01'])}}
             <span class="error"></span>
         </div>
     </div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('longitude','Longitude',['class'=>''])}}
-            {{Form::text('store[longitude]',$longitude,['id'=>'longitude','class'=>'form-control','placeholder'=>'Longitude'])}}
+            {{Form::number('store[longitude]',$longitude,['id'=>'longitude','class'=>'form-control','placeholder'=>'Longitude','step' => '0.01'])}}
             <span class="error"></span>
         </div>
     </div>

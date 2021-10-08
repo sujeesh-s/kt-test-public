@@ -49,8 +49,10 @@
                                                 <div class="row">
 												<div class="col-12">
 												<label class="custom-control custom-checkbox">
-													<input type="checkbox" class="custom-control-input" name="example-checkbox2" value="option2">
-													<span class="custom-control-label">Remember me</span>
+                                                    <input class="custom-control-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="remember" >
+                                                      {{ __('Remember Me') }}
+                                                     </label>
 												</label>
 											  </div>
 										     </div>
@@ -66,10 +68,10 @@
 										</div>
                                         </form>
 									</div>
-									<div class="custom-btns text-center">
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>
-									</div>
+									<!--<div class="custom-btns text-center">-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>-->
+									<!--</div>-->
 								</div>
 							</div>
 						</div>

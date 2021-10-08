@@ -19,7 +19,7 @@ class Auction extends Authenticatable
     protected $table = 'auction';
 
     protected $fillable = ['org_id','auction_code', 'seller_id', 'cat_id','subcat_id','product_id','auction_desc_cid','min_bid_price',
-'shipping_cost_id','auct_start','auct_end','bid_allocated_to','is_active','is_deleted','created_by','updated_by','created_at','updated_at'];
+'shipping_cost_id','auct_start','auct_end','bid_allocated_to','sale_id','is_active','is_deleted','created_by','updated_by','created_at','updated_at'];
 
         static function getAuctions($seller_id=''){ 
             
@@ -98,7 +98,7 @@ class Auction extends Authenticatable
             $data['product_id']        =   $row->product_id;
             $data['product_name']        =  Product::where('id',$row->product_id)->first()->name;
             if(ProductImage::where('prd_id',$row->product_id)->first()){
-             $data['product_img']        =  ProductImage::where('prod_id',$row->product_id)->first()->image;   
+             $data['product_img']        =  ProductImage::where('prd_id',$row->product_id)->first()->image;   
             }else {
              $data['product_img']        = '';   
             }

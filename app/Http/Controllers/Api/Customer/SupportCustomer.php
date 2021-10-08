@@ -95,24 +95,32 @@ class SupportCustomer extends Controller
     else
     {
         $support = SupportChat::where('created_by',$user_id)->get();
+        
+        if(!empty($support))
+        {
         foreach($support as $row)
         {
             $list['support_id'] = $row->id;
             $list['ticket_id']  = $row->ticket_id;
             $list['subject']    = $row->subject;
-            if($row->is_closed==0)
-            {
-             $list['status']    = 'Not closed';   
-            }
-            else
-            {
-             $list['status']    = 'Closed';   
-            }
+            // if($row->is_closed==0)
+            // {
+            //  $list['status']    = 'Not closed';   
+            // }
+            // else
+            // {
+            //  $list['status']    = 'Closed';   
+            // }
             $list['created_at'] = date('d M Y',strtotime($row->created_at));
             $support_list[]     = $list;
 
         }
         return ['httpcode'=>200,'status'=>'success','message'=>'success','data'=>['list'=>$support_list]];
+        }
+        else
+        {
+            return ['httpcode'=>404,'status'=>'error','message'=>'Not found','data'=>['errors'=>'Not found']];
+        }
     }
    }
 
@@ -226,7 +234,7 @@ class SupportCustomer extends Controller
             // {
             //     $msg['name']  = $user_id;//
             // }
-            $support_list[]     = $list; 
+            $support_list     = $list; 
             return ['httpcode'=>200,'status'=>'success','message'=>'Support','data'=>['support_messages'=>$support_list]];
         }
         else
@@ -239,6 +247,7 @@ class SupportCustomer extends Controller
    function get_support_msgs($chat_id,$user_id)
     {
         $all = [];
+        $img_message='';
         $chat_msgs= SupportChatMessage::where('support_id',$chat_id)->get();
         foreach($chat_msgs as $row)
             {
@@ -250,18 +259,20 @@ class SupportCustomer extends Controller
                 else{
                     $from = "Admin"; $align ="left"; $me = 0;
                 }
+                $message = $row->message;
                 if($row->msg_type       ==  'image')
-                { $message = config('app.storage_url').$row->image; }
+                { $img_message = config('app.storage_url').$row->image; }
                 else if($row->msg_type       ==  'emoji')
-                { $message = url('storage'.$row->other_msg); }
+                { $img_message = url('storage'.$row->other_msg); }
                 else if($row->msg_type       ==  'video')
-                { $message = url('storage'.$row->other_msg); }
-                else{ $message = $row->message; }
+                { $img_message = url('storage'.$row->other_msg); }
+                else{ $img_message = ''; }
 
                    $msgs['from']       = $from;
                    $msgs['me']         = $me;
                    $msgs['align']      = $align;
                    $msgs['message']    = $message;
+                   $msgs['image']      = $img_message;
                    $msgs['created_at'] = date('Y-m-d H:i:s', strtotime($row->created_at));
                    $msgs['read_status']= $row->read_status;
                    $all[]              = $msgs;

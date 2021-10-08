@@ -35,7 +35,8 @@ use App\Models\PrdOffer;
 use App\Models\PrdReview;
 use App\Models\VariableProdHist;
 use App\Models\ProductVideo;
-
+use App\Models\ProdDimension;
+use App\Models\Tag;
 use App\Models\PrdImports;
 use App\Imports\ProductImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -88,8 +89,16 @@ class SellerProductController extends Controller{
         $data['title']              =   $title; 
         $data['product']            =   $product;
         if($type                    ==  'new'){ $data['title']   =   'View Product Detail'; }
+        $data['dimensions']         =  ProdDimension::where('prd_id',$id)->where("is_deleted",0)->first();
+        $data['relatedprods']         =  getDropdownData(RelatedProduct::where('prd_id',$id)->where("is_deleted",0)->get(),'id','rel_prd_id');
+        $data['relatedprods']         = array_values($data['relatedprods'] );
+
+        $products                   =   Product::where('is_approved',1)->where('visible',1)->where('is_deleted',0)->where('seller_id',auth()->user()->id)->where('id','!=',$id);
+        $data['products']           =   $products->orderBy('id','desc')->get();
+        
         $data['categories']         =   getDropdownData(Category::where('is_deleted',0)->get(),'category_id','cat_name');
         $data['sub_cats']           =   getDropdownData(Subcategory::where('is_deleted',0)->get(),'subcategory_id','subcategory_name');
+        $data['tags']             =   getDropdownCmsData(Tag::where('is_active',1)->where('is_deleted',0)->get(),'id','tag_name_cid');
         $data['brands']             =   getDropdownCmsData(Brand::where('is_active',1)->where('is_deleted',0)->get(),'id','brand_name_cid');
         $data['taxes']              =   getDropdownCmsData(Tax::where('is_active',1)->where('is_deleted',0)->get(),'id','tax_name_cid');
         $data['languages']          =   getDropdownData(Language::where('is_active',1)->where('is_deleted',0)->get(),'id','glo_lang_name');
@@ -116,7 +125,11 @@ class SellerProductController extends Controller{
         return view('seller.my_products.details',$data);
     }
     
-    function adminProduct($id){return   AdminProduct::where('id',$id)->first();}
+    function adminProduct($id){
+        $product                    =   AdminProduct::where('id',$id)->first();
+        $product->short_desc        =   getContent($product->short_desc,1); 
+        return   $product;
+    }
 
     function getAssignedAttributes($id){
         $qry                        =   AssignedAttribute::where('prd_id',$id)->where('is_deleted',0)->get();
@@ -223,7 +236,15 @@ class SellerProductController extends Controller{
         $prd                    =   $post->prd;
         $price                  =   $post->price; 
        if($post->prd_type ==2) { $stock                  =   $post->stock; 
-        $sku                  =   $post->sku; }
+        $sku                  =   $post->sku;
+        $weight                  =   $post->weight;
+        $length                  =   $post->length;
+        $width                  =   $post->width;
+        $height                  =   $post->height;
+           
+       }
+       $dimension                  =   $post->dimension; 
+       $related_prd_id                  =   $post->prd_id; 
         $attrs                  = array();//  (object)$post->attr; 
         if(isset($post->assosi)){   $assosi =   (object)$post->assosi; }else{ $assosi = false; }
         $images                 =   $request->file('image'); 
@@ -285,7 +306,29 @@ class SellerProductController extends Controller{
                 if(isset($post->attr_1_value) && count($post->attr_1_value)>0)
                 {
                     foreach($post->attr_1_value as $a1k=>$a1v){
-                   $attr_1_vals_arr[$a1k] = PrdAttributeValue::create(['attr_id'=>$attr_1_id,'name'=>$a1v[0],'created_by'=>auth()->user()->id])->id; 
+                          $attr_1_img = "";
+                        if($request->file('attr_1_img'))
+                        {
+                            
+                           $image = $imgName = "";
+                            
+                            if(isset($request->file('attr_1_img')[$a1k])){ 
+                            $image = $request->file('attr_1_img')[$a1k][0]; 
+                            $imgName            =   time().'.'.$image->extension();
+                            $path               =   '/app/public/products/attributes/'.$attr_1_id;
+                            $img                =   Image::make($image->path()); 
+                            $destinationPath    =   storage_path($path); 
+                            $image->move($destinationPath.'/', $imgName);
+                            $imgUpload          =   uploadFile($path,$imgName);
+                            $attr_1_img = $path.'/'.$imgName;
+                            
+                            }else {
+                             if(isset($post->attr_1_img[$a1k][0])) { $attr_1_img = $post->attr_1_img[$a1k][0]; }  
+                            }
+                        }
+
+                        $attr_data_arr['attr_1_img'][$a1k] =  $attr_1_img;
+                   $attr_1_vals_arr[$a1k] = PrdAttributeValue::create(['attr_id'=>$attr_1_id,'name'=>$a1v[0],'image'=>$attr_1_img,'created_by'=>auth()->user()->id])->id; 
                     }
                 }
                 
@@ -327,7 +370,28 @@ class SellerProductController extends Controller{
                 if(isset($post->attr_2_value) && count($post->attr_2_value)>0)
                 {
                     foreach($post->attr_2_value as $a2k=>$a2v){
-                   $attr_2_vals_arr[$a2k] = PrdAttributeValue::create(['attr_id'=>$attr_2_id,'name'=>$a2v[0],'created_by'=>auth()->user()->id])->id; 
+                        
+                        $attr_2_img = "";
+                         if($request->file('attr_2_img'))
+                        {   $image = $imgName = "";
+                           
+                            if(isset($request->file('attr_2_img')[$a2k])){ 
+                            $image = $request->file('attr_2_img')[$a2k][0]; 
+                            $imgName            =   time().'.'.$image->extension();
+                            $path               =   '/app/public/products/attributes/'.$attr_2_id;
+                            $img                =   Image::make($image->path()); 
+                            $destinationPath    =   storage_path($path); 
+                            $image->move($destinationPath.'/', $imgName);
+                            $imgUpload          =   uploadFile($path,$imgName);
+                            $attr_2_img = $path.'/'.$imgName;
+                            
+                            }else {
+                             if(isset($post->attr_2_img[$a2k][0])) { $attr_2_img = $post->attr_2_img[$a2k][0]; }  
+                            }
+                        }
+                        $attr_data_arr['attr_2_img'][$a2k] = $attr_2_img;
+                        
+                   $attr_2_vals_arr[$a2k] = PrdAttributeValue::create(['attr_id'=>$attr_2_id,'name'=>$a2v[0],'name'=>$a2v[0],'created_by'=>auth()->user()->id])->id; 
                     }
                 }
                 
@@ -418,6 +482,10 @@ class SellerProductController extends Controller{
                 $var_hist_arr['price_data'] = json_encode($price);
                 $var_hist_arr['stock_data'] =json_encode($stock);
                 $var_hist_arr['sku_data'] = json_encode($sku);
+                $var_hist_arr['weight'] = json_encode($weight);
+                $var_hist_arr['length'] = json_encode($length);
+                $var_hist_arr['width'] = json_encode($width);
+                $var_hist_arr['height'] = json_encode($height);
              if(isset($post->dyn_prds)){   $var_hist_arr['dynamic_ids'] = json_encode($post->dyn_prds);}
                if(isset($post->dyn_prds_names)){ $var_hist_arr['dynamic_prod_names'] = json_encode($post->dyn_prds_names); }
                 $var_hist_arr['prd_id'] = $prdId;
@@ -426,6 +494,16 @@ class SellerProductController extends Controller{
                 $var_hist_arr['is_active'] = 1;
 
                 VariableProdHist::create($var_hist_arr);
+                if(isset($related_prd_id)){
+                RelatedProduct::where('prd_id',$prdId)->update(['is_deleted'=>1]);
+                foreach($related_prd_id as $kv=>$rp_id) {
+                $rltd_prd['prd_id']    =   $prdId;
+                $rltd_prd['rel_prd_id']    =   $rp_id;
+                $rltd_prd['created_by']    =   auth()->user()->id;
+                $rltd_prd['is_deleted']    =   0;
+                RelatedProduct::create($rltd_prd);
+                }
+                }
 
                 AssociatProduct::where('prd_id',$prdId)->update(['is_deleted'=>1]);
         if($assoc_arr){ foreach($assoc_arr as $k=>$ass){
@@ -439,8 +517,19 @@ class SellerProductController extends Controller{
                 $prd['product_type']=   $post->prd_type; $prd['seller_id']   =   auth()->user()->id; 
             $prdId              =   Product::create($prd)->id; $price['created_by']    =   auth()->user()->id;
             $price['prd_id']    =   $prdId; unset($price['tax']); PrdPrice::create($price);
+            if(isset($related_prd_id)){
+                RelatedProduct::where('prd_id',$prdId)->update(['is_deleted'=>1]);
+                foreach($related_prd_id as $kv=>$rp_id) {
+                $rltd_prd['prd_id']    =   $prdId;
+                $rltd_prd['rel_prd_id']    =   $rp_id;
+                $rltd_prd['created_by']    =   auth()->user()->id;
+                $rltd_prd['is_deleted']    =   0;
+                RelatedProduct::create($rltd_prd);
+                }
+                }
             $stockId            =   PrdStock::create(['seller_id'=>$post->seller_id,'prd_id'=>$prdId,'qty'=>0,'rate'=>$post->price['price'],'created_by'=>auth()->user()->id]);
-
+            $dimension['prd_id']    =   $prdId; $dimension['created_by']    =   auth()->user()->id;
+            ProdDimension::create($dimension);
 
             }
             
@@ -497,7 +586,32 @@ class SellerProductController extends Controller{
                 {
 
                     foreach($post->attr_1_value as $a1k=>$a1v){
-                   $attr_1_vals_arr[$a1k] = PrdAttributeValue::create(['attr_id'=>$attr_1_id,'name'=>$a1v[0],'created_by'=>auth()->user()->id])->id; 
+                        
+                        $attr_1_img = "";
+                        if($request->file('attr_1_img'))
+                        {
+                           $image = $imgName = "";
+                            if(isset($request->file('attr_1_img')[$a1k])){ 
+                            $image = $request->file('attr_1_img')[$a1k][0]; 
+
+                            $imgName            =   time().'.'.$image->extension();
+                            $path               =   '/app/public/products/attributes/'.$attr_1_id;
+                            $img                =   Image::make($image->path()); 
+                            $destinationPath    =   storage_path($path); 
+                            $image->move($destinationPath.'/', $imgName);
+                            $imgUpload          =   uploadFile($path,$imgName);
+                            $attr_1_img = $path.'/'.$imgName;
+                             
+                            }else {
+                             if(isset($post->attr_1_img[$a1k][0])) { $attr_1_img = $post->attr_1_img[$a1k][0]; }  
+                            }
+                        }else {
+                             if(isset($post->attr_1_img[$a1k][0])) { $attr_1_img = $post->attr_1_img[$a1k][0]; }  
+                            }
+
+                        $attr_data_arr['attr_1_img'][$a1k] =  $attr_1_img;
+                        
+                   $attr_1_vals_arr[$a1k] = PrdAttributeValue::create(['attr_id'=>$attr_1_id,'name'=>$a1v[0],'image'=>$attr_1_img,'created_by'=>auth()->user()->id])->id; 
                     }
                 }
                 
@@ -539,7 +653,33 @@ class SellerProductController extends Controller{
                 if(isset($post->attr_2_value) && count($post->attr_2_value)>0)
                 {
                     foreach($post->attr_2_value as $a2k=>$a2v){
-                   $attr_2_vals_arr[$a2k] = PrdAttributeValue::create(['attr_id'=>$attr_2_id,'name'=>$a2v[0],'created_by'=>auth()->user()->id])->id; 
+                        
+                        $attr_2_img = "";
+                         if($request->file('attr_2_img'))
+                        {   $image = $imgName = "";
+                            
+                            if(isset($request->file('attr_2_img')[$a2k])){ 
+                            
+                                $image = $request->file('attr_2_img')[$a2k][0]; 
+                            $imgName            =   time().'.'.$image->extension();
+                            $path               =   '/app/public/products/attributes/'.$attr_2_id;
+                            $img                =   Image::make($image->path()); 
+                            $destinationPath    =   storage_path($path); 
+                            $image->move($destinationPath.'/', $imgName);
+                            $imgUpload          =   uploadFile($path,$imgName);
+                            $attr_2_img = $path.'/'.$imgName;
+                            
+                            }else {
+
+                             if(isset($post->attr_2_img[$a2k][0])) { $attr_2_img = $post->attr_2_img[$a2k][0]; }  
+                            }
+                        }else {
+
+                             if(isset($post->attr_2_img[$a2k][0])) { $attr_2_img = $post->attr_2_img[$a2k][0]; }  
+                            }
+                        $attr_data_arr['attr_2_img'][$a2k] = $attr_2_img;
+                        
+                   $attr_2_vals_arr[$a2k] = PrdAttributeValue::create(['attr_id'=>$attr_2_id,'name'=>$a2v[0],'name'=>$a2v[0],'created_by'=>auth()->user()->id])->id; 
                     }
                 }
                 
@@ -633,6 +773,10 @@ class SellerProductController extends Controller{
                 $var_hist_arr['price_data'] = json_encode($price);
                 $var_hist_arr['stock_data'] =json_encode($stock);
                 $var_hist_arr['sku_data'] = json_encode($sku);
+                $var_hist_arr['weight'] = json_encode($weight);
+                $var_hist_arr['length'] = json_encode($length);
+                $var_hist_arr['width'] = json_encode($width);
+                $var_hist_arr['height'] = json_encode($height);
                if(isset($post->dyn_prds)){  $var_hist_arr['dynamic_ids'] = json_encode($post->dyn_prds); }
                if(isset($post->dyn_prds_names)){ $var_hist_arr['dynamic_prod_names'] = json_encode($post->dyn_prds_names); }
                 $var_hist_arr['prd_id'] = $prdId;
@@ -641,6 +785,16 @@ class SellerProductController extends Controller{
                 $var_hist_arr['is_active'] = 1;
 
                 VariableProdHist::create($var_hist_arr);
+                if(isset($related_prd_id)){
+                RelatedProduct::where('prd_id',$prdId)->update(['is_deleted'=>1]);
+                foreach($related_prd_id as $kv=>$rp_id) {
+                $rltd_prd['prd_id']    =   $prdId;
+                $rltd_prd['rel_prd_id']    =   $rp_id;
+                $rltd_prd['created_by']    =   auth()->user()->id;
+                $rltd_prd['is_deleted']    =   0;
+                RelatedProduct::create($rltd_prd);
+                }
+                }
 
                 AssociatProduct::where('prd_id',$prdId)->update(['is_deleted'=>1]);
         if($assoc_arr){ foreach($assoc_arr as $k=>$ass){
@@ -650,7 +804,26 @@ class SellerProductController extends Controller{
 
 
             }else {
-            $prdId              =   $post->id; Product::where('id',$prdId)->update($prd); $price['created_by']    =   auth()->user()->id; 
+            $prdId              =   $post->id; Product::where('id',$prdId)->update($prd);
+            $prdDimensions           =   ProdDimension::where('prd_id',$prdId)->where('is_deleted',0)->orderBy('id','desc')->first();
+            if(isset($prdDimensions)) {
+             $dimension['updated_at'] = date("Y-m-d H:i:s"); 
+             ProdDimension::where('prd_id',$prdId)->update($dimension);
+            }else {
+               $dimension['prd_id']    =   $prdId; $dimension['created_by']    =   auth()->user()->id;
+            ProdDimension::create($dimension); 
+            }
+            if(isset($related_prd_id)){
+                RelatedProduct::where('prd_id',$prdId)->update(['is_deleted'=>1]);
+                foreach($related_prd_id as $kv=>$rp_id) {
+                $rltd_prd['prd_id']    =   $prdId;
+                $rltd_prd['rel_prd_id']    =   $rp_id;
+                $rltd_prd['created_by']    =   auth()->user()->id;
+                $rltd_prd['is_deleted']    =   0;
+                RelatedProduct::create($rltd_prd);
+                }
+                }
+            $price['created_by']    =   auth()->user()->id; 
             $prdPrice           =   PrdPrice::where('prd_id',$prdId)->where('is_deleted',0)->orderBy('id','desc')->first();
             if($price['price']  !=  $prdPrice->price || $price['sale_price']  !=  $prdPrice->sale_price || $price['sale_start_date']  !=  $prdPrice->sale_start_date || $price['sale_end_date']  !=  $prdPrice->sale_end_date){
                 $price['prd_id']=   $prdId; unset($price['tax']); PrdPrice::create($price);
@@ -936,6 +1109,11 @@ class SellerProductController extends Controller{
 
 
        
+    }
+    
+    function deletePrdImg(Request $request){
+        $res                    =   PrdImage::where('id',$request->post('imgId'))->where('is_deleted',0)->update(['is_deleted'=>1]);
+        if($res){ return 'success'; }else{ return 'error'; }
     }
 
 }

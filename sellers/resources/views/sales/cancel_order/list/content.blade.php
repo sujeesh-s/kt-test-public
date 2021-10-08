@@ -13,7 +13,7 @@
                         </div>
                         <div id="table_body" class="card-body table-card-body">
                             <div>
-                                    <table id="sales" class="sales table table-striped table-bordered w-100 text-nowrap">
+                                    <table id="cancel-sales" class="cancel-sales table table-striped table-bordered w-100 text-nowrap">
                                     <thead>
                                         <tr>
                                             <th class="wd-15p notexport"></th>
@@ -33,10 +33,10 @@
                                                 @endphp
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></td>
-                                                    <td><a id="dtlBtn-{{$row->id}}" class="font-weight-bold viewDtl">{{$row->order->order_id}}</a></td> 
-                                                    <td>{{$row->order->address->name}}</td>
+                                                    <td><a id="dtlBtn-{{$row->id}}" class="font-weight-bold viewDtl">@if($row->order) {{$row->order->order_id}} @endif</a></td> 
+                                                    <td>@if($row->order) {{$row->order->address->name}} @endif</td>
                                                     <td>{{date('d M Y',strtotime($row->created_at))}}</td>
-                                                    <td>{{$row->order->total}}</td>
+                                                    <td>@if($row->order) {{$row->order->total}} @endif</td>
                                                     <td><span class="badge badge-{{$stat}} mt-2">{{ucfirst($row->status)}}</span></td>
                                                     <td class="text-center">
                                                         <button id="editBtn-{{$row->sales_id}}" class="mr-2 btn btn-success btn-sm editBtn"><i class="fa fa-file mr-1"></i>Invoice</button>

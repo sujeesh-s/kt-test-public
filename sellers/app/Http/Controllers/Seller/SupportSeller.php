@@ -15,6 +15,9 @@ use App\Models\CustomerInfo;
 use App\Models\SellerInfo;
 use App\Models\SupportSellerChat;
 use App\Models\SupportSellerMessage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 use Carbon\Carbon;
 use App\Rules\Name;
 use Validator;
@@ -50,7 +53,17 @@ class SupportSeller extends Controller
                         'created_at'=>date("Y-m-d H:i:s"),
                         'updated_at'=>date("Y-m-d H:i:s")];
             $create_msg = SupportSellerMessage::create($message)->id;
-
+            
+            $from    = auth()->user()->id; 
+            $utype   =   2;
+            $to      =  1; 
+            $ntype   = 'support';
+            $title   = 'New Support';
+            $desc    = 'New support created by '.sellerData()->fname;
+            $refId   = $create_ticket;
+            $reflink = 'support';
+            $notify  = 'admin';
+            addNotification($from,$utype,$to,$ntype,$title,$desc,$refId,$reflink,$notify);
          }
 
         }    
@@ -95,8 +108,12 @@ class SupportSeller extends Controller
             $html ='';
             $html.='<form id="form_submit" method="POST" role="form" enctype="multipart/form-data">'.csrf_field().'<div class="form-group"><input type="hidden" value="'.$support_id.'" name="support_id" id="support_id" class="support_id"><input type="hidden" value="'.$support->created_by.'" name="cust_id" id="cust_id" class="cust_id"><label class="form-control"><b>Date</b></label><input type="text" readonly class="form-control" value="'.$date.'"></div>
                 <div class="form-group"><label class="form-control"><b>Subject</b></label><input type="text" readonly class="form-control" value="'.$subject.'"></div>';
-            $html.='<div class="form-group"><label class="form-control"><b>Reply</b></label><textarea id="textareas" name="msg" id="msg" row="2" class="form-control textareas" required></textarea></div>';
-            $html.='<div class="row"><div class="col-12"><button type="button" onclick = "submitThisForm('.$support_id.')" class="sendbtn btn btn-primary" id="submit">Send</button></div></div></form>';   
+            $html.='<div class="form-group"><label class="form-control"><b>Reply</b></label><div id="view_img" class="view_img"></div><textarea id="textareas" name="msg" id="msg" row="2" class="form-control textareas" required></textarea></div>';
+            $html.='<div class="row"><div class="col-12"><label class="mr-3">
+                                                <span class="btn btn-primary">
+                                                    <i class="fe fe-paperclip fs-20"></i> <input type="file" style="display: none;" accept="image/png, image/jpeg" class="img_up" id="img_up" onchange="imgchange(this)">
+                                                </span>
+                                            </label><button type="button" onclick = "submitThisForm('.$support_id.')" class="sendbtn btn btn-primary" id="submit">Send</button></div></div></form>';   
 
              return $html;   
 
@@ -108,11 +125,39 @@ class SupportSeller extends Controller
             SupportSellerChat::where('id',$support_id)->update([
             'updated_at'=>date("Y-m-d H:i:s")
             ]);
+            $image = $request->file('file_data');
+            
+            if($image)
+            {
+                $msg_type='image';
+                $imgName            =   time().'.'.$image->extension();
+                $path               =   '/app/public/support_seller/'.$support_id;
+                $destinationPath    =   storage_path($path.'/thumb');
+                $img                =   Image::make($image->path());  //echo storage_path().'  '. $destinationPath; die;
+                if(!file_exists($destinationPath)) { mkdir($destinationPath, 755, true);}
+                $img->resize(250, 250, function($constraint){ $constraint->aspectRatio(); })->save($destinationPath.'/'.$imgName);
+                $destinationPath    =   storage_path($path);
+                $image->move($destinationPath, $imgName);
+                $imgUpload          =   uploadFile('/'.$path,$imgName);
+
+                $image_chat =$path.'/'.$imgName;
+            //     $file=$request->file('file_data');
+            // $extention=$file->getClientOriginalExtension();
+            // $filename=time().'.'.$extention;
+            // $file->move(('storage/app/public/support_seller/'),$filename);
+            // $image_chat ='storage/app/public/support_seller/'.$filename;
+            }
+            else
+            {
+                $image_chat = '';
+                $msg_type='text';
+            }
             $data = ['support_id' => $support_id,
-                     'msg_type'   => 'text',
+                     'msg_type'   => $msg_type,
                      'message'    => $request->msg,
                      'sender_id'  => auth()->user()->id,
                      'receiver_id'=>$request->cust_id,
+                     'image'      =>$image_chat,
                      'sender_type'=>'seller',
                      'sender_role_id'=>3,
                      'show_role_id'=>2,
@@ -120,7 +165,17 @@ class SupportSeller extends Controller
                      'updated_at'=>date("Y-m-d H:i:s")
                     ];
             $create = SupportSellerMessage::create($data);
-             
+            $from = auth()->user()->id; 
+            $utype = 2;
+            $to = 1;
+            $ntype= 'support_replay';
+            $title = 'Support Replay';
+            $desc = 'New support message from '.sellerData()->fname;
+            $refId = $support_id;
+            $reflink = 'support';
+            $notify = 'admin';
+            addNotification($from,$utype,$to,$ntype,$title,$desc,$refId,$reflink,$notify);
+            
              return response()->json(['success'=>'success']);
         }
     }
@@ -170,6 +225,9 @@ class SupportSeller extends Controller
                {
                 $image=url('/public/admin/assets/images/users/2.jpg');
                }
+               
+               if($row->msg_type=='text')
+               {
             $html.='<div class="d-flex justify-content-start">
                                 <div class="img_cont_msg">
                                     <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
@@ -177,6 +235,18 @@ class SupportSeller extends Controller
                                 <div class="msg_cotainer mb-2">'.$row->message.'<span class="msg_time" style="bottom:-31px;"><br>'.$diff_date.','.$row_date.'</span>
                                 </div>
                             </div>';  
+               }
+               else
+               {
+                   $msg_image= config('app.storage_url').$row->image;
+                   $html.='<div class="d-flex justify-content-start">
+                                <div class="img_cont_msg">
+                                    <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
+                                </div>
+                                <div class="msg_cotainer mb-2">'.$row->message.'<div class="row mt-2"><div class="col-12"><img class="img-fluid rounded" src="'.$msg_image.'" alt="image"></div></div><span class="msg_time" style="bottom:-31px;"><br>'.$diff_date.','.$row_date.'</span>
+                                </div>
+                            </div>';
+               }
               }
               else
               {
@@ -189,13 +259,28 @@ class SupportSeller extends Controller
                {
                 $image=url('/public/admin/assets/images/users/2.jpg');
                }
+               
+               if($row->msg_type=='text')
+               {
              $html.='<div class="d-flex justify-content-end ">
                                 <div class="msg_cotainer_send mb-2">'.$row->message.'<span class="msg_time_send" >'.$diff_date.','.$row_date.'</span>
                                 </div>
                                 <div class="img_cont_msg">
                                     <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
                                 </div>
-                            </div>';   
+                            </div>'; 
+               }
+               else
+               {
+                   $msg_image= config('app.storage_url').$row->image;
+                   $html.='<div class="d-flex justify-content-end ">
+                                <div class="msg_cotainer_send mb-2">'.$row->message.'<div class="row mt-2"><div class="col-12"><img class="img-fluid rounded" src="'.$msg_image.'" alt="image"></div></div><span class="msg_time_send" >'.$diff_date.','.$row_date.'</span>
+                                </div>
+                                <div class="img_cont_msg">
+                                    <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
+                                </div>
+                            </div>'; 
+               }
               }
 
               

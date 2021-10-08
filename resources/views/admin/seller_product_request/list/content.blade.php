@@ -50,6 +50,7 @@
                                         <tr>
                                             <th class="wd-15p notexport"></th>
                                             <th class="wd-15p">Product Name</th>
+                                            <th class="wd-15p">Business Name</th>
                                             <th class="wd-15p">Seller</th>
                                             <th class="wd-15p">Category</th>
                                             <th class="wd-20p">Sub Category</th>

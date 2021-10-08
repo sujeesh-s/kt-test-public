@@ -12,7 +12,8 @@ class PrdShockingSaleProduct extends Model{
     protected $table = 'prd_shock_sale_products';
     protected $fillable = ['seller_id','shock_sale_id','prd_id','is_active','is_deleted'];
  
-
+    public function Product(){ return $this->belongsTo(Product::class, 'prd_id'); }
+    public function Store($seller_id){ return DB::table('usr_stores')->where('seller_id', $seller_id)->first(); }
     static function getShockingSalesProducts($sale_id){ 
          
            $shk_list = PrdShockingSaleProduct::where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->where('seller_id',auth()->user()->id)->where('shock_sale_id',$sale_id)->get();     

@@ -33,8 +33,10 @@ Route::post('/customer/product-featured', [App\Http\Controllers\Api\Customer\Pro
 Route::post('/customer/product-deals', [App\Http\Controllers\Api\Customer\ProductController::class, 'daily_deals']);
 
 
-
-
+Route::post('/customer/register/send/otp', [App\Http\Controllers\Api\Customer\CustomerAuth_Api::class, 'regSendotp']);
+Route::post('/customer/register/verify/otp', [App\Http\Controllers\Api\Customer\CustomerAuth_Api::class, 'regVerifyotp']);
+Route::post('/customer/login/send/otp', [App\Http\Controllers\Api\Customer\CustomerAuth_Api::class, 'loginSendotp']);
+Route::post('/customer/login/verify/otp', [App\Http\Controllers\Api\Customer\CustomerAuth_Api::class, 'loginVerifyotp']);
 
 //CART
 Route::post('/customer/cart', [App\Http\Controllers\Api\Customer\CartController::class, 'index']);
@@ -108,3 +110,8 @@ Route::post('/customer/wallet/amount', [App\Http\Controllers\Api\Customer\Accoun
 Route::post('/customer/view/notifications', [App\Http\Controllers\Api\Customer\AccountController::class, 'notifications']);
 Route::post('/customer/order/invoice', [App\Http\Controllers\Api\Customer\AccountController::class, 'invoice']);
 Route::post('/customer/order/return/shipment', [App\Http\Controllers\Api\Customer\AccountController::class, 'return_shipment']);
+
+/*****************AUCTION**************************/
+Route::post('/customer/auction/detail', [App\Http\Controllers\Api\Customer\AuctionController::class, 'auction_detail']);
+Route::post('/customer/auction/checkout', [App\Http\Controllers\Api\Customer\AuctionController::class, 'auction_checkout']);
+Route::post('/customer/auction/order/list', [App\Http\Controllers\Api\Customer\AuctionController::class, 'auction_order_list']);

@@ -15,6 +15,7 @@ use App\Models\CustomerSecurity;
 use App\Models\CustomerTelecom;
 use App\Models\CustomerLogin;
 use App\Models\CustomerAddress;
+use App\Models\CustomerRegisterotp;
 
 use App\Rules\Name;
 use Validator;
@@ -28,15 +29,10 @@ class CustomerAuth_Api extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => ['required','max:255'],
             'last_name' => ['required','max:255'],
-            'email' => ['required_without:phone_number','nullable','email','max:255','unique:usr_mst,username'],
-            'phone_number'=>['required_without:email','nullable','min:10','unique:usr_telecom,usr_telecom_value'],
+            'country_code' => ['required','max:20'],
+            'email' => ['required','nullable','email','max:255','unique:usr_mst,username'],
+            'phone_number'=>['required','nullable','min:7,12'],
             'password' => ['required','min:8','required_with:password_confirmation','confirmed'],
-            'address'=>['nullable','string','max:255'],
-            'country'=>['nullable','numeric'],
-            'state'=>['nullable','numeric'],
-            'city'=>['nullable','numeric'],
-            'pincode'=>['nullable','numeric']
-            
         ]);
 
 
@@ -71,11 +67,6 @@ class CustomerAuth_Api extends Controller
            'user_id' => $masterId,
            'usr_role_id' => 5,
            'profile_image'=>$filename,
-           'address'=>$request->address,
-           'pincode'=>$request->pincode,
-           'country_id'=>$request->country,
-           'state_id'=>$request->state,
-           'city_id'=>$request->city,
            'is_active'=>1,
            'is_deleted'=>0,
            'created_at'=>date("Y-m-d H:i:s"),
@@ -94,6 +85,7 @@ class CustomerAuth_Api extends Controller
            $telecom_email = CustomerTelecom::create(['org_id' => 1,
            'user_id' => $masterId,
            'usr_telecom_typ_id'=>1,
+           'country_code'=>'',
            'usr_telecom_value'=>$request->email,
            'is_active'=>1,
            'is_deleted'=>0,
@@ -110,6 +102,7 @@ class CustomerAuth_Api extends Controller
            $telecom_ph = CustomerTelecom::create(['org_id' => 1,
            'user_id' => $masterId,
            'usr_telecom_typ_id'=>2,
+           'country_code'=>$request->country_code,
            'usr_telecom_value'=>$request->phone_number,
            'is_active'=>1,
            'is_deleted'=>0,
@@ -135,14 +128,54 @@ class CustomerAuth_Api extends Controller
         //     'updated_at'=>date("Y-m-d H:i:s")
         //     ]);
            
-
+           CustomerRegisterotp::where('country_code',$request->country_code)->where('phone_number',$request->phone_number)->where('is_active',1)->where('is_deleted',0)->update(['status'=>0]);
            return response()->json(['httpcode'=>200,'success'=>'successfully registered']);
 
         }
-        return response()->json(['error'=>$validator->errors()->all()]);
+        return response()->json(['httpcode'=>'400','status'=>'error','error'=>$validator->errors()->all()]);
     }
     
     public function login(Request $request){  
+        $post                       =   (object)$request->post(); $error = [];  $user = false;
+        $rules                      =   ['input' => 'required|string|email|max:100','password'=>'required','deviceToken'=> 'required|string|max:200', 'os' => 'required|string|max:20',
+                                            'deviceId' => 'required|string|max:200'];
+        $validator              =   Validator::make($request->post(),$rules);
+        if ($validator->fails()) {
+           $rules                   =   ['input' => 'required|numeric|digits_between:7,12'];
+            $validator              =   Validator::make($request->post(),$rules);
+            if ($validator->fails()){   
+                return array('httpcode'=>400,'status'=>'error','message'=>'Invalid Credential','data'=>array('errors' =>(object)['error_msg'=>'Invalid Email or Phone']));
+            }else{ $input           =   'phone'; $inputId = 2; }
+        }else{ $input               =   'email'; $inputId = 1; }
+        $telecom                    =   CustomerTelecom::whereIn('usr_telecom_typ_id',[1,2])->where('usr_telecom_value',$post->input)->first();
+        if($telecom){ $user         =   CustomerInfo::where('user_id',$telecom->user_id)->where('is_deleted',0)->first(); }
+        if($user){
+            // $otp                    =   $this->validateOtp($user,$post->otp);
+            // if(!$otp){ return ['httpcode'=>400,'status'=>'error','message'=>'Invalid OTP','data'=>['errors' =>['error'=>'Invalid OTP']]]; }
+        //**    $info                   =   CustomerInfo::where('user_id',$user->id)->first();
+            $security               =   CustomerSecurity::where('user_id',$user->user_id)->first(); 
+            // print_r($security);
+            // die();
+            if(Hash::check($post->password, $security->password_hash)){ 
+                
+            if($user->is_active == 0){ $error  =   'This account has been disabled. Please contact Admin'; }
+            if($error){
+                return ['httpcode'=>400,'status'=>'error','message'=>$error,'data'=>['errors' =>['error'=>$error]]];
+            }else{ return $this->authenticateUser($user,$post); }
+        }//pwd
+        else
+        {
+            return array('httpcode'=>400,'status'=>'error','message'=>'Incorrect password ','data'=>array('errors' =>(object)['error_msg'=>'Incorrect password']));
+        }
+        }
+        
+        else{ return array('httpcode'=>400,'status'=>'error','message'=>'Invalid Account','data'=>array('errors' =>(object)['error_msg'=>'Invalid Account'])); }
+        return ['httpcode'=>400,'status'=>'error','redirect'=>'login','message'=>'Invalid credential','data'=>['errors' =>(object)['error_msg'=>'Invalid credential']]];
+        
+    }
+    
+    //****old
+    public function login1(Request $request){  
         $post                       =   (object)$request->post(); $error = [];  $user = false;
         $rules                      =   ['input' => 'required|string|email|max:100'];
         $validator              =   Validator::make($request->post(),$rules);
@@ -191,7 +224,7 @@ class CustomerAuth_Api extends Controller
         if($user){
             $otp                    =   $this->validateOtp($user,$post->otp);
             if(!$otp){ return ['httpcode'=>400,'status'=>'error','message'=>'Invalid OTP','data'=>['errors' =>['error'=>'Invalid OTP']]]; }
-        //    $info                   =   CustomerInfo::where('user_id',$user->id)->first();
+        //**    $info                   =   CustomerInfo::where('user_id',$user->id)->first();
             
             if($user->is_active == 0){ $error  =   'This account has been disabled. Please contact Admin'; }
             if($error){
@@ -281,5 +314,158 @@ class CustomerAuth_Api extends Controller
         $query                  =   CustomerInfo::where('user_id',$userId)->where('is_deleted',0)->first();
         if($query->exists)  {       return $query; }else{ return false; }
     }
+    public function regSendotp(Request $request)
+    {
+        $formData   =   $request->all(); 
+        $rules      =   array();
+        $rules['country_code']    = 'required|string';
+        $rules['phone_number']    = 'required|numeric|min:7,12';
+        $validator  =   Validator::make($request->all(), $rules);
+        if ($validator->fails()) 
+            {
+                foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; $errorMag[] = $row[0]; }  
+                return array('httpcode'=>'400','status'=>'error','message'=>$errorMag[0],'data'=>array('errors' =>(object)$error));
+            }
+        else
+            { 
+              $regexist = CustomerTelecom::where('country_code',$request->country_code)->where('usr_telecom_value',$request->phone_number)->where('is_active',1)->where('is_deleted',0);
+              if($regexist->count() > 0)
+              {
+                return array('httpcode'=>'400','status'=>'error','message'=>'Already Exist','data'=>['message' =>'Phone number already exist!']);
+              }
+              else
+              {
+                $otp = rand(1000, 9999); $otp = 1234;
+                $exisit = CustomerRegisterotp::where('country_code',$request->country_code)->where('phone_number',$request->phone_number)->where('is_active',1)->where('is_deleted',0);
+                if($exisit->count() > 0)
+                {
+                    CustomerRegisterotp::where('country_code',$request->country_code)->where('phone_number',$request->phone_number)->where('is_active',1)->where('is_deleted',0)->update(['otp'=>$otp]);
+                }
+                else
+                {
+                    CustomerRegisterotp::create(['country_code'=>$request->country_code,'phone_number'=>$request->phone_number,'otp'=>$otp,'created_at'=>date('Y-m-d H:i:s')]);
+                }
+               
+                return ['httpcode'=>200,'status'=>'success','message'=>'OTP hes been sent to phone','data'=>['otp' =>$otp,'country_code'=>$request->country_code,'phone_number'=>$request->phone_number]];
+              }
+              
+            }
+    }
     
+    public function regVerifyotp(Request $request)
+    {
+        $formData   =   $request->all(); 
+        $rules      =   array();
+        $rules['country_code']    = 'required|string';
+        $rules['phone_number']    = 'required|numeric|min:7,12';
+        $rules['otp']             = 'required|numeric';
+        $validator  =   Validator::make($request->all(), $rules);
+        if ($validator->fails()) 
+            {
+                foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; $errorMag[] = $row[0]; }  
+                return array('httpcode'=>'400','status'=>'error','message'=>$errorMag[0],'data'=>array('errors' =>(object)$error));
+            }
+        else
+            { 
+                $exisit = CustomerRegisterotp::where('country_code',$request->country_code)->where('phone_number',$request->phone_number)->where('is_active',1)->where('is_deleted',0);
+                if($exisit->count() > 0)
+                {
+                     $exist = CustomerRegisterotp::where('country_code',$request->country_code)->where('phone_number',$request->phone_number)->where('otp',$request->otp)->where('is_active',1)->where('is_deleted',0);
+                     if($exist->count() > 0)
+                     {
+                        CustomerRegisterotp::where('country_code',$request->country_code)->where('phone_number',$request->phone_number)->where('otp',$request->otp)->where('is_active',1)->where('is_deleted',0)->update(['status'=>1]);
+                    return ['httpcode'=>200,'status'=>'success','message'=>'OTP verified','data'=>['redirect' =>'registeration','country_code'=>$request->country_code,'phone_number'=>$request->phone_number]];
+                     }
+                     else
+                     {
+                         return array('httpcode'=>'400','status'=>'error','message'=>'Invalid OTP','data'=>['message' =>'Entered OTP is Invalid!']);
+                     }
+                    
+                }
+                else
+                {
+                   return array('httpcode'=>'400','status'=>'error','message'=>'Phone number does not exist','data'=>['message' =>'Phone number does not exist!']);
+                }
+              
+            }
+    }
+    
+     public function loginSendotp(Request $request)
+    {
+        $formData   =   $request->all(); 
+        $rules      =   array();
+        $rules['country_code']    = 'required|string';
+        $rules['phone_number']    = 'required|numeric|min:7,12';
+        $validator  =   Validator::make($request->all(), $rules);
+        if ($validator->fails()) 
+            {
+                foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; $errorMag[] = $row[0]; }  
+                return array('httpcode'=>'400','status'=>'error','message'=>$errorMag[0],'data'=>array('errors' =>(object)$error));
+            }
+        else
+            { 
+              $regexist = CustomerTelecom::where('country_code',$request->country_code)->where('usr_telecom_value',$request->phone_number)->where('is_active',1)->where('is_deleted',0);
+              if($regexist->count() > 0)
+              {
+                $otp = rand(1000, 9999); $otp = 1234;
+                CustomerTelecom::where('country_code',$request->country_code)->where('usr_telecom_value',$request->phone_number)->update(['otp'=>$otp,'otp_sent_at'=>date('Y-m-d H:i:s')]);
+                return ['httpcode'=>200,'status'=>'success','message'=>'OTP hes been sent to phone','data'=>['otp' =>$otp,'country_code'=>$request->country_code,'phone_number'=>$request->phone_number]];
+              }
+              else
+              {
+                return array('httpcode'=>'400','status'=>'error','message'=>'Phone number does not exist','data'=>['message' =>'Phone number does not exist!']);
+              }
+              
+            }
+    }
+
+    public function loginVerifyotp(Request $request)
+    {
+        $formData   =   $request->all(); 
+        $post       =   (object)$request->post();
+        $rules      =   array();
+        $rules['country_code']    = 'required|string';
+        $rules['phone_number']    = 'required|numeric|min:7,12';
+        $rules['otp']             = 'required|numeric';
+        $rules['deviceToken']     = 'required|string|max:200';
+        $rules['os']              = 'required|string|max:20';
+        $rules['deviceId']        = 'required|string|max:200';
+        $validator  =   Validator::make($request->all(), $rules);
+        if ($validator->fails()) 
+            {
+                foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; $errorMag[] = $row[0]; }  
+                return array('httpcode'=>'400','status'=>'error','message'=>$errorMag[0],'data'=>array('errors' =>(object)$error));
+            }
+        else
+            { 
+                $exisit = CustomerTelecom::where('country_code',$request->country_code)->where('usr_telecom_value',$request->phone_number)->where('is_deleted',0)->first();
+                if($exisit)
+                {
+                    if($exisit->is_active == 0)
+                    {
+                         return array('httpcode'=>'400','status'=>'error','message'=>'Account Disabled','data'=>['message' =>'This account has been disabled. Please contact Admin!']);
+                    }
+                    else
+                    {
+                        $ext = CustomerTelecom::where('country_code',$request->country_code)->where('usr_telecom_value',$request->phone_number)->where('otp',$request->otp)->where('is_deleted',0)->where('is_active',1);
+                         if($ext->count() > 0)
+                         {
+                              $user = $ext->first();
+                              return $this->authenticateUser($user,$post);
+                         }
+                         else
+                         {
+                             return array('httpcode'=>'400','status'=>'error','message'=>'Invalid OTP','data'=>['message' =>'Entered OTP is Invalid!']);
+                         }
+                    }
+                  
+                    
+                }
+                else
+                {
+                   return array('httpcode'=>'400','status'=>'error','message'=>'Phone number does not exist','data'=>['message' =>'Phone number does not exist!']);
+                }
+              
+            }
+    }
 }

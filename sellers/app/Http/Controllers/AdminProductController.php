@@ -33,18 +33,51 @@ class AdminProductController extends Controller
         $this->middleware('auth:seller');
     }
     public function products(Request $request){ // echo Auth::user()->id; die;
-        $post                       =   (object)$request->post();
+        $post                       =   (object)$request->post(); $res = [];
         if(isset($post->viewType))  {   $viewType = $post->viewType; }else{ $viewType = ''; }
         $data['title']              =   'Admin Products';
         $data['menuGroup']          =   'productGroup';
         $data['menu']               =   'admin_product';
         $data['active']             =   '';
-        $products                   =   AdminProduct::where('is_deleted',0);
-        if(isset($post->active) &&  $post->active != ''){ 
-            $products               =   $products->where('is_active',$post->active); 
-            $data['active']         =   $post->active;
+        $products                   =   AdminProduct::where('is_active',1)->where('is_deleted',0);
+        if(isset($request->active)  &&  $request->active != ''){ 
+            $products               =   $products->where('is_active',$request->active); 
+            $data['active']         =   $request->active;
         }
-        $data['products']           =   $products->orderBy('id','desc')->get();
+        if(isset($post->vType)       ==  'ajax'){
+           $search                  =   (isset($post->search['value']))? $post->search['value'] : ''; 
+           $start                   =   (isset($post->start))? $post->start : 0; 
+           $length                  =   (isset($post->length))? $post->length : 10; 
+           $draw                    =   (isset($post->draw))? $post->draw : ''; 
+           $totCount                =   $products->count(); $filtCount  =   $products->count();
+           if($search != ''){
+                $products           =   $products->where(function($qry) use ($search){
+                                            $qry->where('name', 'LIKE', '%'.$search.'%');
+                                            $qry->orWhereIn('category_id', $this->getCatPrdIds($search));
+                                            $qry->orWhereIn('sub_category_id', $this->getSubCatPrdIds($search));
+                                        });
+                $filtCount          =   $products->count();
+           }
+           if($length>0){$products  =   $products->offset($start)->limit($length); }
+           $products                =   $products->orderBy('id','desc')->get();
+           if($products){ foreach   (   $products as $row){ $action = '';
+               if($row->is_active   ==  1){ $checked    = 'checked="checked"'; $act = 'Active'; }else{ $checked = '';  $act = 'Inactive'; }
+               $val['id']           =   '';                                
+               $val['name']         =   '<a id="dtlBtn-'.$row->id.'" class="font-weight-bold viewDtl">'.$row->name.'</a>';
+               $val['cat']          =   $row->category->cat_name;      
+               $val['sub_cat']      =   $row->subCategory->subcategory_name;
+               $val['status']       =   '<span class="badge badge-success mt-2">Active</span>';
+               $res[] = $val;  
+           } }
+           $returnData = array(
+			"draw"            => $draw,   
+			"recordsTotal"    => $totCount,  
+			"recordsFiltered" => $filtCount,
+			"data"            => $res   // total data array
+			);
+            return $returnData;
+        }
+      //  $data['products']           =   $products->orderBy('id','desc')->get();
         if($viewType == 'ajax') {   return view('admin_product.list',$data); }else{ return view('admin_product.page',$data); }
     }
     public function product(Request $request,$id=0,$sellerId=0,$type=''){
@@ -77,4 +110,13 @@ class AdminProductController extends Controller
     }
     
     function getAttrValues($attrId){ return   PrdAttributeValue::where('attr_id',$attrId)->where('is_active',1)->where('is_deleted',0)->get(); }
+    
+    function getCatPrdIds($keyword){
+        $query              =   Category::where('cat_name', 'LIKE', '%'.$keyword.'%')->where('is_deleted',0); $ids = [0];
+        if($query->count()  >   0)  {   foreach($query->get() as $row){ $ids[]    =   $row->category_id; }}return $ids; 
+    }
+    function getSubCatPrdIds($keyword){
+        $query              =   Subcategory::where('subcategory_name', 'LIKE', '%'.$keyword.'%')->where('is_deleted',0); $ids = [0];
+        if($query->count()  >   0)  {   foreach($query->get() as $row){ $ids[]    =   $row->subcategory_id; }}return $ids; 
+    }
 }

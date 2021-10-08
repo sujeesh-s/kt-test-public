@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class PrdAttributeValue extends Model
 {
     use HasFactory;
-    protected $fillable = ['attr_id','name','name_cnt_id','is_active','created_by','seller_id','prd_id'];
+    protected $fillable = ['attr_id','name','name_cnt_id','image','is_active','created_by','seller_id','prd_id'];
 }
 

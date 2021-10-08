@@ -23,7 +23,7 @@
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('sale_price','Sale Price',['class'=>''])}}
-            {{Form::number('price[sale_price]',$sPrice,['id'=>'sale_price','class'=>'form-control chosen-select','placeholder'=>'Sale Price','max'=>9999999999])}}
+            {{Form::number('price[sale_price]',$sPrice,['id'=>'sale_price','class'=>'form-control ','placeholder'=>'Sale Price','max'=>9999999999])}}
             <span class="error"></span>
         </div>
     </div> 
@@ -101,7 +101,7 @@
     
 </div>
 </div>
-                <div class="row panel-body tabs-menu-body variable_prod" style="<?php echo $var_prod; ?>">
+                <div class="row panel-body tabs-menu-body variable_prod attr_list" style="<?php echo $var_prod; ?>">
                 <div class="tab-content col-12">
                 <div class="tab-pane active " id="tab1">
                 <div class="card-header mb-4"><div class="card-title">Attribute Details</div></div>
@@ -124,16 +124,45 @@
                                         ?>  
 
                                             <div id="attr-val-row-<?php echo $ar1_id; ?>" class="attr_val_row_id">
-                                            <div class="col-lg-11 tofix mb-2 fl">
+                                            <div class="col-lg-6 tofix mb-2 fl">
 
                                             <div class="mb-1">
                                                 {{form::label('attr_val_id','Options',['class'=>'m-0'])}}
                                                 {{Form::text("attr_1_value[$att1_k][]",$att1_v[0],['id'=>'attr_val_id','class'=>'form-control attr_value required','placeholder'=>'Enter Variation Options, eg: Red, etc.','data-val'=>"$att1_k"])}}
                                             <span class="error"></span>
                                             </div>
-
+                                            </div>
+                                            <?php if($attr_1_img !=""){
+                                                $var_p = 'attr1_'.$ar1_id;
+                                                $attr1_img = $attr_1_img->$var_p;
+                                                 }else {
+                                                   $attr1_img = ""; 
+                                                 }
+                                                if($attr1_img !=""){
+                                             ?> 
+                                             <div class="col-4 pl-0 mb-2 fl">
+                                            <div class="custom-file">
+                                                {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                                                <input type="file" class="attr_img" id="attr_img" name="attr_1_img[attr1_<?php echo $ar1_id; ?>][]" >
+                                                <input type="hidden" name="attr_1_img[attr1_<?php echo $ar1_id; ?>][]" value="{{ $attr1_img }}">
+                                               
+                                            </div>
+                                            </div>
+                                            <div class="col-1 pl-0 mt-5 fl">
+                                            <div class="clr"></div>
+                                            <img src="{{ config('app.storage_url').$attr1_img }}" width="30px;" />
+                                            </div>
+                                             <?php  }else { ?>
+                                            <div class="col-5 pl-0 mb-2 fl">
+                                            <div class="custom-file">
+                                            {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                                            <input type="file" class="attr_img" id="attr_img" name="attr_1_img[attr1_<?php echo $ar1_id; ?>][]">
 
                                             </div>
+                                            </div>
+                                              <?php } ?>
+                                            
+
                                             <div class="col-1 pl-0 mb-2 fl">
                                             <div class="clr"></div>
                                             <a id="del_val_<?php echo $ar1_id; ?>" class="del_val del"><i class="fa fa-trash"></I></a>
@@ -142,7 +171,7 @@
                                             </div>
                                         <?php  ++$ar1_id; } }else { $ar1_id = 0;  ?>
 
-                                            <div class="col-lg-11 mb-2 fl tofix">
+                                            <div class="col-lg-6 mb-2 fl tofix">
                                            
                                                     <div class=" mb-1">
 
@@ -151,6 +180,13 @@
                                                     <span class="error"></span>
                                                     </div>
 
+                                            </div>
+                                            <div class="col-5 pl-0 mb-2 fl">
+                                            <div class="custom-file">
+                                                {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                                                <input type="file" class="attr_img" id="attr_img" name="attr_1_img[attr1_0][]">
+                                               
+                                            </div>
                                             </div>
                                   
                                             <div class="col-1 pl-0 mb-2 fl">
@@ -190,16 +226,45 @@
                                         ?>  
 
                                             <div id="attr-val-row-<?php echo $ar2_id; ?>" class="attr_val_row_id">
-                                            <div class="col-lg-11 tofix mb-2 fl">
+                                            <div class="col-lg-6 tofix mb-2 fl">
 
                                             <div class="mb-1">
                                                 {{form::label('attr_val_id','Options',['class'=>'m-0'])}}
                                                 {{Form::text("attr_2_value[$att2_k][]",$att2_v[0],['id'=>'attr_val_id','class'=>'form-control attr_value required','placeholder'=>'Enter Variation Options, eg: Red, etc.','data-val'=>"$att2_k"])}}
                                             <span class="error"></span>
                                             </div>
+                                            </div>
 
+                                            <?php if($attr_2_img !=""){
+                                            $var_p = 'attr2_'.$ar2_id;
+                                            $attr2_img = $attr_2_img->$var_p;
+                                            }else {  $attr2_img = ""; }
+                                            if($attr2_img !=""){
+                                            ?> 
+                                            <div class="col-4 pl-0 mb-2 fl">
+                                            <div class="custom-file">
+                                            {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                                            <input type="file" class="attr_img" id="attr_img" name="attr_2_img[attr2_<?php echo $ar2_id; ?>][]" >
+                                            <input type="hidden" name="attr_2_img[attr2_<?php echo $ar2_id; ?>][]" value="{{ $attr2_img }}">
 
                                             </div>
+                                            </div>
+                                            <div class="col-1 pl-0 mt-5 fl">
+                                            <div class="clr"></div>
+                                            <img src="{{ config('app.storage_url').$attr2_img }}" width="30px;" />
+                                            </div>
+                                            <?php }else { ?>
+                                                <div class="col-5 pl-0 mb-2 fl">
+                                            <div class="custom-file">
+                                                {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                                                <input type="file" class="attr_img" id="attr_img" name="attr_2_img[attr2_<?php echo $ar2_id; ?>][]">
+                                               
+                                            </div>
+                                            </div>
+
+                                            <?php } ?>
+
+                                            
                                             <div class="col-1 pl-0 mb-2 fl">
                                             <div class="clr"></div>
                                             <a id="del_val_<?php echo $ar2_id; ?>" class="del_val del"><i class="fa fa-trash"></I></a>
@@ -209,7 +274,7 @@
                                         <?php  ++$ar2_id; } }else { $ar2_id = 0; ?>
 
 
-                                             <div class="col-lg-11 mb-2 fl tofix">
+                                             <div class="col-lg-6 mb-2 fl tofix">
                                            
                                                     <div class=" mb-1">
 
@@ -218,6 +283,13 @@
                                                     <span class="error"></span>
                                                     </div>
 
+                                            </div>
+                                            <div class="col-5 pl-0 mb-2 fl">
+                                            <div class="custom-file">
+                                                {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                                                <input type="file" class="attr_img" id="attr_img" name="attr_2_img[attr2_0][]">
+                                               
+                                            </div>
                                             </div>
                                   
                                             <div class="col-1 pl-0 mb-2 fl">
@@ -248,7 +320,7 @@
 
 <div id="adnl_rows" class="d-none">
     <div id="attr_val_row_id" class="attr_val_row_id">
-                <div class="col-lg-11 tofix mb-2 fl">
+                <div class="col-lg-6 tofix mb-2 fl">
                    
                         <div class="mb-1">
                             {{form::label('attr_val_id','Options',['class'=>'m-0'])}}
@@ -258,6 +330,13 @@
                  
                    
                 </div>
+                <div class="col-5 pl-0 mb-2 fl">
+                <div class="custom-file">
+                {{form::label('attr_img','Image',['class'=>'m-0'])}}
+                <input type="file" class="attr_img" id="attr_img" name="attr_0_img">
+
+                </div>
+                </div>
                 <div class="col-1 pl-0 mb-2 fl">
                     <div class="clr"></div>
                     <a id="del_val_id" class="del_val del"><i class="fa fa-trash"></I></a>
@@ -265,6 +344,76 @@
                 <div class="clr"></div>
     </div>
 </div>     
+
+
+<div id="add_modal" class="d-none">
+               
+
+        <div class="modal fade tochange" role="dialog" tabindex="-1" id="modal_row_id">
+        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title">Shipping</h5>
+        <button type="button" class="close" data-dismiss="modal">
+        <span aria-hidden="true">×</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        <div class="tab-content col-12">
+        <div class="card-header mb-4"><div class="card-title">Shipping</div></div>       
+        <div class="clearfix"></div>   
+        <div class="col-lg-4 fl">
+        <div class="form-group">
+        {{Form::label('mweight','Weight (kg)',['class'=>''])}}
+        {{Form::number('mdimension[weight]','',['id'=>'mweight', 'class'=>'form-control','placeholder'=>'Weight','max'=>9999999999])}}
+        <span class="error"></span>
+        </div>
+        </div>
+        <div class="col-lg-8 fl">
+        <div class="form-group">
+        {{Form::label('mdimensions','Dimensions (cm)',['class'=>''])}}
+        <div class="tab-content">
+        <div class="col-lg-4 fl">
+        <div class="form-group">
+
+        {{Form::number('mdimension[length]','',['id'=>'mlength', 'class'=>'form-control','placeholder'=>'Length','max'=>9999999999])}}
+        <span class="error"></span>
+        </div>
+        </div>
+
+        <div class="col-lg-4 fl">
+        <div class="form-group">
+
+        {{Form::number('mdimension[width]','',['id'=>'mwidth', 'class'=>'form-control','placeholder'=>'Width','max'=>9999999999])}}
+        <span class="error"></span>
+        </div>
+        </div>
+        <div class="col-lg-4 fl">
+        <div class="form-group">
+
+        {{Form::number('mdimension[height]','',['id'=>'mheight', 'class'=>'form-control','placeholder'=>'Height','max'=>9999999999])}}
+        <span class="error"></span>
+        </div>
+        </div>
+        </div>    
+        </div>
+        </div> 
+
+        </div>
+        <div class="py-1">
+        <div class="row">
+        <div class="col d-flex justify-content-end">
+        <input type="button" class="btn btn-primary mr-6" data-dismiss="modal" value="Save">
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+
+ 
+</div>  
 
 <table class="variation_table_hid table" id="hidden_table" style="display: none;">
 </table>
@@ -346,7 +495,51 @@
 
 
                 </div><!--  tab content ends -->
-                </div>   <!--  panel body ends -->              
+                </div>   <!--  panel body ends -->          
+
+
+<!-- Existing Dimensions -->
+ <?php if($attr_weight !="" || $attr_length !="" || $attr_width !="" || $attr_height !=""){     ?>
+
+            <?php  
+            if(isset($attr_stock) && $attr_stock !=""  )
+            {
+            foreach($attr_stock as $dyk=>$dyv){
+            if(is_array($dyv)) {
+            $at_2 = 0;
+                foreach($dyv as $dyk2=>$dyv2){
+                $at_2++;
+                $atr_weight = $attr_weight[$dyk][$dyk2];
+                
+                $atr_length = $attr_length[$dyk][$dyk2];
+                $atr_width = $attr_width[$dyk][$dyk2];
+                $atr_height = $attr_height[$dyk][$dyk2];
+                $row = "$dyk$dyk2";
+                $row_name = "[$dyk][$dyk2]";
+                ?>
+                @include('admin.seller_product.details.shipping')
+                <?php 
+                 } 
+            }else { 
+              
+                $atr_weight = $attr_weight[$dyk];
+                $atr_length = $attr_length[$dyk];
+                $atr_width = $attr_width[$dyk];
+                $atr_height = $attr_height[$dyk]; 
+                $row = "$dyk";
+                $row_name = "[$dyk]";
+                ?>
+                @include('admin.seller_product.details.shipping')
+                <?php 
+              }
+            }
+            } ?>
+
+<?php } ?>
+<!-- Existing Dimensions -->
+
+
+
 
 <style type="text/css">
     .prod_attr_2 .attr_content{
@@ -386,6 +579,9 @@
     .attr_name {
             max-width: 470px;
     margin-left: 10px;
+    }
+    .attr_img {
+        padding: 3px;
     }
 </style>
 <script type="text/javascript">

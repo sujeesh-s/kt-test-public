@@ -6,7 +6,7 @@ $(document).ready(function () {
     });
 
     var table = $(".category-table").DataTable({
-        ordering: false,
+        ordering: true,
         pageLength: 10,
         rowReorder: false,
         colReorder: true,
@@ -71,7 +71,12 @@ $(document).ready(function () {
 //                footer: false
 //            }  
         ],
-        
+        'columnDefs'        : [         // see https://datatables.net/reference/option/columns.searchable
+                { 
+                    'searchable'    : false, 
+                    'targets'       : [6] 
+                },
+            ],
         select: {
             style: "multi",
             selector: "td:first-child"

@@ -116,7 +116,21 @@ class OfferController extends Controller{
         }
         
        
-        if($offrId){   
+        if($offrId){ 
+            
+        $getprd = Product::where('id',$post->prd_id)->first();
+        $from    =  auth()->user()->id; 
+        $utype   = 2;
+        $to      = 1; 
+        $to      =  1; 
+        $ntype   = 'new_offer';
+        $title   = 'New product offer';
+        $desc    = 'New offer created for the product '.$getprd->name.' by '.sellerData()->fname;
+        $refId   =  $offrId;
+        $reflink = 'sales/orders/ref_reqs';
+        $notify  = 'admin';
+        addNotification($from,$utype,$to,$ntype,$title,$desc,$refId,$reflink,$notify);
+        
 Session::flash('message', ['text'=>'Offer created successfully','type'=>'success']);  
              }else{
 Session::flash('message', ['text'=>'Offer creation failed','type'=>'danger']);

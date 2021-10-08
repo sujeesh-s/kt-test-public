@@ -13,7 +13,7 @@ class AuctionRefundHist extends Authenticatable
 {
     use HasFactory, Notifiable;
     protected $table = 'auction_refund_hist';
-    protected $fillable = ['org_id','auction_id', 'user_id', 'sale_id','paid_amount','refund_amount','refund_percentage','status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['org_id','auction_id', 'user_id', 'sale_id','paid_amount','refund_amount','refund_percentage','refund_charge','status','created_by','updated_by','created_at','updated_at'];
 
      
   static function getLog($acn,$status){ 

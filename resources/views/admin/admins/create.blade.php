@@ -60,11 +60,17 @@
                     <label for="fname">First name <span class="text-red">*</span></label>
                     <input type="text" class="form-control" name="user[fname]" id="fname" placeholder="First name" value="@if(old()){{old('user')['fname']}}@endif" required>
                     <span class="error"></span>
+                    @error('fname')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="lname">Last name <span class="text-red">*</span></label>
                     <input type="text" class="form-control" name="user[lname]" id="lname" placeholder="Last name" value="@if(old()){{old('user')['lname']}}@endif" required>
                     <span class="error"></span>
+                    @error('lname')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
             <div class="form-row">
@@ -72,12 +78,18 @@
                     <label for="email">Email <span class="text-red">*</span></label>
                     <input type="email" class="form-control" name="user[email]" id="email" placeholder="Email" value="@if(old()){{old('user')['email']}}@endif" required>
                     <span class="error"></span>
+                    @error('email')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="phone">Phone <span class="text-red">*</span></label>
                     
                     <input type="text" class="form-control" name="user[phone]" id="phone" placeholder="Phone" value="@if(old()){{old('user')['phone']}}@endif" required>
                     <span class="error"></span>
+                    @error('phone')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
           
@@ -87,6 +99,9 @@
                     <label for="password">Password <span class="text-red">*</span></label>
                     <input type="password" class="form-control" name="user[password]" id="password" placeholder="Password"  value="@if(old()){{old('user')['password']}}@endif" >
                     <span class="error"></span>
+                    @error('password')
+                    <p style="color: red">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="avatar">Avatar</label>
@@ -175,6 +190,43 @@
 		<script src="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/sweet-alert.js')}}"></script>
 <script type="text/javascript">
+
+if (window.File && window.FileList && window.FileReader) {
+    $("#avatar").on("change", function(e) {
+        $(".pip1").remove();
+      var files = e.target.files,
+        filesLength = files.length;
+      for (var i = 0; i < filesLength; i++) {
+        var f = files[i]
+        var fileReader = new FileReader();
+        fileReader.onload = (function(e) {
+          var file = e.target;
+          // $("<span class=\"pip1\">" +
+          //   "<input type=\"file\" id=\"havefil\" hidden name=\"havefil[]\" value=\"" + e.target.result + "\"/>"+
+          //   "<img class=\"imageThumb1\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
+          //   "<br/>" +
+          //   "</span>").insertAfter("#avatar");
+          // $(".remove").click(function(){
+          //   $(this).parent(".pip").remove();
+          // });
+
+          $("#avatar_img").attr("src",e.target.result);
+
+          // <span class=\"remove\">Remove image</span>Old code here
+          /*$("<img></img>", {
+            class: "imageThumb",
+            src: e.target.result,
+            title: file.name + " | Click to remove"
+          }).insertAfter("#avatar").click(function(){$(this).remove();});*/
+
+        });
+        fileReader.readAsDataURL(f);
+      }
+    });
+  } else {
+    alert("Your browser doesn't support to File API")
+  }
+  
 	jQuery(document).ready(function(){
 
 jQuery.validator.addMethod("phone", function (phone_number, element) {
@@ -183,6 +235,10 @@ jQuery.validator.addMethod("phone", function (phone_number, element) {
               phone_number.match(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
     }, "Invalid phone number");
 
+jQuery.validator.addMethod("lettersonly", function(value, element) 
+{
+return this.optional(element) || /^[a-z ]+$/i.test(value);
+}, "Please enter valid name.");
 
 $("#save_btn").click(function(){
 
@@ -191,7 +247,12 @@ $("#adminForm").validate({
 rules: {
 
 "user[fname]" : {
-required: true
+required: true,
+lettersonly: true
+},
+"user[lname]" : {
+required: true,
+lettersonly: true
 },
 
 "user[email]": {
@@ -220,6 +281,9 @@ required: true
 messages : {
 "user[fname]": {
 required: "First name is required."
+},
+"user[lname]": {
+required: "Last name is required."
 },
 "user[email]": {
 required: "Email is required."
@@ -260,22 +324,22 @@ required: "Role is required."
 </script>
 
 <script type="text/javascript">
-    $(document).ready(function(){
-            @if(Session::has('message'))
-            @if(session('message')['type'] =="success")
+    // $(document).ready(function(){
+    //         @if(Session::has('message'))
+    //         @if(session('message')['type'] =="success")
             
-            toastr.success("{{session('message')['text']}}"); 
-            @else
-            toastr.error("{{session('message')['text']}}"); 
-            @endif
-            @endif
+    //         toastr.success("{{session('message')['text']}}"); 
+    //         @else
+    //         toastr.error("{{session('message')['text']}}"); 
+    //         @endif
+    //         @endif
             
-            @if ($errors->any())
-            @foreach ($errors->all() as $error)
-            toastr.error("{{$error}}"); 
+    //         @if ($errors->any())
+    //         @foreach ($errors->all() as $error)
+    //         toastr.error("{{$error}}"); 
             
-            @endforeach
-            @endif
-    });
+    //         @endforeach
+    //         @endif
+    // });
     </script>
 @endsection

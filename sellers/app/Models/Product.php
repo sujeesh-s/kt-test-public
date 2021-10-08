@@ -10,8 +10,8 @@ class Product extends Model{
     use HasFactory;
     protected $table = 'prd_products';
     protected $fillable = [
-        'seller_id','product_type','sku','category_id','sub_category_id','brand_id','tax_id','name',' name_cnt_id ','short_desc_cnt_id','desc_cnt_id','content_cnt_id','spec_cnt_id','is_featured','daily_deals',
-        'is_out_of_stock','min_stock_alert','commission','commi_type','is_approved','visible','admin_prd_id','is_active','created_by'
+        'seller_id','product_type','sku','category_id','sub_category_id','brand_id','tax_id','tag_id','name',' name_cnt_id ','short_desc_cnt_id','desc_cnt_id','content_cnt_id','spec_cnt_id','is_featured','daily_deals',
+        'is_out_of_stock','out_of_stock_selling','min_stock_alert','commission','commi_type','is_approved','visible','admin_prd_id','is_active','created_by'
     ];
     public function prdType(){ return $this->belongsTo(ProductType ::class, 'product_type'); }
     public function category(){ return $this->belongsTo(Category ::class, 'category_id'); }
@@ -22,7 +22,7 @@ class Product extends Model{
     public function prdPrice(){ return $this->hasOne(PrdPrice ::class, 'prd_id')->latest(); }    
     public function prdTag(){ return $this->hasMany(PrdAssignedTag::class, 'prd_id'); } 
     public function assAttrs(){ return $this->hasMany(AssignedAttribute ::class, 'prd_id')->latest(); } 
-    public function prdImage(){ return $this->hasMany(ProductImage ::class, 'prd_id'); }
+    public function prdImage(){ return $this->hasMany(ProductImage ::class, 'prd_id')->where('is_deleted',0); }
     
     public function Store($seller_id){ return DB::table('usr_stores')->where('seller_id', $seller_id)->first(); }
     

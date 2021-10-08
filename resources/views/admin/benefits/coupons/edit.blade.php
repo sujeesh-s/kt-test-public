@@ -18,7 +18,7 @@
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
 									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Ecom Benefits</a></li>
-									
+										<li class="breadcrumb-item"><a href="{{ url('admin/coupons')}}"><i class="fe fe-grid mr-2 fs-14"></i>Coupons</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
 							</div>

@@ -1,11 +1,11 @@
 $(document).ready(function () {
-
+    
     $(".seller-table tfoot th").each(function () {
         var title = $(this).text();
         $(this).html('<input type="text" placeholder="' + title + '" />');
     });
 
-    var table = $(".seller-table").DataTable({
+    var table = $(".seller-table").DataTable({ 
         pageLength: 10,
         rowReorder: false,
         colReorder: true,
@@ -23,11 +23,28 @@ $(document).ready(function () {
         processing: true,
         scrollX: false,
         scrollCollapse: true,
-        serverSide: false,
+        serverSide: true,
         search: {
             caseInsensitive: true,
             smart: true
         },
+        ajax:{
+            url: $('#baseurl').val()+"/admin/sellers",
+            dataType: "json",
+            type: "POST",
+            data:{ "_token": $('#_token').val(), vType: 'ajax'},
+        },
+        columns: [
+            { data: "id" },
+            { data: "business_name" },
+            { data: "store_name" },
+            { data: "email" },
+            { data: "phone" },
+            { data: "created_at" },
+            { data: "status" },
+            { data: "service_status" },
+            { data: "action" },
+        ],
         orderMulti: false,
         dom: "Blfrtip",
         stateSave: true,
@@ -77,7 +94,7 @@ $(document).ready(function () {
             },
             {
                 orderable: false,
-                targets: [0,6,7]
+                targets: [0,6,7,8]
             },
             {width: "7%", targets: 0},
             {width: "7%", targets: 1}
@@ -128,6 +145,22 @@ $(document).ready(function () {
 ////            }
 ////        });
 //    });
+
+//    jQuery("#active_filter").on( 'change', function () {
+//                       table.column( 6 )
+//                    .search( "^" + $(this).val(), true, false, true )
+//                    .draw();
+//                    
+//
+//            } );
+//    jQuery(".status-btn").on( 'click', function () {
+//        var active      =   jQuery("#active_filter").val(); alert(active);
+//                       table.column( 6 )
+//                    .search( "^" + $(this).val(), true, false, true )
+//                    .draw();
+//                    
+//
+//            } );
 
     $(".dt-bootstrap4 input[type=search]").attr("placeholder", "Search All");
     $(".action-search input, .search-by input").attr("disabled", "disabled");

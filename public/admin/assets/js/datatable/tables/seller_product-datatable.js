@@ -116,7 +116,7 @@ $(document).ready(function () {
                 }
             }
         }
-    }).columns([3,4,7]).visible(false);
+    }).columns([7]).visible(false);
     table.columns().every(function () {
         var that = this;
 

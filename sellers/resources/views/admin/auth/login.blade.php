@@ -12,7 +12,7 @@
 									<div class="card-body">
 										<h2 class="display-4 mb-2 font-weight-bold error-text text-center"><strong>KANGTAO Login</strong></h2>
 										<h4 class="text-white-80 mb-7 text-center">Sign In to your account</h4>
-                                                                                <form method="POST" action="{{ url('admin/login') }}">
+                                                                                <form method="POST" action="{{ url('seller/login') }}" id="sellerlogin">
                         @csrf
 										<div class="row">
 											<div class="col-9 d-block mx-auto">
@@ -65,10 +65,10 @@
 										</div>
                                         </form>
 									</div>
-									<div class="custom-btns text-center">
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>
-									</div>
+									<!--<div class="custom-btns text-center">-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>-->
+									<!--</div>-->
 								</div>
 							</div>
 						</div>

@@ -119,11 +119,18 @@ if (!function_exists('sidebarMenu')) {
 
         // dd(Modules::visibleModules(auth()->user()->role_id));
         $menu_list = Modules::visibleModules(auth()->user()->role_id);
+        
+        if($menu_list){
         if(count($menu_list) >0){
             return $menu_list;
         }else {
-           return Modules::visibleModules(1); 
-        }
+           return array(); 
+        }    
+        }else {
+            
+           return array(); 
+        } 
+        
         
         
     }
@@ -171,7 +178,7 @@ if (!function_exists('appVersion')) {
         return AppVersion::where('id', 1)->first()->admin_web; 
     }
     else{
-        return AppVersion::where('id', 1)->first()->admin_web; 
+        return AppVersion::where('id', 1)->first()->seller_web; 
     }
         
     }

@@ -6,7 +6,7 @@ $(document).ready(function () {
     });
 
     var table = $(".wishlist-table").DataTable({
-        ordering: false,
+        ordering: true,
         pageLength: 10,
         rowReorder: false,
         colReorder: true,

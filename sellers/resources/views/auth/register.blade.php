@@ -109,19 +109,19 @@
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="phone"><strong>Latitude</strong></label>
-                                            <input type="text" id="latitude" name="store[latitude]" class="form-control fw" placeholder="Latitude">
+                                            <input type="number" id="latitude" name="store[latitude]" class="form-control fw" placeholder="Latitude">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="phone"><strong>Longitude</strong></label>
-                                            <input type="text" id="longitude" name="store[longitude]" class="form-control fw" placeholder="Longitude">
+                                            <input type="number" id="longitude" name="store[longitude]" class="form-control fw" placeholder="Longitude">
                                             <span class="error"></span>
                                         </div>
                                         
                                         <h4 class="col-12 mb-2 mt-4 text-white">Store Settings </h4>
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="phone"><strong>Commission</strong></label>
-                                            <input type="text" id="commission" name="store[commission]" class="form-control fw" placeholder="Commission">
+                                            <input type="number" id="commission" name="store[commission]" class="form-control fw" placeholder="Commission">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">

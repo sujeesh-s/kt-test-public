@@ -341,21 +341,21 @@ $('#state').html(html);
 
 <script type="text/javascript">
     $(document).ready(function(){
-            @if(Session::has('message'))
-            @if(session('message')['type'] =="success")
+            // @if(Session::has('message'))
+            // @if(session('message')['type'] =="success")
             
-            toastr.success("{{session('message')['text']}}"); 
-            @else
-            toastr.error("{{session('message')['text']}}"); 
-            @endif
-            @endif
+            // toastr.success("{{session('message')['text']}}"); 
+            // @else
+            // toastr.error("{{session('message')['text']}}"); 
+            // @endif
+            // @endif
             
-            @if ($errors->any())
-            @foreach ($errors->all() as $error)
-            toastr.error("{{$error}}"); 
+            // @if ($errors->any())
+            // @foreach ($errors->all() as $error)
+            // toastr.error("{{$error}}"); 
             
-            @endforeach
-            @endif
+            // @endforeach
+            // @endif
     });
     </script>
 

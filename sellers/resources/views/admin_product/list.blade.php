@@ -126,15 +126,7 @@
         $("body").on('change','#adminForm input.img',function(){ readURL(this); });
         
         $('body').on('change','#active_filter',function(){  
-            $('#table_body').append($('#loader').html()); $('#attribute').addClass('blur'); 
-            $.ajax({
-                type: "POST",
-                url: '{{url("admin/products")}}',
-                data: {active: this.value,viewType: 'ajax'},
-                success: function (data) {
-                    $('#pg_content').html(data); 
-                } 
-            });
+            $('#product').DataTable().ajax.url("{{url('/admin/products')}}?active="+this.value).load();
         });
         
         $('body').on('change','#country_id',function(){
@@ -158,10 +150,7 @@
             });
         });
         
-        $('.plus-minus-toggle').on('click', function() {
-$(this).toggleClass('collapsed');
-$('#filtersec').toggle('slow');
-});
+        $('.plus-minus-toggle').on('click', function(){ $(this).toggleClass('collapsed'); $('#filtersec').toggle('slow'); });
 
     });
 

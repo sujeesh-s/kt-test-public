@@ -130,6 +130,12 @@ Route::get('/support/create/{id}/{type}', [App\Http\Controllers\Seller\SupportSe
 Route::post('/support/create/{id}/{type}', [App\Http\Controllers\Seller\SupportSeller::class, 'create']);
 Route::get('/support/chat/{id}/{type}', [App\Http\Controllers\Seller\SupportSeller::class, 'chat']);
 
+//chat seller
+Route::get('/chat/list', [App\Http\Controllers\Seller\ChatsController::class, 'chat_list']);
+Route::get('/chat/chat-message/{id}/{type}', [App\Http\Controllers\Seller\ChatsController::class, 'chat_messages']);
+Route::get('/chat/chat-message-new/{id}/{type}', [App\Http\Controllers\Seller\ChatsController::class, 'open_chat_messages']);
+Route::post('/chat/send-message/{id}/{type}', [App\Http\Controllers\Seller\ChatsController::class, 'chat_messages']);
+
 
 
 Route::get('/modules', [App\Http\Controllers\Seller\ModulesController::class, 'modules'])->name('seller.modules');

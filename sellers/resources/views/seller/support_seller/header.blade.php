@@ -1,5 +1,26 @@
 
-<style> .no-border{ border: none } .invoice i.fa{ color: #ff0000; font-size: 10px; } </style>
+<style> .no-border{ border: none } .invoice i.fa{ color: #ff0000; font-size: 10px; } .imageThumb {
+            max-height: 75px;
+            border: 2px solid;
+            padding: 1px;
+            cursor: pointer;
+          }
+          .pip {
+            display: inline-block;
+            margin: 10px 10px 0 0;
+          }
+          .remove {
+            display: block;
+            background: #444;
+            border: 1px solid black;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+          }
+          .remove:hover {
+            background: white;
+            color: black;
+          }</style>
 @php 
 $n_img = 1; $currency = getCurrency()->name;
 @endphp
@@ -122,24 +143,70 @@ $n_img = 1; $currency = getCurrency()->name;
         var support_id = $('.support_id').val();
         var msg = $('.textareas').val();
         var cust_id = $('.cust_id').val();
+        var file_data = $('.img_up')[0].files[0];   
+        var form_data = new FormData();                  
+        form_data.append('file_data', file_data);
+        form_data.append('support_id', support_id);
+        form_data.append('msg', msg);
+        form_data.append('cust_id', cust_id);
        // var postid = $('#post_id').val();
        var id=0;
        //var form_data = new FormData(document.getElementById("form_submit"));
        
        //alert(msg);
+       if(msg=='')
+       {
+          toastr.warning('Please enter the message.'); 
+       }
+       else
+       {
        $.ajax({
            type: "POST",
+           enctype: 'multipart/form-data',
+           contentType: false,
+           processData: false,
            url: '{{url("support/create")}}/'+id+"/create",
-           data: {msg:msg, support_id:support_id,cust_id:cust_id},
+           data: form_data,
            success: function( msg ) {
               // alert( msg );
                $('#normalmodal').modal('hide'); 
+               toastr.success('Replied successfully.'); 
            }
        });
+       }
    }
 
 
+function imgchange(e)
+   {
+    $(".pip").remove();
+    var files = e.files,
+        filesLength = files.length;
+      for (var i = 0; i < filesLength; i++) {
+        var f = files[i]
+        var fileReader = new FileReader();
+        fileReader.onload = (function(e) {
+          var file = e.target;
+          $("<span class=\"pip\">" +
+            "<input type=\"file\" id=\"havefil\" hidden name=\"havefil[]\" value=\"" + e.target.result + "\"/>"+
+            "<img class=\"imageThumb\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
+            "<br/>" +
+            "</span>").insertAfter("#view_img");
+          $(".remove").click(function(){
+            $(this).parent(".pip").remove();
+          });
 
+          // <span class=\"remove\">Remove image</span>Old code here
+          /*$("<img></img>", {
+            class: "imageThumb",
+            src: e.target.result,
+            title: file.name + " | Click to remove"
+          }).insertAfter("#files").click(function(){$(this).remove();});*/
+
+        });
+        fileReader.readAsDataURL(f);
+      }
+   }
    
   
     

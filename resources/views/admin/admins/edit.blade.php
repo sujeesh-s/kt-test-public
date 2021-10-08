@@ -263,10 +263,49 @@
 		<script src="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/sweet-alert.js')}}"></script>
 <script type="text/javascript">
-	jQuery(document).ready(function(){
+
+if (window.File && window.FileList && window.FileReader) {
+    $("#avatar").on("change", function(e) {
+        $(".pip1").remove();
+      var files = e.target.files,
+        filesLength = files.length;
+      for (var i = 0; i < filesLength; i++) {
+        var f = files[i]
+        var fileReader = new FileReader();
+        fileReader.onload = (function(e) {
+          var file = e.target;
+          // $("<span class=\"pip1\">" +
+          //   "<input type=\"file\" id=\"havefil\" hidden name=\"havefil[]\" value=\"" + e.target.result + "\"/>"+
+          //   "<img class=\"imageThumb1\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
+          //   "<br/>" +
+          //   "</span>").insertAfter("#avatar");
+          // $(".remove").click(function(){
+          //   $(this).parent(".pip").remove();
+          // });
+
+          $("#avatar_img").attr("src",e.target.result);
+
+          // <span class=\"remove\">Remove image</span>Old code here
+          /*$("<img></img>", {
+            class: "imageThumb",
+            src: e.target.result,
+            title: file.name + " | Click to remove"
+          }).insertAfter("#avatar").click(function(){$(this).remove();});*/
+
+        });
+        fileReader.readAsDataURL(f);
+      }
+    });
+  } else {
+    alert("Your browser doesn't support to File API")
+  }
+  jQuery(document).ready(function(){
 
 
-
+jQuery.validator.addMethod("lettersonly", function(value, element) 
+{
+return this.optional(element) || /^[a-z ]+$/i.test(value);
+}, "Please enter valid name.");
 
 jQuery.validator.addMethod("phone", function (phone_number, element) {
         phone_number = phone_number.replace(/\s+/g, "");
@@ -282,7 +321,12 @@ $("#adminForm").validate({
 rules: {
 
 "user[fname]" : {
-required: true
+required: true,
+lettersonly: true
+},
+"user[lname]" : {
+required: true,
+lettersonly: true
 },
 
 "user[email]": {
@@ -312,6 +356,10 @@ messages : {
 "user[fname]": {
 required: "First name is required."
 },
+"user[lname]": {
+required: "Last name is required."
+},
+
 "user[email]": {
 required: "Email is required."
 },

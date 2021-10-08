@@ -18,13 +18,14 @@
                                             <th class="wd-15p">Offer type</th>
                                             <th class="wd-15p">Total users</th>
                                             <th class="wd-15p">Purchase amount</th>
-                                            <th class="wd-25p">Discount amount</th>
+                                            <th class="wd-15p">Discount amount</th>
                                             
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                       @if($data && count($data) > 0) @php $n = 0; @endphp
+                                     @if($data && count($data) > 0) @php $n = 0; @endphp
                                             @foreach($data as $row) @php $n++; @endphp 
+                                    <tbody>
+                                      
                                     <tr>    
                                         <td class="align-middle select-checkbox"></td>
                                         <td>

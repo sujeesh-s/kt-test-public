@@ -213,7 +213,9 @@ if(isset($input['modules'])) {
         
         if($input['id']>0) {
         $deleted =  UserRole::where('id',$input['id'])->update(array('is_active'=>$input['status']));
-        
+        if($input['status'] ==0){
+             Admin::where('role_id',$input['id'])->update(array('is_active'=>0));
+        }
         return '1';
         }else {
         

@@ -49,10 +49,10 @@
 											<div class="font-weight-normal fs-16"><a class="btn-link font-weight-normal text-white-80" href="{{ url('admin/login')}}">Back to login page</a></div>
 										</div>
 									</div>
-									<div class="custom-btns text-center">
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>
-										<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>
-									</div>
+									<!--<div class="custom-btns text-center">-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-facebook-f"></i></span></button>-->
+									<!--	<button class="btn btn-icon" type="button"><span class="btn-inner-icon"><i class="fa fa-google"></i></span></button>-->
+									<!--</div>-->
 								</div>
 							</div>
 						</div>

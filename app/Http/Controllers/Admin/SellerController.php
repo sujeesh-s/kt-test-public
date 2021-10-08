@@ -79,6 +79,7 @@ class SellerController extends Controller{
                                                 <span class="switch-active" aria-hidden="true">Active</span><span class="switch-inactive" aria-hidden="true">Inactive</span>
                                             </label>
                                         </div>';
+                                        $action ='';
                 if(checkPermission('admin/sellers','edit') == true){
                     $action         .=   '<button id="editBtn-'.$row->sellerMst->id.'" class="mr-2 btn btn-info btn-sm editBtn"><i class="fa fa-edit mr-1"></i>Edit</button>';
                 }if(checkPermission('admin/sellers','delete') == true){

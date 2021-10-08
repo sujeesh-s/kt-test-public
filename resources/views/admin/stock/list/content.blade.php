@@ -9,6 +9,19 @@
 
 </div>
 
+    <div class="row mb-4 " id="filtersec">
+        
+        <div class="col-3 fl">
+            <div class="page-filters">
+                {{Form::label('seller','Sellers',['class'=>'text-white'])}}
+                {{Form::select('seller',$sellers,$seller,['id'=>'seller','class'=>'form-control','placeholder'=>'All Sellers'])}}
+            </div>
+        </div>
+        
+        
+        <div class="clr"></div>
+    </div>
+
 <div class="row flex-lg-nowrap">
     <div class="col-12">
         <div class="row flex-lg-nowrap">

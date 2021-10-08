@@ -5,6 +5,7 @@
 <link href="{{URL::asset('admin/assets/plugins/fileupload/css/fileupload.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{URL::asset('admin/assets/plugins/quill/quill.snow.css')}}" rel="stylesheet">
         <link href="{{URL::asset('admin/assets/plugins/quill/quill.bubble.css')}}" rel="stylesheet">
+         <link href="{{URL::asset('admin/assets/css/chosen.min.css')}}" rel="stylesheet"/>
 <div id="content_list">@include('admin.seller_product_request.list.content')</div>
 <div id="content_detail" class="row no-disp"></div>
 <div id="newAlertModal" style="display: none">   
@@ -34,7 +35,7 @@
 <!---combo tree--->
 <script src="{{URL::asset('admin/assets/plugins/combotree/comboTreePlugin.js')}}"></script>
  <script src="{{URL::asset('admin/assets/plugins/quill/quill.min.js')}}"></script>
-
+<script src="{{URL::asset('admin/assets/js/chosen.jquery.min.js')}}"></script>
     <script>
 
     $.ajaxSetup({
@@ -150,7 +151,7 @@
         $('body').on('submit','#adminForm',function(e){ 
             $('body #adminForm .error').html('');
             $("#specification").val(JSON.stringify(new Quill('#quillEditor').getContents()));
-            if($('#adminForm #option2').prop('checked') == true && $('#adminForm #admin_prd_id').val() == ''){
+            if($('#adminForm #option2').prop('checked') == true && $('#adminForm #admin_prd_id').val() == ''  && $("#id").val() ==0){
                 $('#adminForm #admin_prd_id').closest('div').find('.error').html('Select Admin Product'); $('#adminForm #admin_prd_id').focus(); return false;
             }else{
                 if($('#adminForm #can_submit').val() > 0){ return true; }
@@ -251,6 +252,112 @@
         
         $("body").on('change','#adminForm input.img',function(){ readURL(this); });
         
+          // prod attribute starts
+
+        $('body').on('change','#prd_type',function(){ 
+            if($(this).val() ==1) {
+                $(".variable_prod").hide(500);
+                $(".simple_prod").show(500);
+            }else {
+                $(".variable_prod").show(500);
+                $(".simple_prod").hide(500);
+
+            }
+        });
+         $('body').on('click','.variation',function(){ 
+         
+                $(".attr_content").show(500);
+                $(".variation").hide(500);
+          
+        });
+
+        $('body').on('click','#add_val',function(){ 
+            var row      =   parseInt($("#attr-val-content-1 .attr_value").length); 
+            var htmlContent             =   $('#adnl_rows').html();
+            htmlContent                 =   htmlContent.replace('attr_val_row_id','attr-val-row-'+row);
+            htmlContent                 =   htmlContent.replace('value_id_id','value_id_'+row);
+            htmlContent                 =   htmlContent.replace('attr_val_id','val'+row);
+            htmlContent                 =   htmlContent.replace('value[val][]','attr_1_value[attr1_'+row+'][]');
+            htmlContent                 =   htmlContent.replace('attr_0_img','attr_1_img[attr1_'+row+'][]');
+            htmlContent                 =   htmlContent.replace('attr1_0','attr1_'+row);
+            htmlContent                 =   htmlContent.replace('val_error_id','val_error_'+row);
+            htmlContent                 =   htmlContent.replace('del_val_id','del_val_'+row);
+            $('#adminForm #attr-val-content-1').append(htmlContent); row++;
+            if($("#attr-val-content-1 .attr_value").length >=5){
+                $("#add_val").hide();
+            }else {
+               $("#add_val").show(); 
+            }
+        });
+         $('body').on('click','#add_var_2',function(){ 
+            var row      =   parseInt($("#attr-val-content-2 .attr_value").length); 
+            var htmlContent             =   $('#adnl_rows').html();
+            htmlContent                 =   htmlContent.replace('attr_val_row_id','attr-val-row-'+row);
+            htmlContent                 =   htmlContent.replace('value_id_id','value_id_'+row);
+            htmlContent                 =   htmlContent.replace('value[val][]','attr_2_value[attr2_'+row+'][]');
+            htmlContent                 =   htmlContent.replace('attr_0_img','attr_2_img[attr1_'+row+'][]');
+            htmlContent                 =   htmlContent.replace('attr1_0','attr2_'+row);
+            htmlContent                 =   htmlContent.replace('attr_val_id','val'+row);
+            htmlContent                 =   htmlContent.replace('val_error_id','val_error_'+row);
+            htmlContent                 =   htmlContent.replace('del_val_id','del_val_'+row);
+            $('#adminForm #attr-val-content-2').append(htmlContent); row++;
+            if($("#attr-val-content-2 .attr_value").length >=5){
+                $("#add_var_2").hide();
+            }else {
+               $("#add_var_2").show(); 
+            }
+        });
+        
+        $('body').on('click','#adminForm #attr-val-content-2 .del_val.del',function(){
+            var id      =   this.id.replace('del_val_',''); 
+            $('#adminForm #attr-val-content-2 #attr-val-row-'+id).remove();
+              build_table();
+              if($("#attr-val-content-2 .attr_value").length <5){
+                $("#add_var_2").show();
+            }
+            
+        });
+         $('body').on('click','#adminForm #attr-val-content-1 .del_val.del',function(){
+            var id      =   this.id.replace('del_val_',''); 
+            $('#adminForm #attr-val-content-1 #attr-val-row-'+id).remove();
+              build_table();
+              
+             if($("#attr-val-content-1 .attr_value").length < 5){
+                $("#add_val").show();
+            }
+        });
+        
+        $('body').on('click','#adminForm .delete_existing',function(){
+           $(".attr_content").hide(500);
+           $('.attr_content').find('input:text').val('');  
+           $("#attr-val-content-2 .attr_val_row_id").remove();
+                $(".variation").show(500);
+                build_table();
+                $(".converted").remove();
+        });
+
+
+
+        // variation table starts
+
+        $('body').on('input','.prod_attr_1 input,.prod_attr_2 input',function(){
+           
+           // $('.variation_table .init_name').text($(this).val());
+           build_table();
+
+        });
+
+        var price_vals = {};
+         $('body').on('input','#variation_table input',function(){
+           
+                var $a = $("#variation_table tbody").clone();
+
+                // $a.appendTo("body");
+            $("#hidden_table").html("");
+            $("#hidden_table").html($a);
+
+        });
+        
         $('body').on('click','#tab5 .dtrow .ck',function(){ 
             var id          =   this.id.replace('ck-','');
             var atteSet     =   $('#tab5 #dtrow-'+id).data('val');
@@ -268,6 +375,151 @@
         });
     });
 
+    function build_table(){ 
+
+
+        var table = $("#variation_table");
+        var attr_lp = 0; var tbody_html ='';var thead_html ='';
+        if(jQuery("#attr-val-content-1 .attr_value").length >0) {
+
+            if($('.prod_attr_1 #attr_name_1').val() !="") {
+                thead_html ='<thead><tr><th class="text-center init_name">'+$('.prod_attr_1 #attr_name_1').val()+'</th><th class="text-center">Price</th><th class="text-center">Stock</th><th class="text-center">SKU</th><th class="text-center">Shipping</th></tr></thead>';
+            }else {
+                thead_html ='<thead><tr><th class="text-center init_name">Name</th><th class="text-center">Price</th><th class="text-center">Stock</th><th class="text-center">SKU</th><th class="text-center">Shipping</th></tr></thead>';
+            }
+            
+
+        $("#attr-val-content-1 .attr_value").each(function(){
+            attr_lp++;
+            // alert(attr_lp);
+            var opt_name = $(this).data("val");
+            var opt_title = $(this).val();
+            if($(this).val() !=""){
+                
+                var price_set = 0; var stock_set = 0; var sku_set = 0;
+                if(jQuery("#attr-val-content-2 .attr_value").length >0 && ($('.prod_attr_2 #attr_name_2').val() !="" || $("#attr-val-content-2 #attr_val_id").val() !="" )) {
+
+                    //thead
+                    if($('.prod_attr_2 #attr_name_2').val() !="") {
+                    thead_html ='<thead><tr><th class="text-center init_name">'+$('.prod_attr_1 #attr_name_1').val()+'</th><th class="text-center attr2_name">'+$('.prod_attr_2 #attr_name_2').val()+'</th><th class="text-center">Price</th><th class="text-center">Stock</th><th class="text-center">SKU</th><th class="text-center">Shipping</th></tr></thead>'; 
+                    } else{ 
+                    thead_html ='<thead><tr><th class="text-center init_name">'+$('.prod_attr_1 #attr_name_1').val()+'</th><th class="text-center">Name</th><th class="text-center">Price</th><th class="text-center">Stock</th><th class="text-center">SKU</th><th class="text-center">Shipping</th></tr></thead>';
+                    } 
+
+                     tbody_html +='<tbody><tr id='+attr_lp+'><td class="text-center init_value" rowspan="'+$("#attr-val-content-2 .attr_value").length+'"><input class="form-control" placeholder="Option" value="'+$(this).val()+'" readonly="true" type="text"></td>';
+                    var k =0;
+                                
+                            $("#attr-val-content-2 .attr_value").each(function(){
+                                k++; var rwpan_s = "";var rwpan_e = ""; var price_set = 0; var stock_set = 0; var sku_set = 0;
+                                if(k >1) {  rwpan_s = "<tr id="+k+">"; rwpan_e = "</tr>"; }
+                                
+                            if($(this).val() !=""){
+                                if($('#hidden_table [name="price['+opt_name+']['+$(this).data("val")+']"]').val() !=null) {
+                                price_set = $('#hidden_table [name="price['+opt_name+']['+$(this).data("val")+']"]').val();
+                                 }else { price_set =0; }
+                                 if($('#hidden_table [name="stock['+opt_name+']['+$(this).data("val")+']"]').val() !=null) {
+                                stock_set = $('#hidden_table [name="stock['+opt_name+']['+$(this).data("val")+']"]').val();
+                                 }else { stock_set =0; }
+                                 if($('#hidden_table [name="sku['+opt_name+']['+$(this).data("val")+']"]').val() !=null) {
+                                sku_set = $('#hidden_table [name="sku['+opt_name+']['+$(this).data("val")+']"]').val();
+                                 }else { sku_set =0 }
+                            tbody_html += rwpan_s+'<td class="text-center"><input class="form-control" placeholder="Option" value="'+$(this).val()+'" type="text"></td><td class="text-center"><input class="form-control price_field" placeholder="Price" required value="'+price_set+'" name="price['+opt_name+']['+$(this).data("val")+']" type="number"></td><td class="text-center"><input class="form-control" required placeholder="Stock" type="number" value="'+stock_set+'" name="stock['+opt_name+']['+$(this).data("val")+']"></td><td class="text-center"><input class="form-control" placeholder="SKU" value="'+sku_set+'" name="sku['+opt_name+']['+$(this).data("val")+']" type="text"><input type="hidden" class="field_name"  value="['+opt_name+']['+$(this).data("val")+']"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" name="dyn_prds['+$(this).data("val")+']" value="1"><input type="hidden" name="dyn_prds_names['+opt_name+"~"+$(this).data("val")+']" value="'+opt_title+" - "+$(this).val()+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>'+rwpan_e;
+                            }else {
+
+                                if($('#hidden_table [name="price['+opt_name+']"]').val() !=null) {
+                                price_set = $('#hidden_table [name="price['+opt_name+']"]').val();
+                                 }else { price_set =0; }
+                                 if($('#hidden_table [name="stock['+opt_name+']"]').val() !=null) {
+                                stock_set = $('#hidden_table [name="stock['+opt_name+']"]').val();
+                                 }else { stock_set =0; }
+                                 if($('#hidden_table [name="sku['+opt_name+']"]').val() !=null) {
+                                sku_set = $('#hidden_table [name="sku['+opt_name+']"]').val();
+                                 }else { sku_set =0 }
+
+
+
+                                tbody_html +=rwpan_s+'<td class="text-center"><input class="form-control" placeholder="Option" value="Option" type="text"></td><td class="text-center"><input class="form-control price_field" placeholder="Price" value="'+price_set+'" required name="price['+opt_name+']" type="number"></td><td class="text-center"><input class="form-control" name="stock['+opt_name+']" required placeholder="Stock" value="'+stock_set+'" type="number"></td><td class="text-center"><input class="form-control" placeholder="SKU" value="'+sku_set+'" name="sku['+opt_name+']" type="text"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" class="field_name"  value="['+opt_name+']"><input type="hidden" name="dyn_prds_names['+opt_name+']" value="'+opt_title+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>'+rwpan_e;
+                            }
+                            });
+                tbody_html = tbody_html+"</tr></tbody>";
+
+
+                    //tbody
+
+                }else{
+                    thead_html ='<thead><tr><th class="text-center init_name">'+$('.prod_attr_1 #attr_name_1').val()+'</th><th class="text-center">Price</th><th class="text-center">Stock</th><th class="text-center">SKU</th><th class="text-center">Shipping</th></tr></thead>';
+
+                    tbody_html +='<tbody><tr id='+attr_lp+' ><td class="text-center init_value" rowspan="'+$("#attr-val-content-2 .attr_value").length+'"><input class="form-control" placeholder="Option" value="'+$(this).val()+'" readonly="true" type="text"></td>';
+                                
+                            if($('#hidden_table [name="price['+opt_name+']"]').val() !=null) {
+                                price_set = $('#hidden_table [name="price['+opt_name+']"]').val();
+                                 }else { price_set =0; }
+                                 if($('#hidden_table [name="stock['+opt_name+']"]').val() !=null) {
+                                stock_set = $('#hidden_table [name="stock['+opt_name+']"]').val();
+                                 }else { stock_set =0; }
+                                 if($('#hidden_table [name="sku['+opt_name+']"]').val() !=null) {
+                                sku_set = $('#hidden_table [name="sku['+opt_name+']"]').val();
+                                 }else { sku_set =0 }
+
+                                tbody_html +='<td class="text-center"><input class="form-control price_field" required name="price['+opt_name+']" placeholder="Price" value="'+price_set+'" type="number"></td><td class="text-center"><input class="form-control" value="'+stock_set+'" placeholder="Stock" required name="stock['+opt_name+']" type="number"></td><td class="text-center"><input class="form-control"  value="'+sku_set+'" name="sku['+opt_name+']" placeholder="SKU" type="text"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" class="field_name"  value="['+opt_name+']"><input type="hidden" name="dyn_prds_names['+opt_name+']" value="'+opt_title+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>';
+                           
+                           
+                tbody_html = tbody_html+"</tr></tbody>";
+
+                }
+            }
+
+
+        // alert($(this).val());
+        });
+          table.empty();
+            table.append(thead_html);
+            table.append(tbody_html);
+            var s =0;
+            $("#variation_table tbody tr").each(function(){
+            s++;
+            $(this).attr("id","tr_"+s);
+            });
+    }
+     
+          
+
+    }
+
+    $('body').on('click','i.shipping',function(){ 
+
+   var trid = $(this).closest('tr').attr('id');
+   var fld_name = $('#'+trid).find('.field_name').val();
+    var row      =   fld_name.replace(/[\[\]']+/g,''); 
+   add_modal(row,fld_name);
+   $('#attr_'+row).modal('show');
+
+        });
+
+    function add_modal(row,fld_name){
+        // alert(attr_lp);
+        // var row      =   fld_name.replace(/[\[\]']+/g,''); 
+        if ($('#attr_'+row).length)
+        {
+        // alert("exists");
+        }
+        else
+        {
+     
+        
+        var htmlContent             =   $('#add_modal').html();
+        htmlContent                 =   htmlContent.replace('modal_row_id','attr_'+row);
+        htmlContent                 =   htmlContent.replace('tochange','converted');
+        htmlContent                 =   htmlContent.replace('mweight','mweight_'+row);
+        htmlContent                 =   htmlContent.replace('mdimension[weight]','weight'+fld_name);
+        htmlContent                 =   htmlContent.replace('mdimension[length]','length'+fld_name);
+        htmlContent                 =   htmlContent.replace('mdimension[width]','width'+fld_name);
+        htmlContent                 =   htmlContent.replace('mdimension[height]','height'+fld_name);
+        $('#adminForm .attr_list').append(htmlContent); 
+
+
+        }
+    }
     
     function select(id,form){ 
         if($('#'+form+' #assosi_'+id).prop('checked') == true){ 

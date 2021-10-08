@@ -23,6 +23,7 @@ use App\Models\CartItem;
 use App\Models\Subcategory;
 use App\Models\Store;
 use App\Models\SellerReview;
+use App\Models\SellerInfo;
 use App\Models\Banner;
 use App\Models\Brand;
 use App\Models\Product;
@@ -188,7 +189,7 @@ class Homepage extends Controller
         }
 
         //category
-        $category_data= Category::where('is_active',1)->where('is_deleted',0)->get();
+        $category_data= Category::where('is_active',1)->where('is_deleted',0)->orderBy('sort_order')->get();
        foreach($category_data as $key)
         {   $image = url('storage/app/public/category/'.$key->image); 
             $category_array=['id'=>$key->category_id,
@@ -460,6 +461,8 @@ class Homepage extends Controller
                
                foreach($store as $str)
                {
+                $seller_info = SellerInfo::where('seller_id',$str->seller_id)->where('is_approved',1)->first();
+                if($seller_info){
                 $total_seller_prds  = Product::where('seller_id',$str->seller_id)->where('is_active',1)->where('visible',1)->where('is_deleted',0)->where('is_approved',1)->count(); 
                 $store_list['store_id']=$str->id;
                 $store_list['seller_id']=$str->seller_id;
@@ -470,6 +473,7 @@ class Homepage extends Controller
                 $store_list['logo']=config('app.storage_url').$str->logo;//url($str->logo);
                 $store_list['banner']=config('app.storage_url').$str->banner;
                 $store_data[]=$store_list;
+                }
                }
 
                $store_rt = array_column($store_data, 'store_rating');
@@ -571,7 +575,7 @@ class Homepage extends Controller
            //category
         $category_data= Category::where('is_active',1)->where('is_deleted',0)->get();
             foreach($category_data as $cat)
-            {
+            {  $image = url('storage/app/public/category/'.$cat->image);
                 // $prod_exist = Product::where('category_id',$cat->category_id)->where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->first();
                 // if($prod_exist)
                 // {
@@ -580,6 +584,7 @@ class Homepage extends Controller
                 //     {
                 $cat_list['category_id']=$cat->category_id;
                 $cat_list['category_name']=$cat->get_content($cat->cat_name_cid,$lang_id);
+                $cat_list['category_image']=$image;
                 $cat_list['subcategory']=$this->get_subcategory($cat->category_id,$lang_id);  
                 
                
@@ -1077,10 +1082,19 @@ class Homepage extends Controller
     function get_subcategory($cat_id,$lang_id){
         $data     =   [];
         
-        $subcat       =   Subcategory::where('category_id',$cat_id)->where('is_active',1)->get(['subcategory_id','sub_name_cid']); 
+        $subcat       =   Subcategory::where('category_id',$cat_id)->where('is_active',1)->get(['subcategory_id','sub_name_cid','image']); 
             if($subcat)   {   foreach($subcat as $k=>$row){ 
+                if($row->image!='')
+                {
+                $image = url('storage/app/public/subcategory/'.$row->image);
+                }
+                else
+                {
+                    $image='';
+                }
                 $val['id']    =   $row->subcategory_id;
                 $val['subcategory_name']   =  $row->get_content($row->sub_name_cid,$lang_id);
+                $val['subcategory_image']  =  $image;
                 $data[]       =   $val;
             } }
             else{ $data     =   []; } return $data;

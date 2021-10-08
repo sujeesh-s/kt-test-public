@@ -222,7 +222,7 @@ class SupportSeller extends Controller
                 if($row->msg_type=='text')
                {
              $html.='<div class="d-flex justify-content-end ">
-                                <div class="msg_cotainer_send mb-2">'.$row->message.'<span class="msg_time_send" >'.$diff_date.','.$row_date.'</span>
+                                <div class="msg_cotainer_send mb-2">'.$row->message.'<span class="msg_time_send" style="bottom:-30px;">'.$diff_date.','.$row_date.'</span>
                                 </div>
                                 <div class="img_cont_msg">
                                     <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
@@ -233,7 +233,7 @@ class SupportSeller extends Controller
                {
                    $msg_image= config('app.storage_url').$row->image;
                    $html.='<div class="d-flex justify-content-end ">
-                                <div class="msg_cotainer_send mb-2">'.$row->message.'<div class="row mt-2"><div class="col-12"><img class="img-fluid rounded" src="'.$msg_image.'" alt="image"></div></div><span class="msg_time_send" >'.$diff_date.','.$row_date.'</span>
+                                <div class="msg_cotainer_send mb-2">'.$row->message.'<div class="row mt-2"><div class="col-12"><img class="img-fluid rounded" src="'.$msg_image.'" alt="image"></div></div><span class="msg_time_send" style="bottom:-30px;">'.$diff_date.','.$row_date.'</span>
                                 </div>
                                 <div class="img_cont_msg">
                                     <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">

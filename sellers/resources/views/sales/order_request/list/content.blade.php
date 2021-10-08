@@ -8,7 +8,7 @@
                        
                         <div id="table_body" class="card-body table-card-body">
                             <div>
-                                    <table id="sales" class="sales table table-striped table-bordered w-100 text-nowrap">
+                                    <table id="sales-req" class="sales-req table table-striped table-bordered w-100 text-nowrap">
                                     <thead>
                                         <tr>
                                             <th class="wd-15p notexport"></th>

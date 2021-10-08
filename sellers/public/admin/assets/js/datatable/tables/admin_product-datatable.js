@@ -23,11 +23,24 @@ $(document).ready(function () {
         processing: true,
         scrollX: false,
         scrollCollapse: true,
-        serverSide: false,
+        serverSide: true,
         search: {
             caseInsensitive: true,
             smart: true
         },
+        ajax:{
+            url: $('#baseurl').val()+"/admin/products",
+            dataType: "json",
+            type: "POST",
+            data:{ "_token": $('#_token').val(), vType: 'ajax'},
+        },
+        columns: [
+            { data: "id" },
+            { data: "name" },
+            { data: "cat" },
+            { data: "sub_cat" },
+            { data: "status" },
+        ],
         orderMulti: false,
         dom: "Blfrtip",
         stateSave: true,
@@ -77,7 +90,7 @@ $(document).ready(function () {
             },
             {
                 orderable: false,
-                targets: [0,5]
+                targets: [0,4]
             },
         ],
 
@@ -121,13 +134,11 @@ $(document).ready(function () {
     table.columns().every(function () {
         var that = this;
     });
-    jQuery("#filterSel").on( 'change', function () {
-                          table.column( 4 )
-                    .search( "^" + $(this).val(), true, false, true )
-                    .draw();
-                    
-
-            } );
+    jQuery("#status_filter").on( 'change', function () {
+        table.column( 2 )
+        .search( "^" + $(this).val(), true, false, true )
+        .draw();
+    } );
 
     $(".dt-bootstrap4 input[type=search]").attr("placeholder", "Search All");
     $(".action-search input, .search-by input").attr("disabled", "disabled");

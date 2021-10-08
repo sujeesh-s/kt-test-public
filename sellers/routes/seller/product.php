@@ -18,4 +18,5 @@ Route::post('/product/updateStatus', [App\Http\Controllers\Seller\SellerProductC
 Route::post('/product/associativeProducts', [App\Http\Controllers\Seller\SellerProductController::class, 'associativeProducts']);
 
 Route::post('/editor-image', [App\Http\Controllers\Seller\SellerProductController::class, 'editorImage']);
+Route::post('/delete/product/image', [App\Http\Controllers\Seller\SellerProductController::class, 'deletePrdImg']);
 

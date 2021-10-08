@@ -9,7 +9,7 @@ class SalesOrder extends Model
 {
     use HasFactory;
     protected $fillable     =   [
-                                    'org_id','parent_sale_id','order_id','cust_id','seller_id','total','discount','tax','packing_charge','wallet_amount','g_total',
+                                    'org_id','parent_sale_id','order_id','cust_id','seller_id','total','discount','tax','packing_charge','wallet_amount','bid_charge','g_total',
                                     'discount_type','coupon_id','order_status'
                                 ];
     public function seller(){ return $this->belongsTo(Seller ::class, 'seller_id'); }

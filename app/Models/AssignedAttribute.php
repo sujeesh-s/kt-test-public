@@ -15,5 +15,12 @@ class AssignedAttribute extends Model{
     /***API***/
     public function PrdAttr(){ return $this->belongsTo(PrdAttribute::class, 'attr_id'); }
     public function PrdAttr_value(){ return $this->belongsTo(PrdAttributeValue::class, 'attr_id'); }
+    public function prdPrice(){ return $this->belongsTo(PrdPrice ::class, 'prd_id')->latest(); }
+    public function Product(){ return $this->belongsTo(Product::class, 'prd_id'); }
+    public function prdStock($prdId){ 
+        $in             =   (int)PrdStock ::where('prd_id',$prdId)->where('type','add')->where('is_deleted',0)->sum('qty'); 
+        $out            =   (int)PrdStock ::where('prd_id',$prdId)->where('type','destroy')->where('is_deleted',0)->sum('qty'); 
+        return ($in-$out);
+    }
     
 }

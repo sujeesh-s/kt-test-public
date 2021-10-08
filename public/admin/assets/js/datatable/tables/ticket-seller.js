@@ -124,28 +124,28 @@ $(document).ready(function () {
 
 table.column(3).visible(false);
 
-        $('body').on('change','#filterSel',function(){ 
-           console.log("innn");
-            minVal = $(this).find(':selected').attr('data-min');
- maxVal = $(this).find(':selected').attr('data-max');
-                table.draw();
+//         $('body').on('change','#filterSel',function(){ 
+//           console.log("innn");
+//             minVal = $(this).find(':selected').attr('data-min');
+//  maxVal = $(this).find(':selected').attr('data-max');
+//                 table.draw();
 
 
 
 
-            } );
+//             } );
 
 
-$.fn.dataTable.ext.search.push(
-function( settings, data, dataIndex ) {
+// $.fn.dataTable.ext.search.push(
+// function( settings, data, dataIndex ) {
 
-var rating = data[2].trim();
-if (( minVal <= rating   && rating <= maxVal )) {
-return true;
-}
-return false;
-}
-);
+// var rating = data[2].trim();
+// if (( minVal <= rating   && rating <= maxVal )) {
+// return true;
+// }
+// return false;
+// }
+// );
           
 
 // $("#viewfilter").click(function(){
