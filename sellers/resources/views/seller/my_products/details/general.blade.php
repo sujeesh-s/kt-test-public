@@ -152,7 +152,7 @@
       <div class="col-lg-12 fl">
         <div class="form-group">
             {{Form::label('rltd_prds','Related Products',['class'=>''])}} 
-            <select class="form-control chosen-select" data-placeholder="Select Product" multiple  name="prd_id[]" id="prd_id" required >
+            <select class="form-control chosen-select" data-placeholder="Select Product" multiple  name="prd_id[]" id="prd_id"  >
             @if($products && count($products) > 0)
             @foreach($products as $row)
             <option <?php if(in_array($row->id,$relatedprods)) { echo "selected"; } ?> value="{{ $row->id }}">{{ $row->name }}</option>

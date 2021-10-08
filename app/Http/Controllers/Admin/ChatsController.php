@@ -124,20 +124,34 @@ class ChatsController extends Controller
                $customer_name = $customer->first_name."".$customer->middle_name." ".$customer->last_name; 
                if($customer->profile_image)
                {
-                $image=$customer->profile_image;
+                $image=config('app.storage_url').'/app/public/customer_profile/'.$customer->profile_image;
                } 
                else
                {
-                $image='';
+                $image=url('/public/admin/assets/images/users/2.jpg');
                }     
                
+               if($row->msg_type=="text")
+               {
             $html.='<div class="d-flex justify-content-start">
                                 <div class="img_cont_msg">
                                     <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
                                 </div>
-                                <div class="msg_cotainer mb-2">'.$row->message.'<span class="msg_time" style="bottom:-31px;"><br>'.$diff_date.','.$row_date.'</span>
+                                <div class="msg_cotainer mb-2">'.$row->message.'<span class="msg_time"><br>'.$diff_date.'</span>
                                 </div>
-                            </div>';  
+                            </div>'; 
+               }
+               else
+               {
+                   $msg_image= config('app.storage_url').$row->other_msg;
+                   $html.='<div class="d-flex justify-content-start">
+                                <div class="img_cont_msg">
+                                    <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
+                                </div>
+                                <div class="msg_cotainer mb-2">'.$row->message.'<div class="row mt-2"><div class="col-12"><img class="img-fluid rounded" src="'.$msg_image.'" alt="image"></div></div><span class="msg_time"><br>'.$diff_date.'</span>
+                                </div>
+                            </div>'; 
+               }
               }
               else
               {
@@ -145,20 +159,33 @@ class ChatsController extends Controller
                 $seller_name = $seller->fname."".$seller->mname." ".$seller->lname;
                if($seller->avatar)
                {
-                $image=$seller->avatar;
+                $image=$image=url('storage/'.$seller->avatar);
                } 
                else
                {
-                $image='';
+                $image=url('/public/admin/assets/images/users/2.jpg');
                } 
-                
+                if($row->msg_type=="text")
+               {
              $html.='<div class="d-flex justify-content-end ">
-                                <div class="msg_cotainer_send mb-2">'.$row->message.'<span class="msg_time_send" style="bottom:-31px;">'.$diff_date.','.$row_date.'</span>
+                                <div class="msg_cotainer_send mb-2">'.$row->message.'<span class="msg_time_send">'.$diff_date.'</span>
                                 </div>
                                 <div class="img_cont_msg">
                                     <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
                                 </div>
-                            </div>';   
+                            </div>';  
+               }
+               else
+               {
+                   $msg_image= config('app.storage_url').$row->other_msg;
+                   $html.='<div class="d-flex justify-content-end ">
+                                <div class="msg_cotainer_send mb-2">'.$row->message.'<div class="row mt-2"><div class="col-12"><img class="img-fluid rounded" src="'.$msg_image.'" alt="image"></div></div><span class="msg_time_send">'.$diff_date.'</span>
+                                </div>
+                                <div class="img_cont_msg">
+                                    <img src="'.$image.'" class="rounded-circle user_img_msg" alt="img">
+                                </div>
+                            </div>';
+               }
               }
 
               
