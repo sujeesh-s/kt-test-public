@@ -3,6 +3,7 @@
    @section('page-header')
     @php
         $user = auth()->user();
+        $c_code =  getDropdownData(DB::table('countries')->where('is_deleted',0)->get(),'id','phonecode');
         if($user->avatar == NULL){ $avatar = url('storage/app/public/no-avatar.png'); }
         else{ $avatar = url('storage'.$user->avatar); }
     @endphp
@@ -23,7 +24,7 @@
                     <h3 class="pro-user-username text-dark mb-1 fs-22">{{$user->fname.' '.$user->lname}}</h3>
                     <h6 class="pro-user-desc text-muted">{{roleData()->usr_role_name}}</h6>
                     <h6 class="pro-user-desc text-muted"><i class="fa fa-envelope mr-2" aria-hidden="true"></i>{{$user->email}}</h6>
-                    <h6 class="pro-user-desc text-muted"><i class="fa fa-phone mr-2" aria-hidden="true"></i> {{$user->phone}}</h6>
+                    <h6 class="pro-user-desc text-muted"><i class="fa fa-phone mr-2" aria-hidden="true"></i> @if(auth()->user()->isd_code) {{ auth()->user()->isd_code }} @endif {{$user->phone}}</h6>
                 </div>
             </div>
         </div>
@@ -51,13 +52,32 @@
                         </div>
                         <div class="col-12 mb-2">
                             {{Form::label('phone','Phone',['class'=>'form-label'])}}
-                            {{Form::text('profile[phone]',$user->phone,['id'=>'phone','class'=>'form-control','placeholder'=>'Phone'])}}
+                            <div class="row">
+                            <div class="col-3 pr-0">
+                            <select id="isd_code" name="profile[isd_code]" class="form-control p-1" >
+                            @if($c_code) @foreach($c_code as $row=>$isd) 
+                            @php if($isd == auth()->user()->isd_code){ $selected = 'selected'; }else{ $selected = ''; } @endphp
+
+                            <option value="{{ $isd }}" {{$selected}}>+{{$isd}}</option>
+                            @endforeach @endif
+                            </select>
+                            </div>
+                            <div class="col-9 pl-0">
+                            <input type="text" class="form-control" name="profile[phone]" id="phone" placeholder="Phone" value="{{$user->phone}}" required>
                             <span class="error"></span>
+                            </div>
+                        </div>
+
+                        </div>
+                        <div class="col-md-12 mb-2">
+                        <label for="avatar">Avatar</label>
+                        {{Form::file('avatar',['id'=>'avatar','class'=>'form-control', 'accept'=>"image/*"])}}
                         </div>
                     </div>
                 </div>
                 <div class="card-footer text-right">
-                    {{Form::hidden('can_submit',0,['id'=>'can_submit'])}}{{Form::hidden('profile[isd_code]',auth()->user()->isd_code,['id'=>'isd_code'])}}
+                    {{Form::hidden('can_submit',0,['id'=>'can_submit'])}}
+                    
                     {{Form::submit('Update',['id'=>'save_btn', 'class'=>'btn  btn-primary'])}}
                     
                     <a href="{{url('/')}}"  class="btn  btn-danger" >Cancel</a> 
@@ -77,7 +97,7 @@
                     </div>
                     <div class="col-12 mb-2">
                         {{Form::label('password','New Password',['class'=>'form-label'])}}
-                        {{Form::password('password',['id'=>'password','class'=>'form-control pwd'])}}
+                        {{Form::password('password',['id'=>'password','class'=>'form-control pwd','data-strength'])}}
                         <span class="error"></span>
                     </div>
                     <div class="col-12 mb-2">

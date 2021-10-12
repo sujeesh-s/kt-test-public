@@ -132,7 +132,7 @@
                                                         <div class="col-md-6">
                                                             <div class="form-group">
                                                                 <label class="form-label">Subcategory<span class="text-red">*</span></label>
-                                                                <input type="text" id="sub-category-id" placeholder="Type to filter" class="tagselect" name="subcategory_id" autocomplete="off" hidden/>
+                                                                <input type="text" id="sub-category-id" placeholder="Type to filter" class="tagselect @error('subcategory_id') is-invalid @enderror"  name="subcategory_id" autocomplete="off" hidden/>
 																<input type="text" id="sub-category-drop" class="form-control " placeholder="Select Subcategory" readonly style="background-color: #fff !important;">
                                                                 <!--<select id="subcategory" class="form-control select2 tagselect @error('subcategory_id') is-invalid @enderror" name="subcategory_id" >-->
                                                                 <!--<option value="0">Select</option>-->
@@ -239,8 +239,15 @@
                                                         <div class="col-lg-12 col-md-12 col-sm-12">
                                                             <label class="form-label">Product Image <span class="text-red">*</span></label>
                                                             <div class="form-group mb-0">
+                                                                 @php $err_var = ""   @endphp 
+                                                             @error('product_image')  @php $err_var = "is-invalid"   @endphp  @enderror  
                                                                 {{Form::hidden('imgId[]',0,['id'=>'img_id_'.$n_img])}}
-                                                                {{Form::file('product_image[]',['id'=>'image_'.$n_img,'class'=>"form-control img",'placeholder'=>'Choose Image','accept'=>'image/*'])}}
+                                                                {{Form::file('product_image[]',['id'=>'image_'.$n_img,'class'=>"form-control img $err_var ",'placeholder'=>'Choose Image','accept'=>'image/*'])}}
+                                                                @error('product_image')
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </span>
+                                                                @enderror
                                                                 
                                                             </div>
                                                             {{-- <input type="file" class="dropify" data-height="180" name="product_image" /> --}}

@@ -244,7 +244,7 @@ class SellerProductController extends Controller{
            
        }
        $dimension                  =   $post->dimension; 
-       $related_prd_id                  =   $post->prd_id; 
+      if(isset($post->prd_id)){ $related_prd_id                  =   $post->prd_id; }
         $attrs                  = array();//  (object)$post->attr; 
         if(isset($post->assosi)){   $assosi =   (object)$post->assosi; }else{ $assosi = false; }
         $images                 =   $request->file('image'); 

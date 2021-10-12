@@ -38,11 +38,11 @@
 						<!--/app header-->
 						<div class="main-proifle">
 							<div class="row">
-								<div class="col-lg-8">
+								<div class="col-lg-7">
 									<div class="box-widget widget-user">
 										<div class="widget-user-image1 d-sm-flex">
 										    @if($info->profile_image!='')
-										    <img alt="User Avatar" class="rounded-circle border p-0" style="width:120px;height:130px;" src="{{ url('storage/app/public/customer_profile/'.$info->profile_image) }}">
+										    <img alt="User Avatar" class="rounded-circle border p-0" style="width:128px;height:128px;" src="{{ config('app.storage_url').'/app/public/customer_profile/'.$info->profile_image }}">
 										    @else
 											<img alt="User Avatar" class="rounded-circle border p-0" src="{{URL::asset('admin/assets/images/users/2.jpg')}}">
 											@endif
@@ -66,7 +66,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-lg-4 col-md-auto">
+								<div class="col-lg-5 col-md-auto">
 									<div class="text-lg-right btn-list mt-4 mt-lg-0">
 										<!--<a href="#" class="btn btn-light">Change Password</a>-->
 										<!-- <button data-toggle="modal" data-target="#SignUp" class="btn btn-primary">Edit Profile</button> -->
@@ -132,8 +132,8 @@
 											<ul class="nav">
 												<li><a href="#tab-7" class="active fs-14" data-toggle="tab">Address</a></li>
 												<li><a href="#tab-8" data-toggle="tab" class="fs-14">Order Summary</a></li>
-												<li><a href="#tab-9" data-toggle="tab" class="fs-14">Order History</a></li>
-												<li><a href="#tab-10" data-toggle="tab" class="fs-14">Transaction History</a></li>
+												<li><a href="#tab-9" data-toggle="tab" id="ord_hist" class="fs-14">Order/Transaction History</a></li>
+												<!--<li><a href="#tab-10" data-toggle="tab" id="trans_hist"  class="fs-14">Transaction History</a></li>-->
 											</ul>
 										</div>
 									</div>
@@ -303,7 +303,7 @@
                                                                 </td>
                                                                 <td class="align-middle">
                                                                     <div class="d-flex">
-                                                                    <h6 class=" font-weight-bold"><a href="{{ url('/customer/invoice/') }}/2/" class="btn btn-sm btn-info">Invoice</a></h6>
+                                                                    <h6 class=" font-weight-bold"><a href="{{ url('/customer/invoice/') }}/{{$row->id}}" class="btn btn-sm btn-info">Invoice</a></h6>
                                                                     </div>
                                                                 </td>
                                                                 </tr>
@@ -323,7 +323,7 @@
                                             <div class="card-body">
 												<div class="e-table">
 													<div class="table-responsive table-lg mt-3">
-														<table id="order-table" class="order-table table table-striped table-bordered w-100 text-nowrap">
+														<table id="trans-table" class="trans-table table table-striped table-bordered w-100 text-nowrap">
 															<thead>
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5"></th>
@@ -447,6 +447,8 @@
                 </div>
             </div>
 
+<input type="hidden" id="ord_dt" value="0">
+<input type="hidden" id="trns_dt" value="0">
  
  <style type="text/css">
  	p.addr_p {
@@ -469,7 +471,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
 
 <!-- INTERNAl Data tables -->
-		<script src="{{URL::asset('admin/assets/js/datatable/tables/order-datatable.js')}}"></script>
+		<!--<script src="{{URL::asset('admin/assets/js/datatable/tables/order-datatable.js')}}"></script>-->
 		<script src="{{URL::asset('admin/assets/plugins/datatable/js/dataTables.bootstrap4.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/plugins/datatable/js/dataTables.buttons.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/plugins/datatable/js/buttons.bootstrap4.min.js')}}"></script>
@@ -484,6 +486,38 @@
 
 <script type="text/javascript">
 
+var myLink = document.getElementById('ord_hist');
+
+myLink.onclick = function(){
+
+var ord_dt = $('#ord_dt').val();
+var script = document.createElement("script");
+script.type = "text/javascript";
+script.src = "{{URL::asset('admin/assets/js/datatable/tables/ordertable-datatable.js')}}"; 
+
+
+if (  ord_dt == 0 ) {
+$('#ord_dt').val(1);
+document.getElementsByTagName("head")[0].appendChild(script);
+}
+return false;
+}
+
+var transHist = document.getElementById('trans_hist');
+
+transHist.onclick = function(){
+var trns_dt = $('#trns_dt').val();
+var script = document.createElement("script");
+script.type = "text/javascript";
+script.src = "{{URL::asset('admin/assets/js/datatable/tables/transtable-datatable.js')}}"; 
+if (  trns_dt == 0 ) {
+$('#trns_dt').val(1);
+document.getElementsByTagName("head")[0].appendChild(script);
+}
+return false;
+}
+    
+    
 $(document).ready(function() {
 $('#cust_item').addClass("active");
 $('#editprofile').submit(function(e) {
@@ -521,6 +555,7 @@ $('#editprofile').submit(function(e) {
 });
 
 });
+
 
 </script>
 @endsection

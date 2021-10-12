@@ -30,7 +30,7 @@ $(document).ready(function () {
         },
         orderMulti: false,
         dom: "Blfrtip",
-        stateSave: true,
+        stateSave: false,
         order: [[0, "asc"]],
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         buttons: [
@@ -77,17 +77,17 @@ $(document).ready(function () {
         },
         language: {
             decimal: "",
-            emptyTable: "No admins found",
-            info: "Showing _START_ to _END_ of _TOTAL_ admins",
-            infoEmpty: "Showing 0 to 0 of 0 admins",
-            infoFiltered: "(filtered from _MAX_ total admins)",
+            emptyTable: "No staffs found",
+            info: "Showing _START_ to _END_ of _TOTAL_ staffs",
+            infoEmpty: "Showing 0 to 0 of 0 staffs",
+            infoFiltered: "(filtered from _MAX_ total staffs)",
             infoPostFix: "",
             thousands: ",",
-            lengthMenu: "Show _MENU_ admins",
+            lengthMenu: "Show _MENU_ staffs",
             loadingRecords: "Loading...",
             processing: "Processing...",
             search: "Search:",
-            zeroRecords: "No matching admins found",
+            zeroRecords: "No matching staffs found",
             paginate: {
                 first: "First",
                 last: "Last",
@@ -118,7 +118,7 @@ $(document).ready(function () {
         // });
     });
     jQuery("#filterSel").on( 'change', function () {
-                          table.column( 4 )
+                          table.column( 6 )
                     .search( "^" + $(this).val(), true, false, true )
                     .draw();
                     

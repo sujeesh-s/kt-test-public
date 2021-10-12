@@ -22,12 +22,26 @@
         </div>
     </div>
     <div id="data_type_div" class="col-lg-6 fl">
-        <div class="form-group">
-            {{Form::label('phone','Phone',['class'=>''])}} <span class="text-red">*</span>
-            {{Form::text('info[phone]',$phone,['id'=>'phone', 'class'=>'form-control','placeholder'=>'Phone'])}}
-            <span class="error"></span>
+        <label for="phone">Phone </label>
+
+        <div class="row">
+        <div class="col-3 pr-0">
+        <select id="isd_code" name="info[isd_code]" class="form-control p-1" >
+        @if($c_code) @foreach($c_code as $row=>$isd) 
+        @php if($isd == $isd_code){ $selected = 'selected'; }else{ $selected = ''; } @endphp
+
+        <option value="{{ $isd }}" {{$selected}}>+{{$isd}}</option>
+        @endforeach @endif
+        </select>
         </div>
-    </div>
+        <div class="col-9 pl-0">
+        <input type="text" class="form-control" name="info[phone]" id="phone" placeholder="Phone" value="{{ $phone }}" >
+        <span class="error"></span>
+        </div>
+        </div>
+        <span class="error"></span>
+        </div>
+    <div class="clearfix"></div>
     <div id="config_div" class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('licence','Licence',['class'=>''])}}
@@ -57,12 +71,25 @@
         </div>
     </div>
     <div class="col-lg-6 fl">
-        <div class="form-group">
-            {{Form::label('incharge_phone','Incharge Phone',['class'=>''])}}
-            {{Form::text('info[incharge_phone]',$icPhone,['id'=>'incharge_phone','class'=>'form-control','placeholder'=>'Incharge Phone'])}}
-            <span class="error"></span>
+        <label for="phone">Incharge Phone </label>
+
+        <div class="row">
+        <div class="col-3 pr-0">
+        <select id="isd_code" name="info[incharge_isd_code]" class="form-control p-1" >
+        @if($c_code) @foreach($c_code as $row=>$isd) 
+        @php if($isd == $icPhoneISD){ $selected = 'selected'; }else{ $selected = ''; } @endphp
+
+        <option value="{{ $isd }}" {{$selected}}>+{{$isd}}</option>
+        @endforeach @endif
+        </select>
         </div>
-    </div> 
+        <div class="col-9 pl-0">
+        <input type="text" class="form-control" name="info[incharge_phone]" id="phone" placeholder="Phone" value="{{ $icPhone }}" required>
+        <span class="error"></span>
+        </div>
+        </div>
+        <span class="error"></span>
+        </div> 
     <div class="col-lg-6 fl">
         <div class="row">
             <div class="col-md-6">

@@ -65,7 +65,8 @@ class SellerController extends Controller{
                if($row->store($row->seller_id)->service_status  ==  1){ $sChecked    = 'checked="checked"'; }else{ $sChecked = ''; }
                $val['id']           =   '';                                 $val['store_name']      =   $row->store($row->seller_id)->store_name;
                $val['business_name']=   '<a id="dtlBtn-'.$row->seller_id.'" class="font-weight-bold viewDtl">'.$row->store($row->seller_id)->store_name.'</a>';
-               $val['email']        =   $row->sellerMst->teleEmail->value;      $val['phone']       =   $row->sellerMst->telePhone->value;
+               $val['email']        =   $row->sellerMst->teleEmail->value;  
+               if($row->sellerMst->isd_code){ $isd_code ="+".$row->sellerMst->isd_code." ";  }else { $isd_code = ""; } $val['phone']       =   $isd_code.$row->sellerMst->telePhone->value;
                $val['created_at']   =   date('d M Y, g:i a',strtotime($row->created_at)); 
                $val['status']       =   '<div class="switch" data-search="'.$act.'">
                                             <input class="switch-input status-btn" id="status-'.$row->sellerMst->id.'" type="checkbox" '.$checked.' name="status">
@@ -119,6 +120,7 @@ class SellerController extends Controller{
         $store                      =   Store::where('seller_id',$id)->where('is_deleted',0)->first();
         $data['store']              =   $store;
         if($store){ $countryId      =  (int)$store->country_id; $stateId = (int)$store->state_id; }
+        $data['c_code']              =   getDropdownData(Country::where('is_deleted',0)->get(),'id','phonecode');
         $data['categories']         =   getDropdownData(Category::where('is_deleted',0)->get(),'category_id','cat_name');
         $data['countries']          =   getDropdownData(Country::where('is_deleted',0)->get(),'id','country_name');
         $data['states']             =   getDropdownData(State::where('country_id',$countryId)->where('is_deleted',0)->get(),'id','state_name');
@@ -179,11 +181,12 @@ class SellerController extends Controller{
      //   $store['pack_charge']   =   $storeSet->pack_charge;
      $store['licence'] =   $info->licence; $store['incharge_name'] =   $info->incharge_name; $store['incharge_phone'] =   $info->incharge_phone;
         $store['business_name'] =   $info->business_name;       $store['store_name']    =   $info->store_name;      $store['licence']    =   $info->licence;
-        $store['commission']    =   $storeSet->commission;      $store['is_active']     =   $storeSet->is_active;
+        $store['commission']    =   $storeSet->commission;      $store['is_active']     =   $storeSet->is_active;$store['incharge_isd_code']     =   $info->incharge_isd_code;
         $emailTypeId            =   Telecom::where('name','email')->first()->id; $phoneTypeId   =   Telecom::where('name','phone')->first()->id;
         if($post->id            >   0){ 
             $seller             =   Seller::where('id',$post->id)->first();
             if($info->email     !=  $seller->username){ Seller::where('id',$post->id)->update(['username'=>$info->email]); }
+            Seller::where('id',$post->id)->update(['isd_code'=>$info->isd_code]);
             $sellerId           =   $post->id; $storeId = $post->storeId;
                                     SellerTelecom::where('id',$seller->email)->update(['value'=>$info->email]);
                                     SellerTelecom::where('id',$seller->phone)->update(['value'=>$info->phone]);
@@ -191,7 +194,7 @@ class SellerController extends Controller{
             $msg                =   'Seller updated successfully!';
         }else{
             $selInfo['is_approved']=   1;  $selInfo['approved_at'] = date('Y-m-d H:i:s'); $selInfo['ic_number'] = $info->ic_number;
-            $sellerId           =   Seller::create(['username'=>$info->email,'password'=>Hash::make('123456')])->id; $selInfo['seller_id'] = $store['seller_id'] = $sellerId; 
+            $sellerId           =   Seller::create(['username'=>$info->email,'password'=>Hash::make('123456'),'isd_code'=>$info->isd_code])->id; $selInfo['seller_id'] = $store['seller_id'] = $sellerId; 
             $storeId            =   Store::create($store)->id; SellerInfo::create($selInfo);
             $teleEmail          =   ['seller_id'=>$sellerId,'type_id'=>$emailTypeId,'value'=>$info->email]; 
             $telePhone          =   ['seller_id'=>$sellerId,'type_id'=>$phoneTypeId,'value'=>$info->phone]; 

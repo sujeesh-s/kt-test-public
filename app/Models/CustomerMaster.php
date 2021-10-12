@@ -9,7 +9,7 @@ class CustomerMaster extends Model
 {
     use HasFactory;
     protected $table = 'usr_mst';
-    protected $fillable = ['org_id','username', 'email', 'phone','ref_code','is_active','is_deleted','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['org_id','username', 'email', 'phone','ref_code','invited_by','is_active','is_deleted','created_by','updated_by','created_at','updated_at'];
     
     public function info(){ return $this->hasOne(CustomerInfo ::class, 'user_id'); }
     public function teleEmail(){ return $this->belongsTo(CustomerTelecom ::class, 'email'); }

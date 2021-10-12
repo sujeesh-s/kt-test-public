@@ -38,7 +38,7 @@
 						<!--/app header-->
 						<div class="main-proifle">
 							<div class="row">
-								<div class="col-lg-8">
+								<div class="col-lg-7">
 									<div class="box-widget widget-user">
 										<div class="widget-user-image1 d-sm-flex">
 										    @if($info->profile_image!='')
@@ -66,7 +66,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-lg-4 col-md-auto">
+								<div class="col-lg-5 col-md-auto">
 									<div class="text-lg-right btn-list mt-4 mt-lg-0">
 										<!--<a href="#" class="btn btn-light">Change Password</a>-->
 										<button data-toggle="modal" data-target="#SignUp" class="btn btn-primary">Edit Profile</button>

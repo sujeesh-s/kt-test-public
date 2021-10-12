@@ -8,6 +8,10 @@
 </style>
 @endsection
 @section('content')
+
+@php
+ $c_code =  getDropdownData(DB::table('countries')->where('is_deleted',0)->get(),'id','phonecode');
+ @endphp
 <div class="page">
     <div class="page-content">
         {{ Form::open(array('url' => "/create/seller", 'id' => 'sellerForm', 'name' => 'sellerForm', 'class' => '','files'=>'true')) }}
@@ -31,11 +35,33 @@
                                             <input type="text" id="store_name" name="store[store_name]" class="form-control fw" placeholder="Store Name">
                                             <span class="error"></span>
                                         </div>
-                                        <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Phone</strong></label>
-                                            <input type="text" id="phone" name="phone" class="form-control fw" placeholder="Phone Number">
-                                            <span class="error"></span>
+                                        <!--<div class="input-group col-md-6 fl mb-2">-->
+                                        <!--    <label class="col-12" for="phone"><strong>Phone</strong></label>-->
+                                        <!--    <input type="text" id="phone" name="phone" class="form-control fw" placeholder="Phone Number">-->
+                                        <!--    <span class="error"></span>-->
+                                        <!--</div>-->
+                                        
+                                        <div class=" col-md-6 fl mb-2">
+                                        <label for="phone">Phone </label>
+                                        
+                                        <div class="row">
+                                        <div class="col-3 pr-0 input-group">
+                                        <select id="isd_code" name="info[isd_code]" class="form-control p-1" >
+                                        @if($c_code) @foreach($c_code as $row=>$isd) 
+                                        @php if($isd == 91){ $selected = 'selected'; }else{ $selected = ''; } @endphp
+                                        
+                                        <option value="{{ $isd }}" {{$selected}}>+{{$isd}}</option>
+                                        @endforeach @endif
+                                        </select>
                                         </div>
+                                        <div class="col-9 pl-0 input-group">
+                                        <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone Number" >
+                                        <span class="error"></span>
+                                        </div>
+                                        </div>
+                                        <span class="error"></span>
+                                        </div>
+                                        
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="Email"><strong>Email</strong></label>
                                             <input type="email" id="email" name="email" class="form-control fw" placeholder="Email">
@@ -61,10 +87,30 @@
                                             <input type="text" id="incharge_name" name="store[incharge_name]" class="form-control fw" placeholder="Incharge Name">
                                             <span class="error"></span>
                                         </div>
-                                        <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="incharge_phone"><strong>Incharge Contact Number</strong></label>
-                                            <input type="text" id="incharge_phone" name="store[incharge_phone]" class="form-control fw" placeholder="Incharge Contact No.">
-                                            <span class="error"></span>
+                                        <!--<div class="input-group col-md-6 fl mb-2">-->
+                                        <!--    <label class="col-12" for="incharge_phone"><strong>Incharge Contact Number</strong></label>-->
+                                        <!--    <input type="text" id="incharge_phone" name="store[incharge_phone]" class="form-control fw" placeholder="Incharge Contact No.">-->
+                                        <!--    <span class="error"></span>-->
+                                        <!--</div>-->
+                                        <div class=" col-md-6 fl mb-2">
+                                        <label for="incharge_phone">Incharge Contact Number</label>
+                                        
+                                        <div class="row">
+                                        <div class="col-3 pr-0 input-group">
+                                        <select id="isd_code" name="store[incharge_isd_code]" class="form-control p-1" >
+                                        @if($c_code) @foreach($c_code as $row=>$isd) 
+                                        @php if($isd == 91){ $selected = 'selected'; }else{ $selected = ''; } @endphp
+                                        
+                                        <option value="{{ $isd }}" {{$selected}}>+{{$isd}}</option>
+                                        @endforeach @endif
+                                        </select>
+                                        </div>
+                                        <div class="col-9 pl-0 input-group">
+                                        <input type="text" class="form-control" name="store[incharge_phone]" id="incharge_phone" placeholder="Incharge Contact No." >
+                                        <span class="error"></span>
+                                        </div>
+                                        </div>
+                                        <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="store_desc"><strong>Store Description</strong></label>

@@ -105,10 +105,11 @@
 													<th class="text-right" style="width: 1%">Amount</th>
 												</tr>
 												@if($order_items && count($order_items) > 0)
-												@php $totals = $total_tax = $total_disc = 0; @endphp
+												@php $totals = $total_tax = $total_disc = $o= 0; @endphp
                     											@foreach($order_items as $row)
+                    												@php $o++; @endphp
 												<tr>
-													<td class="text-center">1</td>
+													<td class="text-center">{{ $o }}</td>
 													<td>
 														<p class="font-weight-semibold mb-1">{{ $row->prd_name }}</p>
 														<!-- <div class="text-muted">Logo and business cards design</div> -->

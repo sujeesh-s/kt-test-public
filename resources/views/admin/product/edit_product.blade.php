@@ -157,7 +157,7 @@
                                                             <div class="form-group">
                                                                 <label class="form-label">Subcategory<span class="text-red">*</span></label>
                                                                 
-                                                                <input type="text" id="sub-category-id" placeholder="Type to filter" name="subcategory_id" autocomplete="off" value="@if(isset($product->sub_category_id)) {{ $product->sub_category_id }} @endif" hidden />
+                                                                <input type="text" id="sub-category-id" placeholder="Type to filter" class="@error('subcategory_id') is-invalid @enderror" name="subcategory_id" autocomplete="off" value="@if(isset($product->sub_category_id)) {{ $product->sub_category_id }} @endif" hidden />
 																<input type="text" id="sub-category-drop" class="form-control " value="" placeholder="Select Subcategory" readonly style="background-color: #fff !important;">
                                                                 
                                                             <!--    <input type="hidden" id="cat_ids" value="{{ $product->sub_category_id }}">-->

@@ -313,8 +313,7 @@ class Homepage extends Controller
             $shock = PrdShock_Sale::join('prd_shock_sale_products','prd_shock_sale.id','=','prd_shock_sale_products.shock_sale_id')
             ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->whereDate('prd_shock_sale.start_time','<=',$current_date)->whereDate('prd_shock_sale.end_time','>=',$current_date)
             ->where('prd_shock_sale_products.is_active',1)->where('prd_shock_sale_products.is_deleted',0)
-            ->select('prd_shock_sale.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->
-            get();
+            ->select('prd_shock_sale.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->get();
             if(count($shock)>0)
             {
             foreach($shock as $rows)
@@ -324,7 +323,7 @@ class Homepage extends Controller
                     {
                 foreach(explode(',',$rows->shock_prd_id) as $shock_rows)
                 {
-                    $valid_prduct = Product::where('id',$shock_rows)->where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->first();
+                    $valid_prduct = Product::where('id',$shock_rows)->where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->first();
                     if($valid_prduct){
                     $category_cid = $rows->category_data($rows->product_data($shock_rows)->category_id)->cat_name_cid;
                     $subcategory_cid = $rows->subcategory_data($rows->product_data($shock_rows)->sub_category_id)->sub_name_cid;
@@ -963,7 +962,7 @@ class Homepage extends Controller
     $prod_data=[];
     if($prd_id!='')
     {
-    $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('id',$prd_id)->get();
+    $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('id',$prd_id)->where('product_type',1)->where('is_approved',1)->get();
         foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -980,7 +979,7 @@ class Homepage extends Controller
     }
     if($category!='')
     {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('category_id',$category)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('category_id',$category)->get(); 
      foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -997,7 +996,7 @@ class Homepage extends Controller
     }
     if($subcategory!='')
     {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('sub_category_id',$subcategory)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('sub_category_id',$subcategory)->get(); 
      foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -1015,7 +1014,7 @@ class Homepage extends Controller
     }
     if($brand!='')
     {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('brand_id',$brand)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('brand_id',$brand)->get(); 
      foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -1035,7 +1034,7 @@ class Homepage extends Controller
      $prod_tags= PrdAssignedTag::where('is_deleted',0)->where('tag_id',$tag)->first();
      if($prod_tags)
      {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('id',$prod_tags->prd_id)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('id',$prod_tags->prd_id)->get(); 
      }
    
 

@@ -85,19 +85,32 @@
                 <div class="col-md-6 mb-3">
                     <label for="phone">Phone <span class="text-red">*</span></label>
                     
-                    <input type="text" class="form-control" name="user[phone]" id="phone" placeholder="Phone" value="@if(old()){{old('user')['phone']}}@endif" required>
-                    <span class="error"></span>
-                    @error('phone')
+                            <div class="row">
+                            <div class="col-3 pr-0">
+                            <select id="isd_code" name="user[isd_code]" class="form-control p-1" >
+                            @if($c_code) @foreach($c_code as $row=>$isd) 
+                            @php if($isd == 91){ $selected = 'selected'; }else{ $selected = ''; } @endphp
+
+                            <option value="{{ $isd }}" {{$selected}}>+{{$isd}}</option>
+                            @endforeach @endif
+                            </select>
+                            </div>
+                            <div class="col-9 pl-0">
+                            <input type="text" class="form-control" name="user[phone]" id="phone" placeholder="Phone" value="@if(old()){{old('user')['phone']}}@endif" required>
+                            <span class="error"></span>
+                            </div>
+                        </div>
+                         @error('phone')
                     <p style="color: red">{{ $message }}</p>
                     @enderror
-                </div>
+                        </div>
             </div>
           
 
             <div class="form-row">
                 <div class="col-md-6 mb-3">
                     <label for="password">Password <span class="text-red">*</span></label>
-                    <input type="password" class="form-control" name="user[password]" id="password" placeholder="Password"  value="@if(old()){{old('user')['password']}}@endif" >
+                    <input type="password" class="form-control" name="user[password]" id="password" data-strength placeholder="Password"  value="@if(old()){{old('user')['password']}}@endif" >
                     <span class="error"></span>
                     @error('password')
                     <p style="color: red">{{ $message }}</p>

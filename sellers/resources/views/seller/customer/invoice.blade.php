@@ -78,9 +78,9 @@
 																<span>{{ $address['address_1'] }}</span>
 																<p class="addr_p">{{ $address['address_2'] }}</p>
 																@if(! is_null($address['city_data']))
-																<p class="addr_p">{{ $address['city_data']['city'] }}</p>
-																<p class="addr_p">{{ $address['city_data']['state'] }}</p>
-																<p class="addr_p">{{ $address['city_data']['country'] }}</p>
+																<p class="addr_p">@if(isset($address['city_data']['city'])) {{ $address['city_data']['city'] }} @endif</p>
+																<p class="addr_p">@if(isset($address['city_data']['state'])) {{ $address['city_data']['state'] }} @endif</p>
+																<p class="addr_p">@if(isset($address['city_data']['country'])) {{ $address['city_data']['country'] }} @endif</p>
 																@endif
 
 														@endforeach
@@ -105,10 +105,11 @@
 													<th class="text-right" style="width: 1%">Amount</th>
 												</tr>
 												@if($order_items && count($order_items) > 0)
-												@php $totals = $total_tax = $total_disc = 0; @endphp
+												@php $totals = $total_tax = $total_disc = $o= 0;  @endphp
                     											@foreach($order_items as $row)
+                    											@php $o++; @endphp
 												<tr>
-													<td class="text-center">1</td>
+													<td class="text-center">{{ $o }}</td>
 													<td>
 														<p class="font-weight-semibold mb-1">{{ $row->prd_name }}</p>
 														<!-- <div class="text-muted">Logo and business cards design</div> -->

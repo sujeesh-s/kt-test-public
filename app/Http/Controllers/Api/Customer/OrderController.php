@@ -22,6 +22,7 @@ use App\Models\Cart;
 use App\Models\CartHistory;
 use App\Models\Coupon;
 use App\Models\CouponHist;
+use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\CustomerAddressType;
 use App\Models\CustomerWallet_Model;
@@ -43,6 +44,8 @@ use App\Models\PrdPrice;
 use App\Models\PrdStock;
 use App\Models\ParentSale;
 use App\Models\RelatedProduct;
+use App\Models\Reward;
+use App\Models\RewardType;
 use App\Models\AssignedAttribute;
 use App\Models\Wishlist;
 use App\Models\WishlistItem;
@@ -71,6 +74,9 @@ class OrderController extends Controller
             'platform_discount_type'=> ['nullable','string',Rule::in(['discount', 'cashback'])],
             'total_amt'             => ['required','numeric'],
             'discount_amt'          => ['required','numeric'],
+            'is_reward'             => ['nullable','numeric'],
+            'reward_amt'            => ['nullable'],
+            'reward_id'             => ['nullable','numeric'],
             'payment_type'          => ['required'],
             'address_id'            => ['required']
 
@@ -184,6 +190,8 @@ class OrderController extends Controller
                                                   'discount_type'     => $plform_discount_type,
                                                   'discount_amt'      => $pltform_discount_amt,
                                                   'wallet_amt'        => $wallet_amt,
+                                                  'reward_id'         => $input['reward_id'],
+                                                  'reward_amt'        => $input['reward_amt'],    
                                                   'grand_total'       => $input['total_amt']-$pltform_discount_amt - $wallet_amt,   
                                                   'created_at'        => date("Y-m-d H:i:s"),
                                                   'updated_at'        => date("Y-m-d H:i:s")
@@ -221,6 +229,53 @@ class OrderController extends Controller
             
         }
         
+        // reward application
+        $sale_before  =  SaleOrder::where('cust_id',$user_id)->count();
+        if($sale_before<1)
+        {
+            $reward = Reward::where('is_active',1)->where('is_deleted',0)->where('ord_min_amount', '<=', $input['total_amt'])->first();
+            if($reward)
+            {
+                if($reward->ord_type=='cashback')
+                {
+                $cashback_reward = CustomerWallet_Model::create(['user_id'    =>  $user_id,
+                                                          'source_id'  =>  $reward->id,
+                                                          'source'     =>  'First Buy',
+                                                          'credit'     =>  $reward->ord_amount,
+                                                          'is_active'  =>  1,
+                                                          'is_deleted' =>  0,
+                                                          'created_at'    =>date("Y-m-d H:i:s"),
+                                                          'updated_at'    =>date("Y-m-d H:i:s")]); 
+                }
+                                                          
+                                                          //If INVITED BY someone
+            $cust_master = Customer::where('id',$user_id)->first();
+            if($cust_master->invited_by!='' && $cust_master->invited_by!=0)
+                {
+                   if($reward->rwd_type==2 || $reward->rwd_type==3)
+                   {
+                       $typ_pts = $reward->rewardType_purchase()->points;
+                       if($typ_pts!='')
+                       {
+                           $credit_value = $typ_pts * $reward->point_val;
+                       }
+                       else
+                       {
+                           $credit_value =1 * $reward->point_val;
+                       }
+                       $cashback_reward_invite = CustomerWallet_Model::create(['user_id'    =>  $cust_master->invited_by,
+                                                          'source_id'  =>  $reward->id,
+                                                          'source'     =>  'Reward',
+                                                          'credit'     =>  $credit_value,
+                                                          'is_active'  =>  1,
+                                                          'is_deleted' =>  0,
+                                                          'created_at'    =>date("Y-m-d H:i:s"),
+                                                          'updated_at'    =>date("Y-m-d H:i:s")]); 
+                   }
+                }
+            }
+        }
+        
         //Wallet used
         if($wallet_amt>0)
         {
@@ -233,6 +288,7 @@ class OrderController extends Controller
                                                           'created_at'    =>date("Y-m-d H:i:s"),
                                                           'updated_at'    =>date("Y-m-d H:i:s")]); 
         }
+        
 
             $latestOrder = SaleOrder::orderBy('created_at','DESC')->first();
             $saleorder_id = date('y').date('m').str_pad($latestOrder->id + 1, 6, "0", STR_PAD_LEFT);
@@ -292,6 +348,7 @@ class OrderController extends Controller
                 'payment_status'  => 'pending',
                 'shipping_status' => 'pending',
                 'cancel_process'  => 0,
+                'cust_message'    => $rows['message'],    
                 'created_at'    =>date("Y-m-d H:i:s"),
                 'updated_at'    =>date("Y-m-d H:i:s")]);
                 $sale_id  = $create_saleorder->id;

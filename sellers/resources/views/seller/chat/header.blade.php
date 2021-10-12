@@ -213,9 +213,15 @@ function loadChat (id){
        //var form_data = new FormData(document.getElementById("form_submit"));
        
        //alert(msg);
-       if(msg!='')
+       if(msg=='' && $('.img_up').val()=='')
        {
-       $.ajax({
+           toastr.warning('Please enter the message.');
+       
+       
+      }
+      else
+      {
+        $.ajax({
            type: "POST",
            enctype: 'multipart/form-data',
            contentType: false,
@@ -232,10 +238,6 @@ function loadChat (id){
                 
            }
        });
-      }
-      else
-      {
-        toastr.warning('Please enter the message.');
       }
    }
    

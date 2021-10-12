@@ -105,8 +105,10 @@ class RegisterController extends Controller
     protected function createSeller(Request $request)
     { 
         $post                   =   (object)$request->post(); $info = $post->info; $store = $post->store;
+        
         $emailTypeId            =   Telecom::where('name','email')->first()->id; $phoneTypeId   =   Telecom::where('name','phone')->first()->id;
         $sellerId               =   Seller::create(['username'=>$post->email,'role_id'=>3,'password'=>Hash::make('123456')])->id;
+        Seller::where('id',$sellerId)->update(['isd_code'=>$info['isd_code']]);
         $info['seller_id']      =   $sellerId; $info['fname'] = $info['director_name']; SellerInfo::create($info); $store['seller_id'] = $sellerId;
         $storeId                =   Store::create($store)->id;
         $teleEmail              =   ['seller_id'=>$sellerId,'type_id'=>$emailTypeId,'value'=>$post->email]; 

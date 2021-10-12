@@ -1094,8 +1094,11 @@ class AccountController extends Controller
                         'status' => $status]);
                         if($formData['status'] == 1)
                         {
+                          $refundcharge = SettingOther::first();
+                          $tot = $sales->g_total;
+                          $gtot = $tot - $refundcharge->refund_deduction;
                           SalesOrderRefundPayment::create([
-                         'ref_id' => $formData['cancel_id'],'source' =>'cancel','refund_mode' => $formData['refund_mode'],'bank_name' => $formData['bank_name'],'account_number' => $formData['account_number'],'branch_name' => $formData['branch_name'],'ifsc_code' => $formData['ifsc_code']]);
+                         'ref_id' => $formData['cancel_id'],'sales_id' => $cancels->sales_id,'source' =>'cancel','refund_mode' => $formData['refund_mode'],'total' => $tot,'refund_tax' => $refundcharge->refund_deduction,'grand_total' => $gtot,'bank_name' => $formData['bank_name'],'account_number' => $formData['account_number'],'branch_name' => $formData['branch_name'],'ifsc_code' => $formData['ifsc_code']]);
                         }
                         return array('httpcode'=>'200','status'=>'success','message'=>'Response sent','data'=>['message' =>'Your cancel response sent successfully!']);
                     }

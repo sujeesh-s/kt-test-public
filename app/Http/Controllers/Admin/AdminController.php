@@ -14,6 +14,7 @@ use Session;
 use DB;
 use App\Models\Modules;
 // use App\Models\UserRoles;
+use App\Models\Country;
 use App\Models\Admin;
 use App\Models\UserRole;
 use App\Models\SalesOrder;
@@ -65,7 +66,7 @@ class AdminController extends Controller
 
         $prd_out_stock_soon = array();
         foreach($data['products'] as $row){
-        if($row->prdStock($row->id) <10){
+        if(($row->prdStock($row->id) <10) && ($row->prdStock($row->id) >= 0)){
         $prd_out_stock_soon[] = $row;    
         }
         }
@@ -192,6 +193,20 @@ class AdminController extends Controller
     
     function saveProfile(Request $request){
         $profile                =   Admin::where('id',auth()->user()->id)->update($request->post('profile'));
+        if($request->file('avatar') && $request->file('avatar') != ''){
+            $image = $request->file('avatar');
+            $input['imagename'] = 'avatar.'.$image->extension();
+            $path               =   '/app/public/user/'.auth()->user()->id;
+            $destinationPath = storage_path($path.'/thumbnail');
+            $img = Image::make($image->path());
+            if (!file_exists($destinationPath)) { mkdir($destinationPath, 755, true);}
+            $img->resize(150, 150, function ($constraint) {
+            $constraint->aspectRatio();
+            })->save($destinationPath.'/'.$input['imagename']);
+            $destinationPath = storage_path($path);
+            $image->move($destinationPath, $input['imagename']);
+            Admin::where('id',auth()->user()->id)->update(['avatar'=>$path.'/'.$input['imagename']]); 
+            }
         if($profile){   return      back()->with('success',' Profile updated successfully! '); }else{ return back(); }
     }
     
@@ -213,7 +228,7 @@ class AdminController extends Controller
     }
     
     function adminLogout(){ 
-        Auth::logout(); return redirect('admin/login');
+        Auth::logout(); return redirect('admin/login')->header('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
     }
     
     
@@ -239,6 +254,7 @@ class AdminController extends Controller
         $permanent = array(1,3,4,5,7);
         $data['modules']              =   Admin::where('is_active',1)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
         $data['roles']              =   UserRole::where('is_active',1)->whereNotIn('id', $permanent)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
+        $data['c_code']              =   getDropdownData(Country::where('is_deleted',0)->get(),'id','phonecode');
         return view('admin.admins.create',$data);
         }
 
@@ -249,6 +265,7 @@ class AdminController extends Controller
         $data['admin']              =   Admin::where('id',$role_id)->first();
         $permanent = array(1,3,4,5,7);
         $data['roles']              =   UserRole::where('is_active',1)->whereNotIn('id', $permanent)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
+        $data['c_code']              =   getDropdownData(Country::where('is_deleted',0)->get(),'id','phonecode');
         // dd($data);
         return view('admin.admins.edit',$data);
         }

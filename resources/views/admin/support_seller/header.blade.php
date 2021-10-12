@@ -150,7 +150,7 @@ $n_img = 1; $currency = getCurrency()->name;
        //var form_data = new FormData(document.getElementById("form_submit"));
        
        //alert(msg);
-       if(msg=='')
+       if(msg=='' && $('.img_up').val()=='')
        {
           toastr.warning('Please enter the message.'); 
        }

@@ -102,7 +102,7 @@
 																		<p>{{$row->email}}</p>
 																	</td>
 																	<td class="text-nowrap align-middle">
-																		<p>{{$row->phone}}</p>
+																		<p>@if($row->isd_code) +{{ $row->isd_code }} @endif {{$row->phone}}</p>
 																	</td>
 																	<td class="text-nowrap align-middle">
 																	@php

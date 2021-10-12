@@ -1,6 +1,6 @@
 @php 
-    if(sellerData()->avatar == NULL){ $avatar = url('storage/app/public/no-avatar.png'); }
-    else{ $avatar = url('storage'.sellerData()->avatar); }
+    if(sellerData()->store(sellerData()->id)->logo == NULL){ $avatar = url('storage/app/public/no-avatar.png'); }
+    else{ $avatar = url('storage'.sellerData()->store(sellerData()->id)->logo); }
     $sidebar = sidebarMenu();
     $version = appVersion('seller');
 @endphp

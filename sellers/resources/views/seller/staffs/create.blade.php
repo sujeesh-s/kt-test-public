@@ -93,7 +93,7 @@
             <div class="form-row">
                 <div class="col-md-6 mb-3">
                     <label for="password">Password <span class="text-red">*</span></label>
-                    <input type="password" class="form-control" name="user[password]" id="password" placeholder="Password" value="@if(old()){{old('user')['password']}}@endif" >
+                    <input type="password" class="form-control" name="user[password]" id="password" data-strength placeholder="Password" value="@if(old()){{old('user')['password']}}@endif" >
                     <span class="error"></span>
                     @error('password')
                     <p style="color: red">{{ $message }}</p>

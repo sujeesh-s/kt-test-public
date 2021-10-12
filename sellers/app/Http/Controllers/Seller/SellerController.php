@@ -77,7 +77,7 @@ class SellerController extends Controller
          if($data['products']){ $data['products_c'] = count($data['products']); }else { $data['products_c'] =0; }
         $prd_out_stock_soon = array();
         foreach($data['products'] as $row){
-        if($row->prdStock($row->id) <10){
+        if(($row->prdStock($row->id) <10) && ($row->prdStock($row->id) >= 0)){
         $prd_out_stock_soon[] = $row;    
         }
         }
@@ -111,7 +111,7 @@ class SellerController extends Controller
         return view('admin.profile');
     }
        function sellerLogout(){ 
-        Auth::logout(); return redirect('/login');
+        Auth::logout(); return redirect('/login')->header('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
     }
 
     function validateUser(Request $request){
@@ -296,6 +296,7 @@ class SellerController extends Controller
         $data['bank']               =   SellerBank::getBankData($id);
         if($store){ $countryId      =  (int)$store->country_id; $stateId = (int)$store->state_id; }
         $data['categories']         =   getDropdownData(Category::where('is_deleted',0)->get(),'category_id','cat_name');
+        $data['c_code']              =   getDropdownData(Country::where('is_deleted',0)->get(),'id','phonecode');
         $data['countries']          =   getDropdownData(Country::where('is_deleted',0)->get(),'id','country_name');
         $data['states']             =   getDropdownData(State::where('country_id',$countryId)->where('is_deleted',0)->get(),'id','state_name');
         $data['cities']             =   getDropdownData(City::where('state_id',$stateId)->where('is_deleted',0)->get(),'id','city_name');
@@ -378,6 +379,7 @@ class SellerController extends Controller
             $seller             =   Seller::where('id',$post->id)->first();
             if($info->email     !=  $seller->username){ Seller::where('id',$post->id)->update(['username'=>$info->email]); }
             $sellerId           =   $post->id; $storeId = $post->storeId;
+            Seller::where('id',$post->id)->update(['isd_code'=>$info->isd_code]); $store['incharge_isd_code']     =   $info->incharge_isd_code;
                                     SellerTelecom::where('id',$seller->email)->update(['value'=>$info->email]);
                                     SellerTelecom::where('id',$seller->phone)->update(['value'=>$info->phone]);
                                     SellerInfo::where('seller_id',$sellerId)->update($selInfo); Store::where('id',$storeId)->update($store);

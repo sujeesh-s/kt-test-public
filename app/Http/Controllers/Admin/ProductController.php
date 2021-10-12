@@ -338,7 +338,7 @@ class ProductController extends Controller{
             'short_description'=> ['required'],
             'product_type'=> ['required'],
             'language'=> ['required'],
-            'product_image' => ['required','string']
+            'product_image' => ['required']
         ]);
             
         }

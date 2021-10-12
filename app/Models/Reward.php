@@ -41,7 +41,15 @@ class Reward extends Authenticatable
 
         }
 
-         
+    public function rewardType_purchase(){ 
+        $reward_type = RewardType::where('is_active',1)->where('is_deleted',0)->where('id',2)->first();
+        return $reward_type;
+    }
+    
+    public function rewardType_register(){ 
+        $reward_type = RewardType::where('is_active',1)->where('is_deleted',0)->where('id',1)->first();
+        return $reward_type;
+    }
     
        
       

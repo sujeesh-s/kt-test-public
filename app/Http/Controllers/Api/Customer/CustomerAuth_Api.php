@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Session;
 use DB;
 use App\Models\Admin;
@@ -16,7 +17,9 @@ use App\Models\CustomerTelecom;
 use App\Models\CustomerLogin;
 use App\Models\CustomerAddress;
 use App\Models\CustomerRegisterotp;
-
+use App\Models\CustomerWallet_Model;
+use App\Models\Reward;
+use App\Models\RewardType;
 use App\Rules\Name;
 use Validator;
 use Illuminate\Support\Facades\Hash;
@@ -39,10 +42,43 @@ class CustomerAuth_Api extends Controller
         $input = $request->all();
 
         if ($validator->passes()) {
-
+            
+            $invited_by='';
+            if($request->ref_code)
+            {
+                $invite=CustomerMaster::where('ref_code',$request->ref_code)->first();
+                if($invite)
+                {
+                $invited_by = $invite->id;
+                $reward = Reward::where('is_active',1)->where('ord_type','cashback')->where('is_deleted',0)->first();
+                if($reward->rwd_type==1 || $reward->rwd_type==1)
+                    {
+                        $typ_pts = $reward->rewardType_register()->points;
+                       if($typ_pts!='')
+                       {
+                           $credit_value = $typ_pts * $reward->point_val;
+                       }
+                       else
+                       {
+                           $credit_value =1 * $reward->point_val;
+                       }
+                       $cashback_reward_invite = CustomerWallet_Model::create(['user_id'    =>  $invited_by,
+                                                          'source_id'  =>  $reward->id,
+                                                          'source'     =>  'Reward',
+                                                          'credit'     =>  $credit_value,
+                                                          'is_active'  =>  1,
+                                                          'is_deleted' =>  0,
+                                                          'created_at'    =>date("Y-m-d H:i:s"),
+                                                          'updated_at'    =>date("Y-m-d H:i:s")]);
+                    }
+                }
+            }
+            
+          $random = Str::random(6);
           $master =  CustomerMaster::create(['org_id' => 1,
                 'username' => $request->email,
-                'ref_code' => $request->ref_code,
+                'ref_code' => $random,
+                'invited_by'=>$invited_by,
                 'is_active'=>1,
                 'is_deleted'=>0,
                 'created_at'=>date("Y-m-d H:i:s"),

@@ -3,7 +3,7 @@
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('password','New Password',['class'=>''])}}
-            {{ Form::password('security[password]', array('id'=>'password','placeholder'=>'Password', 'class'=>'form-control' ) ) }}
+            {{ Form::password('security[password]', array('id'=>'password','placeholder'=>'Password', 'class'=>'form-control','data-strength' ) ) }}
 
             <span class="error"></span>
         </div>

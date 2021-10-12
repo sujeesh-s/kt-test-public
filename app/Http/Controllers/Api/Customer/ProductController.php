@@ -731,11 +731,10 @@ class ProductController extends Controller
            // $current_date=date('Y-m-d H:i:s');
             $current_date=Carbon::now();
             $shock = PrdShockingSaleProduct::join('prd_shock_sale','prd_shock_sale_products.shock_sale_id','=','prd_shock_sale.id')
-            ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->where('prd_shock_sale_products.shock_sale_id',$request->shock_sale_id)->where('prd_shock_sale_products.prd_id',$request->product_id)
-            ->where('prd_shock_sale_products.is_active',1)->where('prd_shock_sale_products.is_deleted',0)
-            ->select('prd_shock_sale.*','prd_shock_sale_products.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->
-            first();
-            //print_r($shock);die;
+            ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->where('prd_shock_sale_products.shock_sale_id',$request->shock_sale_id)->whereRaw("find_in_set($request->product_id,prd_shock_sale_products.prd_id)")
+             ->where('prd_shock_sale_products.is_active',1)->where('prd_shock_sale_products.is_deleted',0)
+            ->select('prd_shock_sale.*','prd_shock_sale_products.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->first();
+            // echo $shock->seller_id;die;
             if($shock)
             {
                 $store_active = Store::where('is_active',1)->where('seller_id',$shock->seller_id)->first();
@@ -752,24 +751,30 @@ class ProductController extends Controller
                             'created_at'=>date("Y-m-d H:i:s"),
                             'updated_at'=>date("Y-m-d H:i:s")]);
                             
-                $shock_list['shock_sale_id']=$shock->id;
-                $shock_list['product_id']=$shock->prd_id;
-                $shock_list['product_name']=$this->get_content($shock->Product->name_cnt_id,$lang);
-                $shock_list['category']=$this->get_content($shock->Product->category->cat_name_cid,$lang);
-                $shock_list['subcategory']=$this->get_content($shock->Product->subCategory->sub_name_cid,$lang);
-                if($shock->Product->brand_id)
+                $shock_list['shock_sale_id']=$shock->shock_sale_id;
+                
+                $real_product = Product::where('id',$request->product_id)->first();
+                if($real_product){
+                
+                $shock_list['product_id']=$real_product->id;
+                $shock_list['product_name']=$this->get_content($real_product->name_cnt_id,$lang);
+                $shock_list['category']=$this->get_content($real_product->category->cat_name_cid,$lang);
+                $shock_list['subcategory']=$this->get_content($real_product->subCategory->sub_name_cid,$lang);
+                if($real_product->brand_id)
                 {
-                $shock_list['brand']=$this->get_content($shock->Product->brand->brand_name_cid,$lang);
+                $shock_list['brand']=$this->get_content($real_product->brand->brand_name_cid,$lang);
                 }
-                $shock_list['short_desc']=$this->get_content($shock->Product->short_desc_cnt_id,$lang);
-                $shock_list['long_desc']=$this->get_content($shock->Product->desc_cnt_id,$lang);
-                $shock_list['content']=$this->get_content($shock->Product->content_cnt_id,$lang);
+                $shock_list['short_desc']=$this->get_content($real_product->short_desc_cnt_id,$lang);
+                $shock_list['long_desc']=$this->get_content($real_product->desc_cnt_id,$lang);
+                $shock_list['content']=$this->get_content($real_product->content_cnt_id,$lang);
                 $shock_list['start_time']=$shock->start_time;
                 $shock_list['end_time']=$shock->end_time;
-                $shock_list['actual_price']=number_format($shock->Product->prdPrice->price,2);
-                $shock_list['sale_price']=$this->get_sale_price($shock->prd_id);
-                $sale_price=$this->get_sale_price($shock->prd_id);
-                $actual_price=$shock->Product->prdPrice->price;
+                if($real_product->product_type==1)
+                {
+                $sale_price=$this->get_sale_price($real_product->id);
+                $actual_price=$real_product->prdPrice->price;
+                $shock_list['actual_price']=number_format($real_product->prdPrice->price,2);
+                $shock_list['sale_price']=$this->get_sale_price($real_product->id);
                 if($shock->discount_type=="percentage")
                 {
                     $shock_list['offer']=$shock->discount_value."% OFF";
@@ -784,23 +789,64 @@ class ProductController extends Controller
                     $ofr_price=(float)$actual_price-(float)$shock->discount_value;
                     $shock_list['offer_price']=number_format($ofr_price,2);
                 }
-
-                $shock_list['rating']=$this->get_rates($shock->prd_id);
-                $shock_list['seller']=$shock->Store($shock->Product->seller_id)->store_name;
-                $shock_list['image']=$this->get_product_image($shock->prd_id);
-                if($shock->Product->product_type==2)
+                }
+                else
                 {
-                $shock_list['attributes']=$this->get_product_attributes($shock->prd_id,$lang); 
+                $shock_list['actual_price']="";
+                $shock_list['sale_price']="";
+                $shock_list['offer']='';
+                $shock_list['offer_price']='';
+                }
+                
+                
+
+                $shock_list['rating']=$this->get_rates($real_product->id);
+                $shock_list['seller']=$shock->Store($real_product->seller_id)->store_name;
+                $shock_list['image']=$this->get_product_image($real_product->id);
+                if($real_product->product_type==2)
+                {
+                //ASSOCIATIVE products
+                    if($real_product->product_type == 2)
+                    {    
+                        $prd_ass = AssociatProduct::where('prd_id',$real_product->id)->where('is_deleted',0)->get();
+                        if(count($prd_ass)>0)
+                        {
+                            foreach($prd_ass as $rows)
+                            {
+                            $product_visibility= Product::where('id',$rows->ass_prd_id)->where('is_active',1)->where('is_deleted',0)->where('visible',0)->where('is_approved',1)->first();
+                            if($product_visibility){
+                            //$associative_prd[]=$this->ass_related_product($rows->ass_prd_id,$lang);
+                            
+                                $associative_prd[]=$this->ass_related_product1($product_visibility->id,$lang);
+                            
+                            
+                             }
+                            }
+                        }
+                        else
+                        {
+                            $associative_prd=[];
+                        }
+                  }
+                  else
+                  {
+                    $associative_prd=[];
+                  }
+        
+                $shock_list['attributes']=$associative_prd; 
                 }
                 
                  $shock_data[]=$shock_list;
+                    }//real
                     }
+                    return response()->json(['httpcode'=>200,'status'=>'success','data'=>$shock_data]);
             }
             else
             {
                 $shock_data=[];
+                return response()->json(['httpcode'=>400,'status'=>'error','data'=>'Not found']);
             }
-            return response()->json(['httpcode'=>200,'status'=>'success','data'=>$shock_data]);
+            
     }
 
     public function auction_product(Request $request)
@@ -2149,7 +2195,7 @@ class ProductController extends Controller
     function related_brand_product($brand_id,$prd_id,$lang){
         $data     =   [];
         
-        $brand_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('brand_id',$brand_id)->where('visible',1)->whereNotIn('id', [$prd_id])->get();
+        $brand_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('product_type',1)->where('brand_id',$brand_id)->where('visible',1)->whereNotIn('id', [$prd_id])->get();
             if(count($brand_data)>0)   {   
               foreach($brand_data as $prod_data) {
                   $store_active = Store::where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();

@@ -202,7 +202,7 @@
                                     </div>
                                     <div class="form-group has-feedback">
                                         <label class= "form-label">Password<span class="text-red">*</span></label>
-                                        <input type="password" name="password" class="form-control" placeholder="Password">
+                                        <input type="password" name="password" class="form-control" data-strength placeholder="Password">
                                     </div>
                                     <div class="form-group has-feedback">
                                         <label class= "form-label">Reference Code<span class="text-red"></span></label>

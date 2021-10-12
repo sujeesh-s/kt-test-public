@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Seller extends Authenticatable{
     use Notifiable;
     protected $table = 'usr_seller_mst';
-    protected $fillable = ['org_id','username', 'ref_code', 'password',];
+    protected $fillable = ['org_id','username','isd_code', 'ref_code', 'password',];
     protected $hidden = ['password',];
     public function sellerInfo(){ return $this->hasOne(SellerInfo ::class, 'seller_id'); }
     public function store(){ return $this->hasOne(Store ::class, 'seller_id'); }

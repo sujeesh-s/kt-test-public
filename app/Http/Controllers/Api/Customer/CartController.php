@@ -35,6 +35,8 @@ use App\Models\PrdAssignedTag;
 use App\Models\PrdReview;
 use App\Models\PrdShock_Sale;
 use App\Models\PrdPrice;
+use App\Models\Reward;
+use App\Models\RewardType;
 use App\Models\RelatedProduct;
 use App\Models\AssignedAttribute;
 use App\Models\Wishlist;
@@ -84,6 +86,7 @@ class CartController extends Controller
             $seller_products = Product::whereIn('id',$cart_bySeller)->where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->groupBy('seller_id')->get();
             $seller_product_list=[];
             $products=[];
+            $rewards=[];
             foreach($seller_products as $s_row)
             {
                 $store_active = Store::where('service_status',1)->where('is_active',1)->where('seller_id',$s_row->seller_id)->first();
@@ -123,7 +126,15 @@ class CartController extends Controller
 
                 $grand_tot = $tot_tax+$total_cost;
             }
-            return ['httpcode'=>200,'status'=>'success','message'=>'Success','data'=>['cart_count'=>$cart_count,'product'=>$seller_product_list,'currency'=>getCurrency()->name,'wallet_balance'=>$wallet,'total_cost'=>$total_cost,'total_tax'=>number_format($tot_tax,2),'grand_total'=>$grand_tot]];       
+            $sale_before  =  SaleOrder::where('cust_id',$user_id)->count();
+            if($sale_before<1)
+            {
+                $reward = Reward::where('is_active',1)->where('is_deleted',0)->where('ord_min_amount', '<=', $total_cost)->where('ord_type','discount')->first();
+                if($reward){
+                $rewards= ['reward_id'=>$reward->id,'reward_amt'=>$reward->ord_amount];
+                }
+            }
+            return ['httpcode'=>200,'status'=>'success','message'=>'Success','data'=>['cart_count'=>$cart_count,'product'=>$seller_product_list,'currency'=>getCurrency()->name,'wallet_balance'=>$wallet,'reward'=>$rewards,'total_cost'=>$total_cost,'total_tax'=>number_format($tot_tax,2),'grand_total'=>$grand_tot]];       
          }
          else
          {
@@ -766,8 +777,8 @@ class CartController extends Controller
                     
                     $prd_list['seller_id']=$prod_data->seller_id;
                     $prd_list['seller']=$prod_data->Store($prod_data->seller_id)->store_name;
-                    $actual_price =$prod_data->prdPrice->price;
-                    $prd_list['unit_actual_price']=number_format($prod_data->prdPrice->price,2);
+                   if($prod_data->prdPrice){ $actual_price =$prod_data->prdPrice->price; }else { $actual_price =0; } 
+                    $prd_list['unit_actual_price']=number_format($actual_price,2);
                     $tot_actual=(int)$actual_price*(int)$qty;
                     $prd_list['total_actual_price']=$tot_actual;
                     $tax_amt=$prod_data->getTaxValue($prod_data->tax_id);
@@ -882,7 +893,7 @@ class CartController extends Controller
                     //$prd_list['brand_name']=$this->get_content($prod_data->brand->brand_name_cid,$lang);
                     $actual_price =$this->get_actual_price($prod_data->product_id);
                     $prd_list['unit_actual_price']=$actual_price;
-                    $tot_actual=$actual_price*$qty;
+                    $tot_actual=(int) $actual_price * (int) $qty;
                     $prd_list['total_actual_price']=(int)$tot_actual;
                     $tax_amt=$prod_data->getTaxValue($prod_data->tax_id);
                     $total_tax_amount = $tot_actual * ($tax_amt/100);
