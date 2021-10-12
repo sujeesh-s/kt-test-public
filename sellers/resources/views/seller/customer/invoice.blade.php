@@ -104,8 +104,9 @@
 													<th class="text-right" style="width: 1%">Packing Charge</th>
 													<th class="text-right" style="width: 1%">Amount</th>
 												</tr>
-												@if($order_items && count($order_items) > 0)
 												@php $totals = $total_tax = $total_disc = $o= 0;  @endphp
+												@if($order_items && count($order_items) > 0)
+												
                     											@foreach($order_items as $row)
                     											@php $o++; @endphp
 												<tr>
