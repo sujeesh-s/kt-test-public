@@ -572,7 +572,7 @@ class Homepage extends Controller
            $cat_subcat=[];
            $lang_id=$request->lang_id;
            //category
-        $category_data= Category::where('is_active',1)->where('is_deleted',0)->get();
+        $category_data= Category::where('is_active',1)->where('is_deleted',0)->orderBy('sort_order')->get();
             foreach($category_data as $cat)
             {  $image = url('storage/app/public/category/'.$cat->image);
                 // $prod_exist = Product::where('category_id',$cat->category_id)->where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->first();
@@ -592,8 +592,8 @@ class Homepage extends Controller
                 // }
             }
             
-            $order = array_column($cat_subcat, 'category_name');
-            array_multisort($order, SORT_ASC, $cat_subcat);
+            // $order = array_column($cat_subcat, 'category_name');
+            // array_multisort($order, SORT_ASC, $cat_subcat);
 
             return ['httpcode'=>200,'status'=>'success','message'=>'Success','data'=>['cat_subcat'=>$cat_subcat]];
        }     

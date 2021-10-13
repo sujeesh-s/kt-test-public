@@ -499,7 +499,7 @@
 
 
 <!-- Existing Dimensions -->
- <?php if($attr_weight !="" || $attr_length !="" || $attr_width !="" || $attr_height !=""){     ?>
+<?php if($attr_weight !="" || $attr_length !="" || $attr_width !="" || $attr_height !=""){     ?>
 
             <?php  
             if(isset($attr_stock) && $attr_stock !=""  )
@@ -509,27 +509,36 @@
             $at_2 = 0;
                 foreach($dyv as $dyk2=>$dyv2){
                 $at_2++;
-                $atr_weight = $attr_weight[$dyk][$dyk2];
+               
+                if($attr_weight && isset($attr_weight[$dyk][$dyk2])) { $atr_weight = $attr_weight[$dyk][$dyk2]; }else { $atr_weight =''; }
+                if($attr_length && isset($attr_length[$dyk][$dyk2])) { $atr_length = $attr_length[$dyk][$dyk2]; }else { $atr_length =''; }
+                if($attr_width && isset($attr_width[$dyk][$dyk2])) { $atr_width = $attr_width[$dyk][$dyk2]; }else { $atr_width =''; }
+                if($attr_height && isset($attr_height[$dyk][$dyk2])) { $atr_height = $attr_height[$dyk][$dyk2]; }else { $atr_height =''; }
                 
-                $atr_length = $attr_length[$dyk][$dyk2];
-                $atr_width = $attr_width[$dyk][$dyk2];
-                $atr_height = $attr_height[$dyk][$dyk2];
+                
+                
+                
                 $row = "$dyk$dyk2";
                 $row_name = "[$dyk][$dyk2]";
                 ?>
-                @include('seller.my_products.details.shipping')
+                @include('admin.seller_product.details.shipping')
                 <?php 
                  } 
             }else { 
               
-                $atr_weight = $attr_weight[$dyk];
-                $atr_length = $attr_length[$dyk];
-                $atr_width = $attr_width[$dyk];
-                $atr_height = $attr_height[$dyk]; 
+               if($attr_weight) { $atr_weight = $attr_weight[$dyk]; }else { $atr_weight =''; }
+                if($attr_length) { $atr_length = $attr_length[$dyk]; }else { $atr_length =''; }
+                if($attr_width) { $atr_width = $attr_width[$dyk]; }else { $atr_width =''; }
+                if($attr_height) {  $atr_height = $attr_height[$dyk]; }else { $atr_height =''; }
+                
+                
+                
+                
+                
                 $row = "$dyk";
                 $row_name = "[$dyk]";
                 ?>
-                @include('seller.my_products.details.shipping')
+                @include('admin.seller_product.details.shipping')
                 <?php 
               }
             }

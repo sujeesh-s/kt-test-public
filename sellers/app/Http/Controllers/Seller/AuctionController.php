@@ -169,7 +169,7 @@ class AuctionController extends Controller
         if(isset($input['selectid'])) { $selectid = $input['selectid']; }else {  $selectid = '';}
             $prod_data=array();
            
-              $squery    =  Product::where('category_id', $cateid)->where('sub_category_id', $subcateid)->where('is_active', 1)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
+              $squery    =  Product::where('seller_id', auth()->user()->id)->where('visible',1)->where('is_approved',1)->where('category_id', $cateid)->where('sub_category_id', $subcateid)->where('is_active', 1)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
 
             
               if($squery->count()> 0)

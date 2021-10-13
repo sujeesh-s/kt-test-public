@@ -314,10 +314,12 @@ class SellerProductController extends Controller{
        if($post->prd_type ==2) {
            $stock                  =   $post->stock; 
         $sku                  =   $post->sku;
-        $weight                  =   $post->weight;
-        $length                  =   $post->length;
-        $width                  =   $post->width;
-        $height                  =   $post->height;
+        
+        if(isset($post->weight)){ $weight                  =   $post->weight; }
+        if(isset($post->length)){ $length                  =   $post->length; }
+        if(isset($post->width)){ $width                  =   $post->width; }
+        if(isset($post->height)){ $height                  =   $post->height; }
+      
          }
         $dimension                  =   $post->dimension; 
         if(isset($post->prd_id)){ $related_prd_id                  =   $post->prd_id; }
@@ -566,10 +568,10 @@ class SellerProductController extends Controller{
                 $var_hist_arr['price_data'] = json_encode($price);
                 $var_hist_arr['stock_data'] =json_encode($stock);
                 $var_hist_arr['sku_data'] = json_encode($sku);
-                $var_hist_arr['weight'] = json_encode($weight);
-                $var_hist_arr['length'] = json_encode($length);
-                $var_hist_arr['width'] = json_encode($width);
-                $var_hist_arr['height'] = json_encode($height);
+               if(isset($weight)){ $var_hist_arr['weight'] = json_encode($weight); } else { $var_hist_arr['weight'] =""; }
+              if(isset($length)){  $var_hist_arr['length'] = json_encode($length); } else { $var_hist_arr['length'] =""; }
+               if(isset($width)){ $var_hist_arr['width'] = json_encode($width); } else { $var_hist_arr['width'] =""; }
+              if(isset($height)){  $var_hist_arr['height'] = json_encode($height); } else { $var_hist_arr['height'] =""; }
                 $var_hist_arr['dynamic_ids'] = json_encode($post->dyn_prds);
                 $var_hist_arr['dynamic_prod_names'] = json_encode($post->dyn_prds_names);
                 $var_hist_arr['prd_id'] = $prdId;
@@ -862,10 +864,10 @@ class SellerProductController extends Controller{
                 $var_hist_arr['price_data'] = json_encode($price);
                 $var_hist_arr['stock_data'] =json_encode($stock);
                 $var_hist_arr['sku_data'] = json_encode($sku);
-                $var_hist_arr['weight'] = json_encode($weight);
-                $var_hist_arr['length'] = json_encode($length);
-                $var_hist_arr['width'] = json_encode($width);
-                $var_hist_arr['height'] = json_encode($height);
+                if(isset($weight)){ $var_hist_arr['weight'] = json_encode($weight); } else { $var_hist_arr['weight'] =""; }
+              if(isset($length)){  $var_hist_arr['length'] = json_encode($length); } else { $var_hist_arr['length'] =""; }
+               if(isset($width)){ $var_hist_arr['width'] = json_encode($width); } else { $var_hist_arr['width'] =""; }
+              if(isset($height)){  $var_hist_arr['height'] = json_encode($height); } else { $var_hist_arr['height'] =""; }
                 $var_hist_arr['dynamic_ids'] = json_encode($post->dyn_prds);
                 $var_hist_arr['dynamic_prod_names'] = json_encode($post->dyn_prds_names);
                 $var_hist_arr['prd_id'] = $prdId;

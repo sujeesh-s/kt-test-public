@@ -773,7 +773,7 @@ class ProductController extends Controller
                 {
                 $sale_price=$this->get_sale_price($real_product->id);
                 $actual_price=$real_product->prdPrice->price;
-                $shock_list['actual_price']=number_format($real_product->prdPrice->price,2);
+                $shock_list['actual_price']=$real_product->prdPrice->price;
                 $shock_list['sale_price']=$this->get_sale_price($real_product->id);
                 if($shock->discount_type=="percentage")
                 {
@@ -787,7 +787,7 @@ class ProductController extends Controller
                 {
                     $shock_list['offer']=$shock->discount_value." OFF";
                     $ofr_price=(float)$actual_price-(float)$shock->discount_value;
-                    $shock_list['offer_price']=number_format($ofr_price,2);
+                    $shock_list['offer_price']=$ofr_price;
                 }
                 }
                 else
@@ -2069,10 +2069,11 @@ class ProductController extends Controller
                     
                     
                     $attr_list['image']=config('app.storage_url').$row->attrValue->image;
-                    $attr_list['attr_value1'][] =$this->inner_attribute($prd_id,$row->attr_id,$lang);
-                    if(empty($attr_list['attr_value1'][1]))
+                    $arrt_vals['list'][] =$this->inner_attribute($prd_id,$row->attr_id,$lang);
+                    if(empty($arrt_vals['list'][1]))
                     {
-                        $actual_price = number_format($row->prdPrice->price,2);
+                    $attr_list['attr_value1'] = [];   
+                    $actual_price = number_format($row->prdPrice->price,2);
                     $attr_list['actual_price_quote']= $actual_price;
                     $attr_list['actual_price']= $row->prdPrice->price;
                     $sale_price =$this->get_sale_price($row->prd_id);
@@ -2095,6 +2096,10 @@ class ProductController extends Controller
                         {
                             $attr_list['out_of_stock_selling']=true;
                         }
+                    }
+                    else
+                    {
+                        $attr_list['attr_value1'][] =$this->inner_attribute($prd_id,$row->attr_id,$lang);
                     }
                     $data             =   $attr_list;
                 }
@@ -2472,7 +2477,7 @@ class ProductController extends Controller
        //$current_date=Carbon::now();
        $rows = PrdPrice::where('is_deleted',0)->where('prd_id',$field_id)->first();        
         if($rows){ 
-        $return_val = number_format($rows->price,2);
+        $return_val = $rows->price;
         return $return_val;
         }
         else

@@ -325,9 +325,9 @@ return this.optional(element) || /^[a-z ]+$/i.test(value);
 
 jQuery.validator.addMethod("phone", function (phone_number, element) {
         phone_number = phone_number.replace(/\s+/g, "");
-        return this.optional(element) || phone_number.length > 9 &&
-              phone_number.match(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
-    }, "Invalid phone number");
+        return this.optional(element) || phone_number.length >= 7 && phone_number.length < 13 &&
+              phone_number.match(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{1})/);
+    }, "Phone Number should be 7-12 digit numbers.");
 
 
 $("#save_btn").click(function(){

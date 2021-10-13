@@ -121,7 +121,7 @@
 									</div>
 									<div class="card-body">
 										
-										 <div class="demo-container">
+										 <div class="demo-container"  id="placeholder_loader">
       <div id="placeholder" class="demo-placeholder"></div>
     </div>
 
@@ -286,7 +286,7 @@
 									</div>
 									<div class="card-body">
 										
-										 <div class="demo-container">
+										 <div class="demo-container" id="placeholder_loader_sale">
       <div id="placeholder_sale" class="demo-placeholder"></div>
     </div>
 
@@ -303,6 +303,13 @@
 				</div>
 				<!-- End app-content-->
 			</div>
+
+        <div id="loader" class="d-none">
+        <div class="spinner1"  style="position: absolute;top: 100px;left: 50%;">
+        <div class="double-bounce1"></div><div class="double-bounce2"></div>
+        </div>
+        </div>			
+			
 @endsection
 @section('js')
 
@@ -347,19 +354,8 @@ $(document).ready(function(){
   $(function() {
 
     // var d = <?php echo json_encode($traffic_arr); ?>;
-    var d = [ <?php foreach ($traffic_arr as $key => $value) { ?>
-   
-    [<?php echo strtotime($key)* 1000; ?>,<?php echo $value; ?>],
-    	<?php 
-    	
-    } ?>]
-
-     var sales = [ <?php   foreach ($sales_arr as $sk => $sv) { ?>
-   
-    [<?php echo strtotime($sk)* 1000; ?>,<?php echo $sv; ?>],
-    	<?php 
-    	
-    } ?>]
+    var d = <?php echo json_encode($traffic_arr); ?>;
+    var sales = <?php echo json_encode($sales_arr); ?>;
 
  $('#valid_from').daterangepicker
         (
@@ -382,16 +378,43 @@ $(document).ready(function(){
             endDate = end.format('YYYY/MM/DD  HH:mm:ss');
             console.log('A date range was chosen: ' + startDate + ' to ' + endDate);
        
-        $.plot("#placeholder", [d], {
-        xaxis: {
-          mode: "time",
-          min: (new Date(startDate)).getTime(),
+            // $.plot("#placeholder", [d], {
+            // xaxis: {
+            // mode: "time",
+            // min: (new Date(startDate)).getTime(),
+            // max: (new Date(endDate)).getTime(),
+            // timeBase: "milliseconds",
+            // autoScale: "none"
+            // }
+            // });
+            // init_graph(d,startDate,endDate,1);
+            
+                $('#placeholder_loader').append($('#loader').html());
+                $('#placeholder').addClass('blur'); 
+                
+                $.ajax({
+                type: "POST",
+                url: '{{url("/admin/visitlog")}}',
+                data: { "_token": "{{csrf_token()}}", startDate: startDate,endDate:endDate},
+                success: function (data) {
+                var obj = JSON.parse(data);
+                
+                console.log(obj);
+                
+                $.plot("#placeholder", [obj], {
+                xaxis: {
+                mode: "time",
+                min: (new Date(startDate)).getTime(),
                 max: (new Date(endDate)).getTime(),
-          timeBase: "milliseconds",
-          autoScale: "none"
-        }
-      });
-        init_graph(d,startDate,endDate,1);
+                timeBase: "milliseconds",
+                autoScale: "none"
+                }
+                });
+                init_graph(obj,startDate,endDate,1);
+                $('#placeholder_loader .spinner1').remove();
+                $('#placeholder').removeClass('blur'); 
+                }
+                });
           }
         );
 
@@ -417,16 +440,43 @@ $(document).ready(function(){
             endDate = end.format('YYYY/MM/DD  HH:mm:ss');
             console.log('A date range was chosen: ' + startDate + ' to ' + endDate);
 
-        $.plot("#placeholder_sale", [sales], {
-        xaxis: {
-          mode: "time",
-          min: (new Date(startDate)).getTime(),
+            // $.plot("#placeholder_sale", [sales], {
+            // xaxis: {
+            // mode: "time",
+            // min: (new Date(startDate)).getTime(),
+            // max: (new Date(endDate)).getTime(),
+            // timeBase: "milliseconds",
+            // autoScale: "none"
+            // }
+            // });
+            // init_graph_sale(sales,startDate,endDate,1);
+            
+                $('#placeholder_loader_sale').append($('#loader').html());
+                $('#placeholder_sale').addClass('blur'); 
+                
+                $.ajax({
+                type: "POST",
+                url: '{{url("/admin/salelog")}}',
+                data: { "_token": "{{csrf_token()}}", startDate: startDate,endDate:endDate},
+                success: function (data) {
+                var obj = JSON.parse(data);
+                
+                console.log(obj);
+                
+                $.plot("#placeholder_sale", [obj], {
+                xaxis: {
+                mode: "time",
+                min: (new Date(startDate)).getTime(),
                 max: (new Date(endDate)).getTime(),
-          timeBase: "milliseconds",
-          autoScale: "none"
-        }
-      });
-        init_graph_sale(sales,startDate,endDate,1);
+                timeBase: "milliseconds",
+                autoScale: "none"
+                }
+                });
+                init_graph_sale(obj,startDate,endDate,1);
+                $('#placeholder_loader_sale .spinner1').remove();
+                $('#placeholder_sale').removeClass('blur'); 
+                }
+                });
           }
         );
     // $.plot("#placeholder", [d], {

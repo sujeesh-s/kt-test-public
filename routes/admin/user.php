@@ -204,6 +204,10 @@ Route::post('/admin/support/create/{id}/{type}', [App\Http\Controllers\Admin\Sup
 Route::get('/admin/support/chat/{id}/{type}', [App\Http\Controllers\Admin\SupportSeller::class, 'chat']);
 
 
+// dashboard chart
+Route::post('/admin/visitlog', [App\Http\Controllers\Admin\AdminController::class, 'visitlog']);
+Route::post('/admin/salelog', [App\Http\Controllers\Admin\AdminController::class, 'salelog']);
+
 //Clear Cache facade value:
 Route::get('/clear-cache', function() {
     $exitCode = Artisan::call('cache:clear');

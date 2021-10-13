@@ -12,7 +12,7 @@ class Subcategory extends Model
     protected $table = 'subcategory';
     public $primaryKey = 'subcategory_id';
     protected $guarded=[];
-    protected $fillable = ['category_id','sub_name_cid','subcategory_name','slug','desc_cid','parent','level','image','is_active','created_by'];
+    protected $fillable = ['category_id','sub_name_cid','subcategory_name','slug','local_name','desc_cid','parent','level','image','is_active','created_by'];
     
     static function get_content($field_id){ 
 

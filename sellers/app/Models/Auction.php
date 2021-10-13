@@ -39,7 +39,9 @@ class Auction extends Authenticatable
             $data[$row->id]['seller_id']        =   $row->seller_id;
             $data[$row->id]['seller_name']        =  Store::where('seller_id',$row->seller_id)->first()->store_name;
             $data[$row->id]['product_id']        =   $row->product_id;
+           if(Product::where('id',$row->product_id)->first()){
             $data[$row->id]['product_name']        =  Product::where('id',$row->product_id)->first()->name;
+        }else { $data[$row->id]['product_name']        =""; } 
             if(ProductImage::where('prd_id',$row->product_id)->first()) {
              $data[$row->id]['product_img']        =  ProductImage::where('prd_id',$row->product_id)->first()->image;   
             }else {
@@ -96,7 +98,11 @@ class Auction extends Authenticatable
             $data['subcat_id']        =   $row->subcat_id;
             $data['subcat_name']        = Subcategory::where('subcategory_id',$row->subcat_id)->first()->subcategory_name;;
             $data['product_id']        =   $row->product_id;
-            $data['product_name']        =  Product::where('id',$row->product_id)->first()->name;
+            if(Product::where('id',$row->product_id)->first()) {
+                 $data['product_name']        =  Product::where('id',$row->product_id)->first()->name;
+            }else {
+                 $data['product_name']        =  "";
+            } 
             if(ProductImage::where('prd_id',$row->product_id)->first()){
              $data['product_img']        =  ProductImage::where('prd_id',$row->product_id)->first()->image;   
             }else {

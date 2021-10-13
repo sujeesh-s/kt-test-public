@@ -62,6 +62,7 @@
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5">Select</th>
 																	<th class="border-bottom-0 w-20">Sub-Category</th>
+																	<th class="border-bottom-0 w-15">Local name</th>
                                                                     <th class="border-bottom-0 w-20">Category</th>
                                                                     <th class="border-bottom-0 w-20">Parent</th>
 																	<th class="border-bottom-0 w-30">Description</th>
@@ -107,6 +108,11 @@
 																		<!--<div class="d-flex">-->
 																		<!--		<h6 class=" font-weight-bold">{{$subcategory_name->content}}</h6>-->
                   <!--                                                      </div>-->
+																	</td>
+																	<td class="align-middle" >
+																		<div class="d-flex">
+																				<p style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis; max-width: 100px;">{{$row->local_name}}</p>
+                                                                        </div>
 																	</td>
                                                                     <td class="align-middle" >
 																		<div class="d-flex">

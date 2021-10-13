@@ -20,7 +20,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">Add Category</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Masters</a></li>
+									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Master Settings</a></li>
 
 									<li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.category')}}">Category List</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">Add Category</a></li>
@@ -73,6 +73,17 @@
                                                                 <label class="form-label">Category Name <span class="text-red">*</span></label>
                                                                 <input type="text" class="form-control @error('category_name') is-invalid @enderror" placeholder="Category" value="{{ old('category_name') }}"  name="category_name">
                                                                 @error('category_name')
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </span>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="form-label">Name in Local Language <span class="text-red"></span></label>
+                                                                <input type="text" class="form-control @error('local_name') is-invalid @enderror" placeholder="Name in Local Language" value="{{ old('local_name') }}"  name="local_name">
+                                                                @error('local_name')
                                                                     <span class="invalid-feedback" role="alert">
                                                                         <strong>{{ $message }}</strong>
                                                                     </span>

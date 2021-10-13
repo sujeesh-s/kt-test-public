@@ -21,9 +21,9 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">Add Subcategory</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Masters</a></li>
+									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Master Settings</a></li>
 
-									<li class="breadcrumb-item active" aria-current="page"><a href="#">Subcategory List</a></li>
+									<li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.subcategory')}}">Subcategory List</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">Add Subcategory</a></li>
 								</ol>
 							</div>
@@ -75,6 +75,18 @@
                                                                 <input type="text" class="form-control @error('sub_category_name') is-invalid @enderror" placeholder="Sub Category" value="{{ old('sub_category_name') }}" name="sub_category_name">
                                                                 <input type="hidden" name="id" id="curent_subid" value="0" />
                                                                 @error('sub_category_name')
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </span>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="form-label">Name in Local Language <span class="text-red">*</span></label>
+                                                                <input type="text" class="form-control @error('local_name') is-invalid @enderror" placeholder="Name in Local Language" value="{{ old('local_name') }}" name="local_name">
+                                                                <input type="hidden" name="id" id="" value="0" />
+                                                                @error('local_name')
                                                                     <span class="invalid-feedback" role="alert">
                                                                         <strong>{{ $message }}</strong>
                                                                     </span>
@@ -148,9 +160,14 @@
                                             
                                                         {{-- <div class="dropdown dropdown-tree" id="firstDropDownTree"></div> --}}
                                                         <div class="col-lg-4 col-md-4 col-sm-12">
-                                                            <label class="form-label">Sub-Category Image <span class="text-red">*</span></label>
-                                                            <input type="file" class="dropify" data-height="180" name="subcategory_image" />
+                                                            <label class="form-label">Subcategory Image <span class="text-red">*</span></label>
+                                                            <input type="file" class="dropify @error('subcategory_image') is-invalid @enderror" data-height="180" name="subcategory_image" />
                                                         </div>
+                                                        @error('subcategory_image')
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </span>
+                                                                @enderror
                                                     </div>
                                                     <div class="col d-flex justify-content-end">
                                                     <a href="{{ route('admin.subcategory')}}" class="mr-2 mt-4 mb-0 btn btn-secondary" >Cancel</a>
@@ -306,5 +323,24 @@ $(document).ready(function () {
   
 
 </script>
+<script type="text/javascript">
+    $(document).ready(function(){
+            @if(Session::has('message'))
+            @if(session('message')['type'] =="success")
+            
+            toastr.success("{{session('message')['text']}}"); 
+            @else
+            toastr.error("{{session('message')['text']}}"); 
+            @endif
+            @endif
+            
+            @if ($errors->any())
+            @foreach ($errors->all() as $error)
+            toastr.error("{{$error}}"); 
+            
+            @endforeach
+            @endif
+    });
+    </script>
 
 @endsection

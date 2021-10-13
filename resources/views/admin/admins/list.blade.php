@@ -61,13 +61,13 @@
 															<thead>
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5 userroles">Select</th>
-																	<th class="border-bottom-0 w-20">Name</th>
+																	<th class="border-bottom-0 w-15">Name</th>
 																	
-																	<th class="border-bottom-0 w-30">Email</th>
-																	<th class="border-bottom-0 w-30">Phone</th>
-																	<th class="border-bottom-0 w-30">Role</th>
+																	<th class="border-bottom-0 w-15">Email</th>
+																	<th class="border-bottom-0 w-15">Phone</th>
+																	<th class="border-bottom-0 w-10">Role</th>
 																	
-																	<th class="border-bottom-0 w-15">Created On</th>						<th class="border-bottom-0 w-30">Status</th>						
+																	<th class="border-bottom-0 w-10">Created On</th>						<th class="border-bottom-0 w-30">Status</th>						
 																	<th class="border-bottom-0 w-10 userroles">Actions</th>
 																</tr>
 															</thead>

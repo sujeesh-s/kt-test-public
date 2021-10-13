@@ -24,6 +24,7 @@ $(document).ready(function () {
         scrollX: false,
         scrollCollapse: true,
         serverSide: true,
+         bServerSide: false,
         search: {
             caseInsensitive: true,
             smart: true
@@ -44,7 +45,7 @@ $(document).ready(function () {
         orderMulti: false,
         dom: "Blfrtip",
         stateSave: true,
-        order: [[0, "asc"]],
+        // order: [[0, "asc"]],
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         buttons: [
             {

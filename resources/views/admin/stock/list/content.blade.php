@@ -43,13 +43,13 @@
                                     </thead>
                                     <tbody>
                                         @if($products && count($products) > 0) @php $n = 0; @endphp
-                                            @foreach($products as $row) @php $n++; @endphp <?php // echo '<pre>'; print_r($row->price($row->prd_id)); echo '</pre>'; die; ?>
+                                            @foreach($products as $row) @php $n++; if(isset($row->prdPrice)){ $pr_price = $row->prdPrice->price; }else { $pr_price =0; } @endphp <?php // echo '<pre>'; print_r($row->price($row->prd_id)); echo '</pre>'; die; ?>
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></span></td>
                                                     <td>{{$row->seller->fname}}</td> 
                                                     <td>{{$row->name}}</td> 
                                                     <?php if(isset($row->prdPrice)) { $pr_sale_price = $row->prdPrice->sale_price; $pr_sale_start = $row->prdPrice->sale_start_date; $pr_sale_end = $row->prdPrice->sale_end_date; }else { $pr_sale_price = 0; $pr_sale_start = $pr_sale_end = ""; } ?>
-                                                    <td class="tar">@if(isset($row->prdPrice)) {{ $pr_price = $row->prdPrice->price}}   @else $pr_price =0;   @endif</td> 
+                                                    <td class="tar">{{ $pr_price }}</td> 
                                                     <td class="tar">{{$row->prdStock($row->id)}}</td> 
                                                     <td class="text-center">
                                                         {{Form::hidden('prd_name_'.$row->id,$row->name,['id'=>'prd_name_'.$row->id])}}{{Form::hidden('slr_name_'.$row->id,$row->seller->fname,['id'=>'slr_name_'.$row->id])}}{{Form::hidden('prd_price_'.$row->id,$pr_price,['id'=>'prd_price_'.$row->id])}}

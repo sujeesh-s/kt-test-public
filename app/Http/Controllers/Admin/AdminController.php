@@ -73,7 +73,10 @@ class AdminController extends Controller
         $data['prd_out_stock_soon'] = $prd_out_stock_soon;
         if($data['prd_out_stock_soon']){ $data['prd_out_stock_soon_c'] = count($data['prd_out_stock_soon']); }else { $data['prd_out_stock_soon_c'] =0; }
         
-        $web_traffic = UserVisit::where('org_id',1)->orderBy('id','desc')->get(); 
+        // visitor log chart
+        $visit_start_date = date('Y-m-d 00:00:00');
+        $visit_end_date = date('Y-m-d 11:59:00');
+        $web_traffic = UserVisit::where('org_id',1)->whereBetween('visited_on', [$visit_start_date, $visit_end_date])->orderBy('id','desc')->get(); 
         $web_traffic_init = UserVisit::where('org_id',1)->orderBy('visited_on','asc')->first()->visited_on; 
         $web_traffic_till = UserVisit::where('org_id',1)->orderBy('visited_on','desc')->first()->visited_on; 
         $data['web_traffic_init'] = $web_traffic_init;
@@ -82,12 +85,14 @@ class AdminController extends Controller
         foreach($web_traffic as $row){
         if(! in_array(strtotime($row->visited_on),$tosend_arr)){
         // $traffic_arr[] = array(strtotime($row->visited_on),UserVisit::getCount($row->visited_on));
-        $traffic_arr[$row->visited_on] =UserVisit::getCount($row->visited_on);
+        $timekey = (strtotime($row->visited_on) * 1000);
+        // $traffic_arr[strtotime($row->visited_on)* 1000] =$ret_cnt;
+        $traffic_arr[] = array($timekey,UserVisit::getCount($row->visited_on));
         $tosend_arr[] =strtotime($row->visited_on);
         }
         }
 
-    $data['traffic_arr'] = $traffic_arr;
+        $data['traffic_arr'] = $traffic_arr;
     
         // dummy to show more data  - else enable  $traffic_arr 
 
@@ -129,7 +134,9 @@ class AdminController extends Controller
         foreach($sales_graph as $row){
             if($row->created_at) {
         if(! in_array(strtotime($row->created_at),$sales_arr_c)){
-        $sales_arr[date('Y-m-d',strtotime($row->created_at))] =$this->sale_ord_cnt($row->created_at);
+        // $sales_arr[date('Y-m-d',strtotime($row->created_at))] =$this->sale_ord_cnt($row->created_at);
+        $sale_timekey = (strtotime(date('Y-m-d',strtotime($row->created_at))) * 1000);
+        $sales_arr[] = array($sale_timekey,$this->sale_ord_cnt($row->created_at));
         $sales_arr_c[] =strtotime($row->created_at);
         }
 
@@ -386,6 +393,60 @@ class AdminController extends Controller
         Session::flash('message', ['text'=>'Admin failed to delete.','type'=>'danger']);
         return false;
         }
+
+        }
+        
+        public function visitlog(Request $request)
+        {
+        $input = $request->all();
+        $visit_start_date = date('Y-m-d 00:00:00',strtotime($input['startDate']));
+        $visit_end_date = date('Y-m-d 11:59:00',strtotime($input['endDate']));
+        $web_traffic = UserVisit::where('org_id',1)->whereBetween('visited_on', [$visit_start_date, $visit_end_date])->orderBy('id','desc')->get(); 
+        $web_traffic_init = UserVisit::where('org_id',1)->orderBy('visited_on','asc')->first()->visited_on; 
+        $web_traffic_till = UserVisit::where('org_id',1)->orderBy('visited_on','desc')->first()->visited_on; 
+        $data['web_traffic_init'] = $web_traffic_init;
+        $data['web_traffic_till'] = $web_traffic_till;
+        $traffic_arr = array(); $tosend_arr = array();
+        foreach($web_traffic as $row){
+        if(! in_array(strtotime($row->visited_on),$tosend_arr)){
+        // $traffic_arr[] = array(strtotime($row->visited_on),UserVisit::getCount($row->visited_on));
+        $ret_cnt = 0;
+        $cnt             =   UserVisit::where('visited_on',$row->visited_on)->get(); 
+        if(count($cnt) >0) {
+        $ret_cnt = count($cnt);   
+        }
+        $timekey = (strtotime($row->visited_on) * 1000);
+        $traffic_arr[] = array($timekey,$ret_cnt);
+        $tosend_arr[] =strtotime($row->visited_on);
+        }
+        }
+
+        return json_encode($traffic_arr);
+
+        }
+
+        public function salelog(Request $request)
+        {
+        $input = $request->all();
+        $sale_start_date = date('Y-m-d 00:00:00',strtotime($input['startDate']));
+        $sale_end_date = date('Y-m-d 11:59:00',strtotime($input['endDate']));
+        $sales_graph = SalesOrder::where('org_id',1)->whereBetween('created_at', [$sale_start_date, $sale_end_date])->where('order_status', '!=', "cancelled")->orderBy('id','desc')->get(); 
+        $sales_arr = array(); $sales_arr_c = array();
+        foreach($sales_graph as $row){
+        if($row->created_at) {
+        if(! in_array(strtotime($row->created_at),$sales_arr_c)){
+        // $sales_arr[date('Y-m-d',strtotime($row->created_at))] =$this->sale_ord_cnt($row->created_at);
+
+        $sale_timekey = (strtotime(date('Y-m-d',strtotime($row->created_at))) * 1000);
+        // $traffic_arr[strtotime($row->visited_on)* 1000] =$ret_cnt;
+        $sales_arr[] = array($sale_timekey,$this->sale_ord_cnt($row->created_at));
+
+        $sales_arr_c[] =strtotime($row->created_at);
+        }
+        }
+        }
+
+        return json_encode($sales_arr);
 
         }
     

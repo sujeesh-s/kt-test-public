@@ -51,7 +51,7 @@ class ShockingSaleController extends Controller{
         $data['title']              =   'Create Shocking Sale';
         $data['menu']               =   'create-shocking-sales';
         $data['language']      =    DB::table('glo_lang_lk')->where('is_active', 1)->get();
-        $products           =   Product::where('is_deleted',0)->where('is_active',1)->orderBy('id', 'DESC')->get();
+        $products           =   Product::where('is_deleted',0)->where('seller_id',auth()->user()->id)->where('visible',1)->where('is_approved',1)->where('is_active',1)->orderBy('id', 'DESC')->get();
         $data['products']           = $products;
         $data['shockingsale']      = PrdShockingSale::getShockingSalesData($sale_id);
         // dd($data);

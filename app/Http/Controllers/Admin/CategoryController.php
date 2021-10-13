@@ -53,10 +53,16 @@ class CategoryController extends Controller
             'language'=> ['required'],
             'category_description'=> ['required'],
             'language'=> ['required'],
+            'local_name'=>['nullable','string'],
             'category_image'=>['required','image','mimes:jpeg,png,jpg']
         ]);
         if (Category::where('cat_name', '=', $validate['category_name'])->where('is_deleted', '=',0)->exists()) {
             Session::flash('message', ['text'=>'Category Already Exist','type'=>'warning']);
+            // return redirect(route('admin.category'));
+             return back()->withInput($request->all());
+        }
+        else if (Category::where('local_name', '=', $validate['local_name'])->where('is_deleted', '=',0)->exists()) {
+            Session::flash('message', ['text'=>'Local name of Category Already Exist','type'=>'warning']);
             // return redirect(route('admin.category'));
              return back()->withInput($request->all());
         }
@@ -84,6 +90,7 @@ class CategoryController extends Controller
             'cat_name_cid' => $latest_cat_cid,
             'cat_name'=>$validate['category_name'],
             'slug' => $validate['category_name'],
+            'local_name'=>$validate['local_name'],
             'cat_desc_cid' => $latest_desc_cid,
             'image' => $filename,
             'sort_order'=>0,
@@ -116,6 +123,7 @@ class CategoryController extends Controller
             'category_name' => ['required', 'string'],
             'language'=> ['required'],
             'category_description'=> ['required'],
+            'local_name'=>['nullable','string'],
             'category_image'=> ['image','mimes:jpeg,png,jpg']
         ]);
 
@@ -169,6 +177,7 @@ class CategoryController extends Controller
             Category::where('category_id',$cat_id)->update([
             'cat_name_cid' => $cat_cid,
             'cat_name'=>$validate['category_name'],
+            'local_name'=>$validate['local_name'],
             'slug' => $validate['category_name'],
             'cat_desc_cid' => $cat_desc_cid,
             'image' => $filename,
@@ -311,13 +320,18 @@ class CategoryController extends Controller
         
         $validate= $request->validate([
             'sub_category_name' => ['required', 'string'],
+            'local_name'=>['nullable','string'],
             'language'=> ['required'],
             'category'=> ['required'],
-            'subcategory_image'=>['image','mimes:jpeg,png,jpg']
+            'subcategory_image'=>['required','image','mimes:jpeg,png,jpg']
         ]);
         if (Subcategory::where('subcategory_name', '=', $validate['sub_category_name'])->where('is_deleted', '=',0)->exists()) {
             Session::flash('message', ['text'=>'Sub-Category Already Exist','type'=>'warning']);
-            return redirect(route('admin.subcategory'));
+            return back()->withInput($request->all());
+        }
+        else if (Subcategory::where('local_name', '=', $validate['local_name'])->where('is_deleted', '=',0)->exists()) {
+            Session::flash('message', ['text'=>'Local name of Subcategory Already Exist','type'=>'warning']);
+            return back()->withInput($request->all());
         }
         else
         {
@@ -393,6 +407,7 @@ class CategoryController extends Controller
             'category_id'=>$validate['category'],
             'sub_name_cid' => $latest_cat_cid,
             'subcategory_name'=>$validate['sub_category_name'],
+            'local_name'=>$validate['local_name'],
             'slug' => $validate['sub_category_name'],
             'desc_cid' => $latest_desc_cid,
             'image' => $filename,
@@ -457,6 +472,7 @@ class CategoryController extends Controller
 
         $validate= $request->validate([
             'sub_category_name' => ['required', 'string'],
+            'local_name'=>['nullable','string'],
             'language'=> ['required'],
             'category'=> ['required'],
             'subcategory_image'=> ['image','mimes:jpeg,png,jpg']
@@ -557,6 +573,7 @@ class CategoryController extends Controller
                 'category_id'=>$validate['category'],
                 'sub_name_cid' => $scat_cid,
                 'subcategory_name'=>$validate['sub_category_name'],
+                'local_name'=>$validate['local_name'],
                 'slug' => $validate['sub_category_name'],
                 'desc_cid' => $scat_desc_cid,
                 'image' => $filename,

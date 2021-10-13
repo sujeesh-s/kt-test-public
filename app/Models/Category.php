@@ -11,7 +11,7 @@ class Category extends Model
     use HasFactory;
     protected $table = 'category';
     public $primaryKey = 'category_id';
-    protected $fillable = ['cat_name_cid','cat_name', 'slug', 'cat_desc_cid','image','sort_order','is_active','created_by',];
+    protected $fillable = ['cat_name_cid','cat_name', 'slug','local_name', 'cat_desc_cid','image','sort_order','is_active','created_by',];
     protected $guarded=[];
     
      static function get_content($field_id){ 

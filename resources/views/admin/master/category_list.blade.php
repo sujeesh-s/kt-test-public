@@ -73,6 +73,7 @@
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5">Select</th>
 																	<th class="border-bottom-0 w-30">Category</th>
+																	<th class="border-bottom-0 w-15">Local name</th>
 																	<th class="border-bottom-0 w-30">Description</th>
 																	<th class="border-bottom-0 w-15">Order</th>
 																	<th class="border-bottom-0 w-15">Status</th>
@@ -109,6 +110,8 @@
 																		<!--<div class="d-flex">-->
 																		<!--<h6 class=" font-weight-bold">{{$category_name->content}}</h6>-->
                   <!--                                                      </div>-->
+																	</td>
+																	<td class="text-nowrap align-middle"><p style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis; max-width: 100px;">{{$row->local_name}}</p>
 																	</td>
 																	<td class="text-nowrap align-middle"><p style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis; max-width: 100px;">{{$category_desc->content}}</p>
 																	</td>

@@ -21,9 +21,9 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">Edit Subcategory</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Masters</a></li>
+									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Master Settings</a></li>
 
-									<li class="breadcrumb-item active" aria-current="page"><a href="#">Subcategory List</a></li>
+									<li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.subcategory')}}">Subcategory List</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">Edit Subcategory</a></li>
 								</ol>
 							</div>
@@ -99,6 +99,18 @@
                                                                 <input type="hidden" name="id" id="curent_subid" value="{{ $subcategory->parent }}" />
                                                                 <input type="hidden" name="id" id="curent_subid1" value="0" />
                                                                 @error('sub_category_name')
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </span>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="form-label">Name in Local Language <span class="text-red">*</span></label>
+                                                                <input type="text" class="form-control @error('local_name') is-invalid @enderror" placeholder="Name in Local Language" value="{{ $subcategory->local_name }}" name="local_name">
+                                                                <input type="hidden" name="id" id="" value="0" />
+                                                                @error('local_name')
                                                                     <span class="invalid-feedback" role="alert">
                                                                         <strong>{{ $message }}</strong>
                                                                     </span>

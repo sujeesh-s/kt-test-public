@@ -64,7 +64,7 @@ class SellerController extends Controller{
                if($row->is_active   ==  1){ $checked    = 'checked="checked"'; $act = 'Active'; }else{ $checked = '';  $act = 'Inactive'; }
                if($row->store($row->seller_id)->service_status  ==  1){ $sChecked    = 'checked="checked"'; }else{ $sChecked = ''; }
                $val['id']           =   '';                                 $val['store_name']      =   $row->store($row->seller_id)->store_name;
-               $val['business_name']=   '<a id="dtlBtn-'.$row->seller_id.'" class="font-weight-bold viewDtl">'.$row->store($row->seller_id)->store_name.'</a>';
+               $val['business_name']=   '<a id="dtlBtn-'.$row->seller_id.'" class="font-weight-bold viewDtl">'.$row->store($row->seller_id)->business_name.'</a>';
                $val['email']        =   $row->sellerMst->teleEmail->value;  
                if($row->sellerMst->isd_code){ $isd_code ="+".$row->sellerMst->isd_code." ";  }else { $isd_code = ""; } $val['phone']       =   $isd_code.$row->sellerMst->telePhone->value;
                $val['created_at']   =   date('d M Y, g:i a',strtotime($row->created_at)); 
