@@ -62,7 +62,7 @@ class SellerProductController extends Controller{
         $data['sellerinfo']= SellerInfo::where('is_approved',1)->where("seller_id",auth()->user()->id)->where('is_deleted',0)->first();
         $data['sellers']            =   getDropdownData(SellerInfo::where('is_approved',1)->where('is_deleted',0)->get(),'seller_id','fname');
         $data['categories']         =   getDropdownData(Category::where('is_deleted',0)->get(),'category_id','cat_name');
-        // dd($data);
+        dd($data);
         return view('seller.my_products.list',$data);
     }
     
