@@ -19,7 +19,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
+									<li class="breadcrumb-item"><a href="{{ url('/admin/customer') }}"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
 
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
@@ -461,8 +461,8 @@
                             </div><!---row-->
 
                                     <div class="row">
-                                        <div class="col-xs-12 col-md-12 text-center">
-                                          <button type="submit" id="submitForm" class="btn btn-primary btn-prime white btn-flat">Save</button>
+                                        <div class="col-xs-12 col-md-12 justify-content-end">
+                                          <button type="submit" id="submitForm" class="btn btn-primary btn-prime white btn-flat fr">Save</button>
                                         </div>
                                     </div>
                         </form>

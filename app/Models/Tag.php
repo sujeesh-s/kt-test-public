@@ -12,7 +12,7 @@ class Tag extends Authenticatable
     use HasFactory, Notifiable;
     protected $table = 'prod_tag';
 
-    protected $fillable = ['org_id', 'tag_name_cid', 'tag_desc_cid','cat_id', 'subcat_id','is_active','is_deleted'];
+    protected $fillable = ['org_id','name', 'tag_name_cid', 'tag_desc_cid','cat_id', 'subcat_id','is_active','is_deleted'];
 
         static function getTags(){ 
         $tags_list = Tag::where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->orderBy('id', 'DESC')->get();

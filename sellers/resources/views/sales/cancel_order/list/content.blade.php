@@ -37,7 +37,7 @@
                                                     <td>@if($row->order) {{$row->order->address->name}} @endif</td>
                                                     <td>{{date('d M Y',strtotime($row->created_at))}}</td>
                                                     <td>@if($row->order) {{$row->order->total}} @endif</td>
-                                                    <td><span class="badge badge-{{$stat}} mt-2">{{ucfirst($row->status)}}</span></td>
+                                                    <td><span class="badge badge-{{$stat}} btn-sm">{{ucfirst($row->status)}}</span></td>
                                                     <td class="text-center">
                                                         <button id="editBtn-{{$row->sales_id}}" class="mr-2 btn btn-success btn-sm editBtn"><i class="fa fa-file mr-1"></i>Invoice</button>
                                                     </td> 

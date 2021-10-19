@@ -128,6 +128,9 @@ class SellerProductController extends Controller{
     function adminProduct($id){
         $product                    =   AdminProduct::where('id',$id)->first();
         $product->short_desc        =   getContent($product->short_desc,1); 
+        $product->desc        =   getContent($product->desc,1); 
+        $product->content        =   getContent($product->content,1); 
+        $product->spec_cnt_id        =   getContent($product->spec_cnt_id,1); 
         return   $product;
     }
 
@@ -237,10 +240,10 @@ class SellerProductController extends Controller{
         $price                  =   $post->price; 
        if($post->prd_type ==2) { $stock                  =   $post->stock; 
         $sku                  =   $post->sku;
-        $weight                  =   $post->weight;
-        $length                  =   $post->length;
-        $width                  =   $post->width;
-        $height                  =   $post->height;
+        if(isset($post->weight)){ $weight                  =   $post->weight; }else{ $weight = [];}
+        if(isset($post->length)){ $length                  =   $post->length; }else{ $length = [];}
+        if(isset($post->width)){ $width                  =   $post->width; }else{ $width = [];}
+        if(isset($post->height)){ $height                  =   $post->height; }else{ $height = [];}
            
        }
        $dimension                  =   $post->dimension; 
@@ -253,13 +256,13 @@ class SellerProductController extends Controller{
         $prd['is_approved']     =   0;
         if(!isset($prd['is_featured'])) { $prd['is_featured']     =   0;}
          if(!isset($prd['daily_deals'])) { $prd['daily_deals']     =   0;}
-//                echo '<pre>'; print_r($post); echo '</pre>'; 
-//        echo '<pre>'; print_r($request->file()); echo '</pre>'; die;
+        //         echo '<pre>'; print_r($post); echo '</pre>'; 
+        // echo '<pre>'; print_r($request->file()); echo '</pre>'; die;
 
         if($post->prd_option    ==  'option2' && $post->id == 0){
             $adPrd              =   AdminProduct::where('id',$post->admin_prd_id)->first();
             $prd['name']        =   $adPrd->name; $prd['category_id'] = $adPrd->category_id; $prd['sub_category_id'] = $adPrd->sub_category_id;  $prd['is_approved'] =   1;
-            $prd['brand_id']    =   $adPrd->brand_id; $prd['admin_prd_id'] = $post->admin_prd_id; $prd['created_by'] = auth()->user()->id; $post->prd_type = 1; 
+            $prd['brand_id']    =   $adPrd->brand_id; $prd['admin_prd_id'] = $post->admin_prd_id; $prd['created_by'] = auth()->user()->id; 
         } $name = $prd['name'];
         if($post->admin_prd_id  >   0 && $post->id > 0){
             unset($prd['name']);    unset($prd['category_id']); unset($prd['sub_category_id']); unset($prd['brand_id']);

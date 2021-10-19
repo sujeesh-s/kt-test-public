@@ -123,7 +123,7 @@ $(document).ready(function () {
     });
     
     jQuery("#filterStat").on( 'change', function () {
-table.column( 6 )
+table.column( 5 )
 .search( "^" + $(this).val(), true, false, true )
 .draw();
 } );
@@ -135,7 +135,7 @@ table.column( 2 )
 } );
 
 jQuery("#filterCat").on( 'change', function () {
-table.column( 3 )
+table.column( 2 )
 .search( "^" + $(this).val(), true, false, true )
 .draw();
 } );

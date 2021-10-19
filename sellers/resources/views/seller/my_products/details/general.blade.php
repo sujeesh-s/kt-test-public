@@ -61,7 +61,7 @@
         <div class="form-group">
             {{Form::label('category_id','Category',['class'=>''])}} <span class="text-red">*</span>
             <!--{{Form::select('prd[category_id]',$categories,$catId,['id'=>'category_id','class'=>'form-control admin', 'placeholder'=>'Select Category'])}}-->
-            <select class="form-control select2 @error('category') is-invalid @enderror" id="categoryList" onchange="loadsubcat()"  name="prd[category_id]">
+            <select class="form-control select2 @error('category') is-invalid @enderror admin" id="categoryList" onchange="loadsubcat()"  name="prd[category_id]">
             <option value="">Select</option>
           
             @foreach($categories as $key=>$cat )
@@ -78,7 +78,7 @@
             {{Form::label('sub_category_id','Sub Category',['class'=>''])}} <span class="text-red">*</span>
             <!--{{Form::select('prd[sub_category_id]',$sub_cats,$subCatId,['id'=>'sub_category_id','class'=>'form-control admin', 'placeholder'=>'Select Sub Category'])}}-->
             <input type="text" id="sub-category-id" placeholder="Type to filter" name="prd[sub_category_id]" autocomplete="off" value="@if(isset($subCatId)) {{ $subCatId }} @endif" hidden />
-            <input type="text" id="sub-category-drop" class="form-control " value="" placeholder="Select Subcategory" readonly style="background-color: #fff !important;">
+            <input type="text" id="sub-category-drop" class="form-control admin" value="" placeholder="Select Subcategory" readonly style="background-color: #fff !important;">
             <span class="error"></span>
         </div>
     </div>
@@ -105,14 +105,14 @@
     </div><div class="clr"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
-            {{Form::label('desc','Description',['class'=>''])}}
-            {{Form::textarea('prd[desc]',$desc,['id'=>'desc','class'=>'form-control content'])}}
+            {{Form::label('desc','Long Description',['class'=>''])}}
+            {{Form::textarea('prd[desc]',$desc,['id'=>'desc','class'=>'form-control longdesc'])}}
         </div>
     </div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('content','Content',['class'=>''])}} 
-            {{Form::textarea('prd[content]',$content,['id'=>'content','class'=>'form-control content'])}}
+            {{Form::textarea('prd[content]',$content,['id'=>'content','class'=>'form-control maincontent'])}}
         </div>
     </div>
     <div class="col-lg-12 fl">

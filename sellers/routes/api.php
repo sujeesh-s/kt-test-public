@@ -20,3 +20,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/registeration', [App\Http\Controllers\Api\AuthenticationController::class, 'register']);
 Route::post('/login', [App\Http\Controllers\Api\AuthenticationController::class, 'login']);
+foreach (glob(__DIR__ . '/api/*.php') as $filename) { require_once($filename); }

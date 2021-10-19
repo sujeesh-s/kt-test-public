@@ -24,7 +24,7 @@
         <div class="col-3 fl">
             <div class="page-filters">
                 {{Form::label('active','Status',['class'=>'text-white'])}}
-                {{Form::select('active',[1=>'Avtive',0=>'Inactive'],$active,['id'=>'active_filter','class'=>'form-control mr-4 active_filters','placeholder'=>'All Status'])}}
+                {{Form::select('active',[1=>'Active',0=>'Inactive'],$active,['id'=>'active_filter','class'=>'form-control mr-4 active_filters','placeholder'=>'All Status'])}}
             </div>
         </div>
         <div class="col-3 fl">

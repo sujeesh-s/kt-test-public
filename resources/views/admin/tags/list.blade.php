@@ -61,13 +61,14 @@
 															<thead>
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5 notexport">Select</th>
-																	<th class="border-bottom-0 w-20">Tag Name</th>
+																	<th class="border-bottom-0 w-15">Tag Name</th>
 																	
-																	<!--<th class="border-bottom-0 w-30">Description</th>-->
-																	<th class="border-bottom-0 w-30">Category</th>
-																	<th class="border-bottom-0 w-30">Sub Category</th>
+																	<th class="border-bottom-0 w-20">Description</th>
+																	<th class="border-bottom-0 w-10">Category</th>
+																	<th class="border-bottom-0 w-10">Sub Category</th>
 																	
-																	<th class="border-bottom-0 w-15">Created On</th>						<th class="border-bottom-0 w-30">Status</th>								
+																	<th class="border-bottom-0 w-15">Created On</th>
+																	<th class="border-bottom-0 w-15">Status</th>								
 																	<th class="border-bottom-0 w-10 notexport">Actions</th>
 																</tr>
 															</thead>
@@ -85,15 +86,17 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																	
-																	<h6 class=" font-weight-bold"><a href="{{ url('admin/tags/view/') }}/{{$row['id']}}" >{{$row['tag_name']}} </a></h6>
+																		@php	$tag_name = Str::of($row['tag_name'])->limit(20); @endphp
+																	<h6 class=" font-weight-bold"><a href="{{ url('admin/tags/view/') }}/{{$row['id']}}" >{{$tag_name}} </a></h6>
 																				
 																			
 																		</div>
 																	</td>
-																	<!--<td class="text-nowrap align-middle">-->
-																	<!--	<p>{{$row['tag_desc']}}</p>-->
-																	<!--</td>-->
+																	<td class="text-nowrap align-middle">
+																		
+																			@php	$tag_desc = Str::of($row['tag_desc'])->limit(20); @endphp
+																		<p>{{$tag_desc}}</p>
+																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
 																			

@@ -31,7 +31,7 @@ $(document).ready(function () {
         },
         orderMulti: false,
         dom: "Blfrtip",
-        stateSave: true,
+        stateSave: false,
         order: [[0, "asc"]],
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         buttons: [
@@ -125,7 +125,7 @@ $(document).ready(function () {
     });
     
         jQuery("#filterSel").on( 'change', function () {
-                          table.column( 4 )
+                          table.column( 5 )
                     .search( "^" + $(this).val(), true, false, true )
                     .draw();
                     

@@ -18,7 +18,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
+									<li class="breadcrumb-item"><a href="{{ url('/admin/customer') }}"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
 
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>

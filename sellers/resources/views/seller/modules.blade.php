@@ -67,10 +67,10 @@
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5 notexport">Select</th>
 																	<th class="border-bottom-0 w-20">Module</th>
-																	<th class="border-bottom-0 w-30">Link</th>
-																	<th class="border-bottom-0 w-30">Class</th>
+																	<th class="border-bottom-0 w-20">Link</th>
+																	<th class="border-bottom-0 w-15 d-none">Class</th>
 																	<!-- <th class="border-bottom-0 w-30">Sort Order</th> -->
-																	
+																	<th class="border-bottom-0 w-15 d-none">Icon</th>
 																	<th class="border-bottom-0 w-15">Created On</th>
 																	<th class="border-bottom-0 w-30">Status</th>
 																	<th class="border-bottom-0 w-10 notexport">Actions</th>
@@ -102,7 +102,7 @@
 <td class="text-nowrap align-middle" id="module_link" data-value="{{$pt['link']}}">
 <p>{{$pt['link']}}</p>
 </td>
-<td class="text-nowrap align-middle" id="module_class" data-value="{{$pt['class']}}">
+<td class="text-nowrap align-middle d-none" id="module_class" data-value="{{$pt['class']}}">
 <p>{{$pt['class']}}</p>
 </td>
 <!-- <td class="text-nowrap align-middle" id="module_order" data-value="{{$pt['sort']}}">
@@ -165,7 +165,7 @@
 <td class="text-nowrap align-middle" id="module_link" data-value="{{$ch['link']}}">
 <p>{{$ch['link']}}</p>
 </td>
-<td class="text-nowrap align-middle" id="module_class" data-value="{{$ch['class']}}">
+<td class="text-nowrap align-middle d-none" id="module_class" data-value="{{$ch['class']}}">
 <p>{{$ch['class']}}</p>
 </td>
 <!-- <td class="text-nowrap align-middle" id="module_order" data-value="{{$ch['sort']}}">

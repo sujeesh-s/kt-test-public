@@ -79,7 +79,7 @@ class BrandController extends Controller
         if($input['id']>0){
 
         $validator= $request->validate([
-        'brand_name'   =>  ['required'],
+        'brand_name'   =>  ['required','unique:prd_brand,name,' . $input['id']],
         'brand_desc' => ['required']
         ], [], 
         [
@@ -165,7 +165,7 @@ class BrandController extends Controller
         }else{
 
         $validator= $request->validate([
-        'brand_name'   =>  ['required'],
+        'brand_name'   =>  ['required','unique:prd_brand,name,'],
         'brand_desc' => ['required']
         ], [], 
         [

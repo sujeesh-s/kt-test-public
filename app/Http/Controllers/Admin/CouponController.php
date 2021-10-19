@@ -56,7 +56,8 @@ class CouponController extends Controller
         $data['menu']               =   'create-coupon';
         $data['language']      =    DB::table('glo_lang_lk')->where('is_active', 1)->get();
         $data['categories']      =   Category::where('is_active',1)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
-        $data['sellers']      =    Store::where('is_active',1)->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
+        $data['sellers']      =    Store::where('is_active',1)->whereIn('seller_id',function($query) {
+   $query->select('seller_id')->from('usr_seller_info')->where('is_active',1)->where('is_approved',1);})->where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})->get();
         // dd($data);
         return view('admin.benefits.coupons.create',$data);
         }

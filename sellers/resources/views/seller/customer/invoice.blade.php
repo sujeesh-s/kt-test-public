@@ -18,8 +18,8 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
-
+									<li class="breadcrumb-item"><a href="{{ url('/customers') }}"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url('customer/view/') }}/{{$user_id}}"><i class="fe fe-grid mr-2 fs-14"></i>Customer Info</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
 							</div>
@@ -104,8 +104,9 @@
 													<th class="text-right" style="width: 1%">Packing Charge</th>
 													<th class="text-right" style="width: 1%">Amount</th>
 												</tr>
-												@if($order_items && count($order_items) > 0)
 												@php $totals = $total_tax = $total_disc = $o= 0;  @endphp
+												@if($order_items && count($order_items) > 0)
+												
                     											@foreach($order_items as $row)
                     											@php $o++; @endphp
 												<tr>

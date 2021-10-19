@@ -78,6 +78,14 @@
 																		
 															</div>
 															<div class="col-md-6 col-lg-6 col-xl-6 col-sm-12">
+															    
+															    
+                                                                <div class="form-group row">
+																	<label class="form-label col-md-4">Name in Local Language:</label>
+																	<div class="col-md-8">
+																	<p class="view_value"> {{ $subcategory->local_name }} </p>
+																</div>
+																</div>
 																<div class="form-group row">
 																	<label class="form-label col-md-4">Parent Category:</label>
 																	<div class="col-md-8">

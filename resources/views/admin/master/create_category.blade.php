@@ -132,7 +132,8 @@
                                                         </div> --}}
                                                         <div class="col-lg-4 col-md-4 col-sm-12">
                                                             <label class="form-label">Category Image <span class="text-red">*</span></label>
-                                                            <input type="file" class="dropify @error('category_image') is-invalid @enderror" data-height="180"  accept="image/*" name="category_image" />
+                                                            <p>(Image type .png,.jpeg)</p>
+                                                            <input type="file" class="dropify @error('category_image') is-invalid @enderror" data-height="180"  accept="image/*" data-allowed-file-extensions='["png", "jpg", "jpeg"]' name="category_image" />
                                                             <p style="color: red" id="errNm1"></p>
                                                         </div>
                                                        

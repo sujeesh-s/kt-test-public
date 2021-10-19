@@ -18,7 +18,9 @@
             {{Form::select('discount_type',$disc_type,$discount_type,['id'=>'discount_type','class'=>'form-control', 'placeholder'=>'Discount Type'])}}
             <span class="error"></span>
         </div>
-    </div><div  class="col-lg-6 fl">
+    </div>
+     <div class="clearfix"></div>
+     <div  class="col-lg-6 fl">
         <div class="form-group">
 
             {{Form::label('quantity_limit','Product Quantity Limit',['class'=>''])}} <span class="text-red">*</span>
@@ -31,19 +33,20 @@
             <label class="form-label" for="valid_from" >Valid From <span class="text-red">*</span></label>
                 <div id="valid_from"  class="datepicker input-group date"
                 data-date-format="yyyy-mm-dd">
-                <input class="form-control" name="valid_from" type="text" readonly  onchange="date_check()" />
+                <input class="form-control" name="valid_from" type="text" readonly  value="{{$valid_from}}"  onchange="date_check()" />
                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                 </div>
             <span class="error"></span>
         </div>
     </div>
+     <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
 
             <label class="form-label" for="valid_from" >Valid To <span class="text-red">*</span></label>
             <div id="valid_to" class="datepicker input-group date"
             data-date-format="yyyy-mm-dd">
-            <input class="form-control"  name="valid_to" type="text" readonly  onchange="date_check()" />
+            <input class="form-control"  name="valid_to" type="text" readonly  value="{{$valid_to}}"  onchange="date_check()" />
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
             </div>
             <span class="error"></span>

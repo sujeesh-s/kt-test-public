@@ -192,7 +192,7 @@
 													?>		
 																		<p>{{ $valid_till }}</p>
 																	</td>
-																	<td class="text-nowrap align-middle"><span>{{date('d M Y',strtotime($row['created_at']))}}</span></td>
+																	<td class="text-nowrap align-middle"><p>{{date('d M Y',strtotime($row['created_at']))}}</p></td>
 																	<td class="text-nowrap align-middle"  data-search="@if($row['is_active'] ==1){{ "Active" }}@else{{ "Inactive" }}@endif">
 																		
 																	<div class="switch">

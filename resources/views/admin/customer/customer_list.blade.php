@@ -138,7 +138,7 @@
                 <!-- Modal content-->
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3 class="modal-title text-center">Register Customer</h3>
+                            <h3 class="modal-title text-center">Add New Customer</h3>
                             <button type="button" class="close" data-dismiss="modal">×</button>
 
                         </div>
@@ -212,8 +212,8 @@
                             </div><!---row-->
 
                                     <div class="row">
-                                        <div class="col-xs-12 col-md-12 text-center">
-                                          <button type="submit" id="submitForm" class="btn btn-primary btn-prime white btn-flat">Register</button>
+                                        <div class="col-xs-12 col-md-12 justify-content-end">
+                                          <button type="submit" id="submitForm" class="btn btn-primary btn-prime white btn-flat fr">Save</button>
                                         </div>
                                     </div>
 

@@ -67,7 +67,7 @@ class ProductController extends Controller{
            if($products){ foreach   (   $products as $row){ $action = '';
                if($row->is_active   ==  1){ $checked    = 'checked="checked"'; $act = 'Active'; }else{ $checked = '';  $act = 'Inactive'; }
                $val['id']           =   '';                                
-               $val['name']         =   '<a id="dtlBtn-'.$row->id.'" class="font-weight-bold viewDtl">'.$row->name.'</a>';
+               $val['name']         =   '<a  href="'.url('admin/product/view').'/'.$row->id.'"  id="dtlBtn-'.$row->id.'" class="font-weight-bold viewDtl">'.$row->name.'</a>';
                $val['cat']          =   $row->category->cat_name;      
                $val['sub_cat']      =   $row->subCategory->subcategory_name;
                $val['created_at']   =   date('d M Y, g:i a',strtotime($row->created_at)); 
@@ -80,7 +80,7 @@ class ProductController extends Controller{
                 if(checkPermission('admin/product/list','edit') == true){
                     $action         .=   '<a href="'.url('admin/product/edit').'/'.$row->id.'"   class="mr-2 btn btn-info btn-sm"><i class="fe fe-edit mr-1"></i> Edit</a>';
                 }if(checkPermission('admin/product/list','delete') == true){
-                    $action         .=   '<button  class="btn btn-sm btn-secondary deleteproduct" type="button" onclick="delete_cat('.$row->id.'}" ><i class="fe fe-trash-2 mr-1"></i>Delete</button>';
+                    $action         .=   '<button  class="btn btn-sm btn-secondary deleteproduct" type="button" onclick="delete_cat('.$row->id.')" ><i class="fe fe-trash-2 mr-1"></i>Delete</button>';
                 }
                $val['action']       =   $action; $res[] = $val;  
            } }
@@ -315,6 +315,21 @@ class ProductController extends Controller{
         $data['prod_type']          =    DB::table('prd_product_types')->where('is_deleted',0)->get();
         // dd($data['product']);
         return view('admin.product.edit_product',$data);
+    }
+      public function view_product($prd_id)
+    {
+        $data['title']              =   'Admin Product';
+        $data['menu']               =   'Admin Product';
+        $data['product']            =    AdminProduct::where('id',$prd_id)->first();
+        $data['language']           =    DB::table('glo_lang_lk')->where('is_active', 1)->get();
+        $data['category']           =    Category::where('is_deleted',NULL)->orWhere('is_deleted',0)->where('is_active',1)->get();
+        $data['subCats']            =   getDropdownData(Subcategory::where('is_active',1)->where('is_deleted',0)->get(),'subcategory_id','subcategory_name');
+        $data['tag']                =    Tag::where('is_active',1)->where('is_deleted',0)->where('cat_id',$data['product']->category_id)->where('subcat_id',$data['product']->sub_category_id)->get();
+        $data['brand']              =    Brand::where('is_active',1)->where('is_deleted',0)->get();
+        $data['prod_type']          =    DB::table('prd_product_types')->where('is_deleted',0)->get();
+        // dd($data['product']);
+        // dd($data);
+        return view('admin.product.view_product',$data);
     }
 
     public function update_product(Request $request,$prd_id)

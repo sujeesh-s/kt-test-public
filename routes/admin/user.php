@@ -136,6 +136,7 @@ Route::post('/admin/insert-product/', [App\Http\Controllers\Admin\ProductControl
 Route::post('/admin/product/change-status-product/', [App\Http\Controllers\Admin\ProductController::class, 'change_status_product']);
 Route::post('/admin/product/delete-product/', [App\Http\Controllers\Admin\ProductController::class, 'delete_product']);
 Route::get('/admin/product/edit/{id}', [App\Http\Controllers\Admin\ProductController::class, 'edit_product']);
+Route::get('/admin/product/view/{id}', [App\Http\Controllers\Admin\ProductController::class, 'view_product']);
 Route::post('/admin/update-product/{id}', [App\Http\Controllers\Admin\ProductController::class, 'update_product']);
 Route::post('/admin/product/remove-image', [App\Http\Controllers\Admin\ProductController::class, 'remove_image']);
 

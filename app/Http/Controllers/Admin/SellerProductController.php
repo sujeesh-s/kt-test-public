@@ -210,7 +210,15 @@ class SellerProductController extends Controller{
         }else{  return view('admin.seller_product.details',$data); }
     }
     
-    function adminProduct($id){return   AdminProduct::where('id',$id)->first();}
+    function adminProduct($id){
+      $product                    =   AdminProduct::where('id',$id)->first();
+        $product->short_desc        =   getContent($product->short_desc,1); 
+        $product->desc        =   getContent($product->desc,1); 
+        $product->content        =   getContent($product->content,1); 
+        $product->spec_cnt_id        =   getContent($product->spec_cnt_id,1); 
+        return   $product;
+        
+    }
     
     function getAttributes(){
         $qry                        =   PrdAttribute::where('is_active',1)->where('is_deleted',0)->get();

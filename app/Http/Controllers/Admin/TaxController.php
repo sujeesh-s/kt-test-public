@@ -117,7 +117,7 @@ class TaxController extends Controller
 
      
        $validator= $request->validate([
-        'tax_name'   =>  ['required'],
+        'tax_name'   =>  ['required','unique:prd_tax,name,' . $input['id']],
         'tax_desc' => ['required'],
         'country' => ['required'],
         'valid_from' => ['required'],
@@ -229,7 +229,7 @@ class TaxController extends Controller
         }else{
 
         $validator= $request->validate([
-        'tax_name'   =>  ['required'],
+        'tax_name'   => ['required','unique:prd_tax,name,'],
         'tax_desc' => ['required'],
         'country' => ['required'],
         'valid_from' => ['required'],

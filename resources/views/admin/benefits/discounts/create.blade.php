@@ -74,11 +74,11 @@
 																	<span class="error"></span>
 																	</div>
 																	</div>
-																	
+																	<div class="clearfix"></div>
 																	<div class="col-lg-6 fl">
 																	<div class="form-group">
 																	{{Form::label('discount_value','Discount Value',['class'=>''])}} <span class="text-red">*</span>
-																	{{Form::number('discount_value','',['id'=>'discount_value','class'=>'form-control admin', 'placeholder'=>'Discount Value'])}}
+																	{{Form::number('discount_value','',['id'=>'discount_value','class'=>'form-control admin', 'placeholder'=>'Discount Value','max'=>9999])}}
 																
 																	<span class="error"></span>
 																	</div>
@@ -92,11 +92,13 @@
 																	{{Form::select('discount_type',$disc_type,'',['id'=>'discount_type','class'=>'form-control', 'placeholder'=>'Discount Type'])}}
 																	<span class="error"></span>
 																	</div>
-																	</div><div  class="col-lg-6 fl">
+																	</div>
+																	<div class="clearfix"></div>
+																	<div  class="col-lg-6 fl">
 																	<div class="form-group">
 
 																	{{Form::label('quantity_limit','Product Quantity Limit',['class'=>''])}} <span class="text-red">*</span>
-																	{{Form::number('quantity_limit','',['id'=>'quantity_limit','class'=>'form-control admin', 'placeholder'=>'Product Quantity Limit'])}}
+																	{{Form::number('quantity_limit','',['id'=>'quantity_limit','class'=>'form-control admin', 'placeholder'=>'Product Quantity Limit','max'=>9999])}}
 																	<span class="error"></span>
 																	</div>
 																	</div>
@@ -111,6 +113,7 @@
 																	<span class="error"></span>
 																	</div>
 																	</div>
+																	<div class="clearfix"></div>
 																	<div class="col-lg-6 fl">
 																	<div class="form-group">
 

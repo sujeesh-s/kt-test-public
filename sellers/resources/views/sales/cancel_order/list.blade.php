@@ -197,6 +197,18 @@
             $(this).toggleClass('collapsed');
             $('#filtersec').toggle('slow');
         });
+        
+           var start_date = document.getElementById('start_date');
+        var end_date = document.getElementById('end_date');
+        
+        start_date.addEventListener('change', function() {
+        if (start_date.value)
+        end_date.min = start_date.value;
+        }, false);
+        end_date.addEventLiseter('change', function() {
+        if (end_date)
+        start_date.max = end_date.value;
+        }, false);
 
     });
 

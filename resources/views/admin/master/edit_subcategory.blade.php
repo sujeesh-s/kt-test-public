@@ -56,7 +56,7 @@
 									<div class="col-12 mb-3">
 											<div class="card">
                                                 <div class="card-body">
-                                                    <form action="{{url('admin/update-subcategory/'.$subcategory->subcategory_id)}}" method="POST" enctype="multipart/form-data">
+                                                    <form action="{{url('admin/update-subcategory/'.$subcategory->subcategory_id)}}" method="POST"  id="subcatForm" enctype="multipart/form-data">
 													@csrf
                                                     <?php  $default_lang =DB::table('glo_lang_lk')->where('is_active', 1)->first();
                                                             $category_data =DB::table('category')->where('category_id', $subcategory->category_id)->first();
@@ -107,7 +107,7 @@
                                                         </div>
                                                         <div class="col-md-12">
                                                             <div class="form-group">
-                                                                <label class="form-label">Name in Local Language <span class="text-red">*</span></label>
+                                                                <label class="form-label">Name in Local Language </label>
                                                                 <input type="text" class="form-control @error('local_name') is-invalid @enderror" placeholder="Name in Local Language" value="{{ $subcategory->local_name }}" name="local_name">
                                                                 <input type="hidden" name="id" id="" value="0" />
                                                                 @error('local_name')
@@ -194,12 +194,13 @@
                                                         @endif
                                                         <div class="col-lg-4 col-md-4 col-sm-12">
                                                             <label class="form-label">Choose another Subcategory Image <span class="text-red">*</span></label>
-                                                            <input type="file" class="dropify" data-height="180" name="subcategory_image" />
+                                                            <p>(Image type .png,.jpeg)</p>
+                                                            <input type="file" class="dropify" data-height="180"  accept="image/*"  data-allowed-file-extensions='["png", "jpg", "jpeg"]' name="subcategory_image" />
                                                         </div>
                                                     </div>
                                                     <div class="col d-flex justify-content-end">
                                                     <a href="{{ route('admin.subcategory')}}" class="mr-2 mt-4 mb-0 btn btn-secondary" >Cancel</a>
-                                                    <button type="submit" class="btn btn-primary mt-4 mb-0" >Submit</button>
+                                                    <button type="submit" id="frontval" class="btn btn-primary mt-4 mb-0" >Submit</button>
                                                     </div>
                                                 </form>
                                                 </div>
@@ -221,6 +222,7 @@
          <!--INTERNAL Select2 js -->
 		<script src="{{URL::asset('admin/assets/plugins/select2/select2.full.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/select2.js')}}"></script>
+		<script src="{{URL::asset('admin/assets/js/jquery.validate.min.js')}}"></script>
 	<!-- INTERNAL Popover js -->
 		<script src="{{URL::asset('admin/admin/assets/js/popover.js')}}"></script>
 
@@ -243,6 +245,63 @@
         <!----combotree----->
         <script src="{{URL::asset('admin/assets/plugins/combotree/comboTreePlugin.js')}}"></script>
         <!--<script src="https://estrradoweb.com/vrise/template/seller/assets/scripts/dropdown-tree/comboTreePlugin.js" ></script>-->
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function(){
+
+
+$("#frontval").click(function(){
+    
+   
+
+$("#subcatForm").validate({
+	ignore: [],
+rules: {
+
+sub_category_name : {
+required: true
+},
+
+category : {
+required: true
+},
+
+
+},
+
+messages : {
+sub_category_name: {
+required: "Subcategory Name is required."
+},
+category: {
+required: "Category Name is required."
+},
+
+
+},
+
+
+ errorPlacement: function(error, element) {
+ 	 // $("#errNm1").empty();$("#errNm2").empty();
+ 	 console.log($(error).text());
+            if (element.attr("name") == "subcategory_image" ) {
+            	
+                $("#errNm1").text($(error).text());
+                
+            }else if (element.attr("name") == "product_id" ) {
+                $("#errNm2").text($(error).text());
+                
+            }else {
+               error.insertAfter(element)
+            }
+        },
+
+});
+});
+
+});
+</script> 
 <script type="text/javascript">
     
     $(document).ready(function () {

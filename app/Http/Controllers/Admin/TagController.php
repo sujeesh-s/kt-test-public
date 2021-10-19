@@ -161,7 +161,7 @@ class TagController extends Controller
 
      
         $validator= $request->validate([
-        'tag_name'   =>  ['required'],
+        'tag_name'   =>  ['required','unique:prod_tag,name,' . $input['id']],
         'tag_desc' => ['required'],
         'cat_id' => ['required']
 
@@ -225,6 +225,7 @@ class TagController extends Controller
 
         $tag =  Tag::where('id',$tag_id)->update([
         'org_id' => 1, 
+        'name' => $input['tag_name'], 
         'tag_name_cid' => $tag_name_cid,
         'tag_desc_cid' => $tag_desc_cid,
         'cat_id'=>$input['cat_id'],
@@ -249,7 +250,7 @@ class TagController extends Controller
         }else{
 
         $validator= $request->validate([
-        'tag_name'   =>  ['required'],
+        'tag_name'   =>  ['required','unique:prod_tag,name,'],
         'tag_desc' => ['required'],
         'cat_id' => ['required']
 
@@ -295,6 +296,7 @@ class TagController extends Controller
         if($tag_name !="" && $tag_desc !="") {
         $tag =  Tag::create([
         'org_id' => 1, 
+        'name' => $input['tag_name'], 
         'tag_name_cid' => $tag_name_cid,
         'tag_desc_cid' => $tag_desc_cid,
         'cat_id'=>$input['cat_id'],

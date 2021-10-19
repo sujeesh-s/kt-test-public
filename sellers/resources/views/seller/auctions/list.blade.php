@@ -143,7 +143,7 @@
 																	</td>
 
 																	<td class="align-middle" >
-																	    @php $prod_img=url('storage/app/public/product/'.$row['product_img']);
+																	    @php $prod_img= config('app.storage_url').$row['product_img'];
 																	    @endphp
 																	    <div class="d-flex">
 																			@if($row['product_img'])

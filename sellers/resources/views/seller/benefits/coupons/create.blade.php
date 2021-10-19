@@ -9,6 +9,13 @@
 		<link href="{{URL::asset('admin/assets/css/combo-tree.css')}}" rel="stylesheet" />
 		<link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.0.45/css/materialdesignicons.min.css">
 		<link href="{{URL::asset('admin/assets/css/datepicker.css')}}" rel="stylesheet" />
+		<style>
+		    .input-group-addon {
+		        margin-top: -1px !important;
+		        border-right:1px solid #e3e4e9 !important;
+		        
+		    }
+		</style>
 @endsection
 @section('page-header')
 						<!--Page header-->
@@ -19,7 +26,7 @@
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
 									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Ecom Benefits</a></li>
-									
+									<li class="breadcrumb-item " aria-current="page"><a href="{{ url('/coupons') }}">Coupons</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
 							</div>
@@ -148,14 +155,14 @@
 														<div  class="purchase_type_options purchase-number" style="display:block;">
 														<label class="form-label" for="purchase_number" >Purchase Number <span class="text-red">*</span></label>
 														
-														<input min="1" step="1" type="number" name="purchase_number" id="purchase_number" class="form-control" />
+														<input min="1" step="1"  max="9999"  type="number" name="purchase_number" id="purchase_number" class="form-control" />
 
 														</div>
 
 														<div  class="purchase_type_options purchase-amount" style="display:none;">
 														<label class="form-label" for="purchase_amount">Purchase Amount <span class="text-red">*</span></label>
 													
-														<input type="Number" min="0" name="purchase_amount" id="purchase_amount" class="form-control"  />
+														<input type="number" min="0"  max="9999"  name="purchase_amount" id="purchase_amount" class="form-control"  />
 
 														</div>
 																			
@@ -175,7 +182,7 @@
 																		<div class="form-group">
 																			<label class="form-label">Min. Order Amount <span class="text-red">*</span></label>
 																	
-																			{!! Form::number('ofr_min_amount', null, ['class' => 'form-control','required','id'=>'ofr_min_amount']) !!}
+																			{!! Form::number('ofr_min_amount', null, ['class' => 'form-control','required','id'=>'ofr_min_amount','min'=>0,'max'=>99999]) !!}
 																		</div>
 																		@error('ofr_min_amount')
 																	<p style="color: red" class="error">{{ $message }}</p>
@@ -186,7 +193,7 @@
 															<div class="form-group">
 															<label class="form-label">Offer Value <span class="text-red">*</span></label>
 
-															{!! Form::number('ofr_value', null, ['class' => 'form-control','required','id'=>'ofr_value']) !!}
+															{!! Form::number('ofr_value', null, ['class' => 'form-control','required','id'=>'ofr_value','min'=>0,'max'=>99999]) !!}
 															</div>
 															@error('ofr_value')
 																	<p style="color: red" class="error">{{ $message }}</p>
@@ -284,12 +291,13 @@
 														<div  class="validity_type_options valid-days" style="display:none;">
 														<label class="form-label" for="valid_days">Validity Days <span class="text-red">*</span></label>
 													
-														<input type="Number" min="0" name="valid_days" id="valid_days" class="form-control"  />
+														<input type="number" min="0" max="9999" name="valid_days" id="valid_days" class="form-control"  />
 
 														</div>
 																			
 
 																		</div>
+																		<p style="color: red" id="errNm2"></p>
 																		@error('valid_days','valid_from','valid_to')
 																	<p style="color: red" class="error">{{ $message }}</p>
 																	@enderror
@@ -453,6 +461,9 @@ min: "Validity Days must be greater than 0"
  	 $("#errNm1").empty();
             if (element.attr("name") == "ofr_code" ) {
                 $("#errNm1").text($(error).text());
+                
+            }else if (element.attr("name") == "valid_from" || element.attr("name") == "valid_to" ) {
+                $("#errNm2").text($(error).text());
                 
             }else {
                error.insertAfter(element)

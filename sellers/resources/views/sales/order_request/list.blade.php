@@ -18,7 +18,7 @@
         <div class="col-3 fl">
             <div class="page-filters">
                 {{Form::label('start_date','Date From',['class'=>'text-white'])}}
-                {{Form::date('start_date','',['id'=>'start_date','class'=>'form-control'])}}
+                {{Form::date('start_date','',['id'=>'start_date','class'=>'form-control','min'=>date("y-m-d")])}}
             </div>
         </div>
         <div class="col-3 fl">
@@ -220,6 +220,18 @@
             $(this).toggleClass('collapsed');
             $('#filtersec').toggle('slow');
         });
+        
+        var start_date = document.getElementById('start_date');
+        var end_date = document.getElementById('end_date');
+        
+        start_date.addEventListener('change', function() {
+        if (start_date.value)
+        end_date.min = start_date.value;
+        }, false);
+        end_date.addEventLiseter('change', function() {
+        if (end_date)
+        start_date.max = end_date.value;
+        }, false);
 
     });
 

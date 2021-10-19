@@ -224,6 +224,9 @@
             },function(inputValue){
                 if (inputValue == true) { 
                     updateStatus(id,'',status,url,'product','is_approved',smsg);
+                    setTimeout(function() {
+                    location.reload();
+                    }, 1500);
                 }
             });
         });

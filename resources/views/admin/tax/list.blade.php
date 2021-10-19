@@ -64,12 +64,13 @@
 																	<th class="border-bottom-0 w-20">Tax Name</th>
 																	
 																	<!-- <th class="border-bottom-0 w-30">Description</th> -->
-																	<th class="border-bottom-0 w-30">Percentage</th>
+																	<th class="border-bottom-0 w-10">Percentage</th>
 																	<!--<th class="border-bottom-0 w-30">Valid From</th>-->
 																	<!--<th class="border-bottom-0 w-30">Valid To</th>-->
-																	<th class="border-bottom-0 w-30">Country</th>
+																	<th class="border-bottom-0 w-15">Country</th>
+																	<th class="border-bottom-0 w-15">State</th>
 																	<th class="border-bottom-0 w-15">Created On</th>
-																	<th class="border-bottom-0 w-30">Status</th>
+																	<th class="border-bottom-0 w-20">Status</th>
 																															
 																	<th class="border-bottom-0 w-10 notexport">Actions</th>
 																</tr>
@@ -88,8 +89,8 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																			
-																		<h6 class=" font-weight-bold"><a href="{{ url('admin/tax/view/') }}/{{$row['id']}}">{{$row['tax_name']}} </a></h6>
+																			@php	$tax_name = Str::of($row['tax_name'])->limit(20); @endphp
+																		<h6 class=" font-weight-bold"><a href="{{ url('admin/tax/view/') }}/{{$row['id']}}">{{$tax_name}} </a></h6>
 																				
 																			
 																		</div>
@@ -114,6 +115,9 @@
 																	<!--</td>-->
 																	<td class="text-nowrap align-middle">
 																		<p>{{$row['country']}}</p>
+																	</td>
+																	<td class="text-nowrap align-middle">
+																		<p>{{$row['state']}}</p>
 																	</td>
 																	<td class="text-nowrap align-middle"><span>{{date('d M Y',strtotime($row['created_at']))}}</span></td>
 																	<td class="text-nowrap align-middle" data-search="@if($row['is_active'] ==1){{ "Active" }}@else{{ "Inactive" }}@endif">

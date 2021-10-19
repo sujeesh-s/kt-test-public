@@ -521,7 +521,7 @@
                 $row = "$dyk$dyk2";
                 $row_name = "[$dyk][$dyk2]";
                 ?>
-                @include('admin.seller_product.details.shipping')
+                @include('seller.my_products.details.shipping')
                 <?php 
                  } 
             }else { 
@@ -538,7 +538,7 @@
                 $row = "$dyk";
                 $row_name = "[$dyk]";
                 ?>
-                @include('admin.seller_product.details.shipping')
+                @include('seller.my_products.details.shipping')
                 <?php 
               }
             }

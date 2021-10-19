@@ -53,7 +53,7 @@ class OfferController extends Controller{
      function createOffer(){
         $data['title']              =   'Create Offer';
         $data['menu']               =   'offers';
-     $products           =   Product::where('is_deleted',0)->where('is_active',1)->whereNotIn('id',function($query) {
+     $products           =   Product::where('is_deleted',0)->where('visible',1)->where('is_active',1)->whereNotIn('id',function($query) {
    $query->select('prd_id')->from('prd_special_offer');})->get();
      $prod_arr = [];
      if($products) {
@@ -76,7 +76,7 @@ class OfferController extends Controller{
         if($input['sell_id']>0) {
 
 
-     $products           =   Product::where('is_deleted',0)->where('is_active',1)->whereNotIn('id',function($query) {
+     $products           =   Product::where('is_deleted',0)->where('visible',1)->where('is_active',1)->whereNotIn('id',function($query) {
    $query->select('prd_id')->from('prd_special_offer');})->where('seller_id',$input['sell_id'])->get();
      $prod_arr = [];
      if($products) {

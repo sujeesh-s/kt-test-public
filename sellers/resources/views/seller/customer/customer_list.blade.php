@@ -48,6 +48,7 @@
 															<thead>
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5"></th>
+																	<th class="border-bottom-0 w-30">Customer ID</th>
 																	<th class="border-bottom-0 w-30">Customer Name</th>
 																	<th class="border-bottom-0 w-30">Contact number</th>
                                                                     <th class="border-bottom-0 w-30">Email</th>
@@ -61,13 +62,19 @@
 																@if($customer && count($customer) > 0)
                     											@foreach($customer as $row)
                                                                <?php   
-                                                                        $user_id=$row->id;
+                                                                       $user_id=$row->id;
+                                                                       $cust_id = date('y',strtotime($row->created_at)).date('m',strtotime($row->created_at)).str_pad($user_id, 6, "0", STR_PAD_LEFT);
                                                                        $name=DB::table('usr_info')->where('user_id', $user_id)->first();
                                                                        ?>
 																<tr>
 																	<td class="align-middle select-checkbox" id="" data-value="{{$row->id}}">
 																		<label class="custom-control custom-checkbox">
 																		</label>
+																	</td>
+																	<td class="align-middle">
+																		<div class="d-flex">
+																		<h6 class=" font-weight-bold">{{$cust_id}}</h6>
+                                                                        </div>
 																	</td>
 																	<td class="align-middle">
 																		<div class="d-flex">

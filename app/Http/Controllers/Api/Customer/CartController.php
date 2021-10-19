@@ -13,6 +13,7 @@ use App\Models\UserRoles;
 use App\Models\Admin;
 use App\Models\Auction;
 use App\Models\AuctionHist;
+use App\Models\AssociatProduct;
 use App\Models\UserRole;
 use App\Models\Category;
 use App\Models\CartItem;
@@ -83,7 +84,7 @@ class CartController extends Controller
                         ->where('usr_cart_item.is_active',1)
                         ->where('usr_cart_item.is_deleted',0)
                         ->pluck('product_id');
-            $seller_products = Product::whereIn('id',$cart_bySeller)->where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->groupBy('seller_id')->get();
+            $seller_products = Product::whereIn('id',$cart_bySeller)->where('is_active',1)->where('is_deleted',0)->groupBy('seller_id')->get();
             $seller_product_list=[];
             $products=[];
             $rewards=[];
@@ -312,7 +313,6 @@ class CartController extends Controller
         $cart = Product::join('usr_cart_item','usr_cart_item.product_id','=','prd_products.id')
                         ->join('usr_cart','usr_cart_item.cart_id','=','usr_cart.id')
                         ->where('prd_products.is_active',1)->where('prd_products.is_deleted',0)
-                        ->where('prd_products.is_approved',1)
                         ->when($cat_id,function ($q,$cat_id) {
                             $q->where('prd_products.category_id', $cat_id);
                         })
@@ -754,7 +754,7 @@ class CartController extends Controller
    function get_cart_products($prd_id,$cart_id,$qty,$lang){
         $data     =   [];
         
-        $prod_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('id',$prd_id)->first();
+        $prod_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('id',$prd_id)->first();
             if($prod_data)   { 
                 $store_active = Store::where('service_status',1)->where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();
                     if($store_active)
@@ -864,7 +864,6 @@ class CartController extends Controller
                             ->where('usr_cart_item.is_active',1)
                             ->where('usr_cart_item.is_deleted',0)
                             ->where('prd_products.is_active',1)->where('prd_products.is_deleted',0)
-                            ->where('prd_products.is_approved',1)
                             ->where('prd_products.seller_id',$seller_id)
                             ->get();
             if($prod_data1)   { 
@@ -876,7 +875,33 @@ class CartController extends Controller
                     $qty=$prod_data->quantity;
                     $prd_list['cart_id']=$prod_data->cart_id;   
                     $prd_list['product_id']=$prod_data->product_id;
+                    if($prod_data->product_type==1){
+                     $prd_list['product_type'] ='simple';   
+                    }
+                    else
+                    {
+                        $prd_list['product_type'] ='config'; 
+                    }
+                    if($prod_data->product_type==1){
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
+                    $prd_list['image']=$this->get_product_image($prod_data->product_id);
+                    }
+                    else
+                    {
+                        $associate= AssociatProduct::where('ass_prd_id',$prod_data->product_id)->first();
+                        $attr_data =   AssignedAttribute::where('is_deleted',0)->where('prd_id',$prod_data->product_id)->get();
+                         //print_r($attr_data);die;
+                         $i=1;
+                        foreach($attr_data as $attr)
+                        {
+                        $prd_listsatr=$attr->attr_value;
+                        $prd_list['attr_name'.$i]=$prd_listsatr;
+                        $i++;
+                        }
+                        
+                        $prd_list['product_name']=$this->get_content($associate->product->name_cnt_id,$lang); 
+                        $prd_list['image']=$this->get_product_image($associate->product->id);
+                    }
                     $prd_list['quantity']=$prod_data->quantity;
                     $prd_list['category_id']=$prod_data->category_id;
                     $prd_list['category_name']=$this->get_content($prod_data->category->cat_name_cid,$lang);
@@ -956,7 +981,7 @@ class CartController extends Controller
             }
 
             $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
-            $prd_list['image']=$this->get_product_image($prod_data->product_id);
+           
                     $data[]             =  $prd_list;
                     }//Active store
              }
@@ -972,7 +997,7 @@ class CartController extends Controller
 function get_cart_ofr_products($prd_id,$cart_id,$qty,$lang,$cat_id,$sub_id,$seller){
         $data     =   [];
         
-        $prod_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('id',$prd_id)
+        $prod_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('id',$prd_id)
         ->when($cat_id,function ($q,$cat_id) {
                             $q->where('category_id', $cat_id);
                         })

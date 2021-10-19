@@ -142,7 +142,7 @@
 															<label class="form-label">Valid From<span class="text-red">*</span></label>
 															<div id="valid_from"  class="datepicker input-group date"
 															data-date-format="yyyy-mm-dd">
-															<input class="form-control" name="valid_from" type="text" readonly />
+															<input class="form-control" name="valid_from" type="text" readonly onchange="date_check()" />
 															<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 															</div>
 															@error('valid_from')
@@ -156,7 +156,7 @@
 															<label class="form-label">Valid To<span class="text-red">*</span></label>
 															<div id="valid_to" class="datepicker input-group date"
 															data-date-format="yyyy-mm-dd">
-															<input class="form-control"  name="valid_to" type="text" readonly />
+															<input class="form-control"  name="valid_to" type="text" readonly  onchange="date_check()" />
 															<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 															</div>
 															@error('valid_to')
@@ -171,7 +171,7 @@
 															<div class="form-group">
 															<label class="form-label">Percentage<span class="text-red">*</span></label>
 															
-															<input type="number" step="1.0" min="0" max="100" name="percentage" class="form-control">
+															<input type="number" step="0.01" min="0" max="100" name="percentage" class="form-control">
 															@error('percentage')
 															<p style="color: red">{{ $message }}</p>
 															@enderror
@@ -314,30 +314,29 @@ $('#state').html(html);
         
         
     }
-
+function date_check() 
+    {
+      var sdate=$("[name='valid_from']").val();
+      var tdate=$("[name='valid_to']").val();
+      
+      $('#valid_from').datepicker('setStartDate',new Date(sdate));
+      if(sdate && tdate)
+      {
+        var d1 = Date.parse(sdate);
+        var d2 = Date.parse(tdate);
+        if (d1 > d2) 
+        {
+          $("[name='valid_to']").val(sdate);
+          $('#valid_to').datepicker('setStartDate',new Date(sdate));
+        }
+      }
+      
+    }
 
 	
 </script>
 
-<script type="text/javascript">
-    $(document).ready(function(){
-            // @if(Session::has('message'))
-            // @if(session('message')['type'] =="success")
-            
-            // toastr.success("{{session('message')['text']}}"); 
-            // @else
-            // toastr.error("{{session('message')['text']}}"); 
-            // @endif
-            // @endif
-            
-            // @if ($errors->any())
-            // @foreach ($errors->all() as $error)
-            // toastr.error("{{$error}}"); 
-            
-            // @endforeach
-            // @endif
-    });
-    </script>
+
 
 
 @endsection

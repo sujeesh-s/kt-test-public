@@ -30,7 +30,7 @@ $(document).ready(function() {
         },
         orderMulti: false,
         dom: "Blfrtip",
-        stateSave: true,
+        stateSave: false,
         order: [
             [0, "asc"]
         ],
@@ -133,7 +133,7 @@ $(document).ready(function() {
     });
     
     jQuery("#filterSel").on( 'change', function () {
-                          table.column( 5 )
+                          table.column( 6 )
                     .search( "^" + $(this).val(), true, false, true )
                     .draw();
                     

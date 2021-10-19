@@ -88,7 +88,7 @@
                                         <tr>
                                             <th class="wd-15p notexport"></th>
                                             <th class="wd-15p">Product Name</th>
-                                            <th class="wd-15p">Seller Name</th>
+                                            <!--<th class="wd-15p">Seller Name</th>-->
                                             <th class="wd-15p">Category</th>
                                             <th class="wd-20p">Sub Category</th>
                                             <th class="wd-10p">Created On</th>
@@ -107,7 +107,7 @@
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></td>
                                                     <td><a style="cursor: pointer;" class="pointer viewBtn" id="viewBtn-{{$row->id}}">{{$row->name}}</a></td>
-                                                    <td data-search="{{$row->seller->fname}}">{{$row->seller->fname}}</td>
+                                                    <!--<td data-search="{{$row->seller->fname}}">{{$row->seller->fname}}</td>-->
                                                     <td data-search="{{$row->category->cat_name}}">{{$row->category->cat_name}}</td>
                                                     <td>{{$row->subCategory->subcategory_name}}</td>
                                                     <td>{{date('d M Y',strtotime($row->created_at))}}</td>

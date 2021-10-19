@@ -9,5 +9,6 @@ class AssociatProduct extends Model{
     use HasFactory;
     protected $table = 'prd_associative_products';
     protected $fillable = ['prd_id','ass_prd_id','created_by',];
+    public function product(){ return $this->belongsTo(Product ::class, 'prd_id'); }
     
 }

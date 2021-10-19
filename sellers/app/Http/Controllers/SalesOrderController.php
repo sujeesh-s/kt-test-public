@@ -32,7 +32,7 @@ class SalesOrderController extends Controller
     public function orders(Request $request,$type=''){ // echo Auth::user()->id; die;
         $post                       =   (object)$request->post();
         if(isset($post->viewType))  {   $viewType = $post->viewType; }else{ $viewType = ''; }
-        $data['title']              =   'Sales Orders';
+        $data['title']              =   'Order Requests';
         $data['menuGroup']          =   'salesGroup';
         $data['menu']               =   'sales_request';
         $data['start_date']         =   '';

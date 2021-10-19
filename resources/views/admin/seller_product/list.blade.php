@@ -111,11 +111,21 @@
                 url: '{{url("/admin/seller/products/offer/")}}/'+id,
                 success: function (data) {
                     $('#content_detail').html(data); $('#content_detail').fadeIn(700); $('#content_list').hide(); 
-                    $(".datepicker").datepicker({ 
+                    var seldate=$("[name='valid_from']").val();
+                    if(seldate){
+                         $(".datepicker").datepicker({ 
                     autoclose: true, 
                     todayHighlight: true,
                     startDate: new Date()
                     }).datepicker();
+                    }else {
+                         $(".datepicker").datepicker({ 
+                    autoclose: true, 
+                    todayHighlight: true,
+                    startDate: new Date()
+                    }).datepicker('update', new Date());
+                    }
+                   
 
 
 
@@ -252,6 +262,18 @@ required: "Status field is required."
                 success: function (data) { 
                     $.each(data, function(key,value) { // alert(key+' -- '+value);
                         if(key != 'id'){ $('#adminForm #'+key).val(value); }
+                           if(key == "category_id") { $('#adminForm #categoryList').val(value); }
+                        if(key == "sub_category_id") { $('#adminForm #sub-category-id').val(value); loadsubcat('1'); }
+                         if(key == "desc") { $('#adminForm #desc').parents('.richText').find(".richText-editor").html(value); }
+                         if(key == "content") { $('#adminForm #content').parents('.richText').find(".richText-editor").html(value); }
+                         if(key == "spec_cnt_id") { 
+                             var container = document.querySelector("#quillEditor");
+                            var quill = new Quill(container);
+                            if(Quill.find(container) === quill) {
+                                quill.setContents(JSON.parse(value), 'api');
+                            }
+                             
+                         }
                     });  $('#adminForm .admin').prop('disabled',true);
                 } 
             }); 
@@ -690,7 +712,24 @@ function build_table(){
             }
         });
     }
-   
+    function date_check() 
+    {
+      var sdate=$("[name='valid_from']").val();
+      var tdate=$("[name='valid_to']").val();
+      
+      $('#valid_from').datepicker('setStartDate',new Date(sdate));
+      if(sdate && tdate)
+      {
+        var d1 = Date.parse(sdate);
+        var d2 = Date.parse(tdate);
+        if (d1 > d2) 
+        {
+          $("[name='valid_to']").val(sdate);
+          $('#valid_to').datepicker('setStartDate',new Date(sdate));
+        }
+      }
+      
+    }
 </script>
 
 @endsection

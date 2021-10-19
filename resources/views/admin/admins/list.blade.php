@@ -67,7 +67,8 @@
 																	<th class="border-bottom-0 w-15">Phone</th>
 																	<th class="border-bottom-0 w-10">Role</th>
 																	
-																	<th class="border-bottom-0 w-10">Created On</th>						<th class="border-bottom-0 w-30">Status</th>						
+																	<th class="border-bottom-0 w-10">Created On</th>	
+																	<th class="border-bottom-0 w-15">Status</th>						
 																	<th class="border-bottom-0 w-10 userroles">Actions</th>
 																</tr>
 															</thead>

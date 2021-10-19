@@ -7,7 +7,7 @@ $(document).ready(function () {
 
     var table = $(".modulestable").DataTable({
         ordering: false,
-        pageLength: 10,
+        pageLength: 100,
         rowReorder: false,
         colReorder: true,
         paging: true,

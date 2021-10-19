@@ -126,7 +126,8 @@
                                                         </div>
                                                         <div class="col-lg-4 col-md-4 col-sm-12">
                                                             <label class="form-label">Change Category Image <span class="text-red">*</span></label>
-                                                            <input type="file" class="dropify" data-height="180"  accept="image/*" name="category_image" />
+                                                            <p>(Image type .png,.jpeg)</p>
+                                                            <input type="file" class="dropify" data-height="180"  accept="image/*" name="category_image"  data-allowed-file-extensions='["png", "jpg", "jpeg"]' />
                                                              <p style="color: red" id="errNm1"></p>
                                                         </div>
                                                     </div>

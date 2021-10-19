@@ -7,7 +7,7 @@
             @if(count($images) >0)
             @foreach ($images as $img)
              <li class="prod_img">
-           <img src="{{ url('storage/'.$img->image) }}" alt="Product Image"  >
+           <img src="{{ url('storage/'.$img->image) }}" alt="Product Image" width="150px" >
         </li> 
 
             @endforeach

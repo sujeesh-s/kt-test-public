@@ -102,7 +102,8 @@
 																			<span class="avatar brround avatar-md d-block" style="background-image: url({{URL::asset('admin/assets/images/users/2.jpg')}})"></span>
 																			@endif
 																			<div class="ml-3 mt-1">
-																				<h6 style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis; max-width: 200px;" class="mb-0 font-weight-bold">{{$subcategory_name->content}}</h6>
+																			     @php	$subcat_name = Str::of($subcategory_name->content)->limit(20); @endphp
+																				<h6 style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis; max-width: 200px;" class="mb-0 font-weight-bold"><a href="{{ url('admin/subcategory/view/') }}/{{$row->subcategory_id}}">{{$subcat_name}}</a></h6>
 																			</div>
 																		</div>
 																		<!--<div class="d-flex">-->
@@ -232,7 +233,7 @@
        $('body').removeClass('timer-alert');
     swal({
         title: "Delete Confirmation",
-        text: "Are you sure you want to delete this product?",
+        text: "Are you sure you want to delete this Sub Category?",
         // type: "input",
         showCancelButton: true,
         closeOnConfirm: true,
@@ -272,8 +273,15 @@
         });
         if(status!=true)
         { toastr.success("Inactivated Successfully");
+        jQuery('#status-'+cat_id).closest("td").attr("data-search","Inactive");
+        var table = $.fn.dataTable.tables( { api: true } );
+            table.rows().invalidate().draw();
         $(this).prop("");
-        }else{ toastr.success("Activated Successfully"); }
+        }else{ toastr.success("Activated Successfully");
+        jQuery('#status-'+cat_id).closest("td").attr("data-search","Active");
+              var table = $.fn.dataTable.tables( { api: true } );
+            table.rows().invalidate().draw();
+        }
     })
   })
 </script>

@@ -97,7 +97,8 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																		<p>{{$row['title']}}</p>
+																		    	@php	$title = Str::of($row['title'])->limit(20); @endphp
+																		<p>{{$title}}</p>
 																	</div>
 																	</td>
 																	<td class="align-middle" >

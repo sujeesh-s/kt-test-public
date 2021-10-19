@@ -1,6 +1,15 @@
 @extends('layouts.admin')
 @section('title', 'Profile')
 @section('content')
+<style>
+#logo {
+    padding: 3px;
+    font-size: 14px;
+}
+#banner {
+     padding: 3px;
+}
+</style>
 <div id="pg_content"  >
     @include('seller.profile.details')
 </div>

@@ -19,7 +19,7 @@
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
 									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Ecom Benefits</a></li>
-									
+									<li class="breadcrumb-item " aria-current="page"><a href="{{ url('/offers') }}">Offers</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
 							</div>
@@ -64,12 +64,12 @@
 																	<div class="col-lg-6 fr">
 																	<div class="form-group">
 																	{{Form::label('discount_value','Discount Value',['class'=>''])}} <span class="text-red">*</span>
-																	{{Form::number('discount_value','',['id'=>'discount_value','class'=>'form-control admin', 'placeholder'=>'Discount Value'])}}
+																	{{Form::number('discount_value','',['id'=>'discount_value','class'=>'form-control admin', 'placeholder'=>'Discount Value','max'=>9999])}}
 																
 																	<span class="error"></span>
 																	</div>
 																	</div>
-
+                                                                    <div class="clearfix"></div>
 
 																	<div  class="col-lg-6  fl">
 																	<div class="form-group">
@@ -82,10 +82,11 @@
 																	<div class="form-group">
 
 																	{{Form::label('quantity_limit','Product Quantity Limit',['class'=>''])}} <span class="text-red">*</span>
-																	{{Form::number('quantity_limit','',['id'=>'quantity_limit','class'=>'form-control admin', 'placeholder'=>'Product Quantity Limit'])}}
+																	{{Form::number('quantity_limit','',['id'=>'quantity_limit','class'=>'form-control admin', 'placeholder'=>'Product Quantity Limit','max'=>9999])}}
 																	<span class="error"></span>
 																	</div>
 																	</div>
+																	<div class="clearfix"></div>
 																	<div class="col-lg-6 fl">
 																	<div class="form-group">
 																	<label class="form-label" for="valid_from" >Valid From <span class="text-red">*</span></label>
@@ -109,6 +110,7 @@
 																	<span class="error"></span>
 																	</div>
 																	</div>
+																	<div class="clearfix"></div>
 																	<div class="col-lg-6 fl">
 																	<div class="form-group">
 																	{{Form::label('is_active','Status',['class'=>''])}} <span class="text-red">*</span>

@@ -26,7 +26,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Master Settings</a></li>
+									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Auction Management</a></li>
 									
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
@@ -186,7 +186,7 @@
 																	</td>
 
 																	<td class="align-middle" >
-																	    @php $prod_img=url('storage/app/public/product/'.$row['product_img']);
+																	    @php $prod_img= config('app.storage_url').$row['product_img'];
 																	    @endphp
 																	    <div class="d-flex">
 																			@if($row['product_img'])

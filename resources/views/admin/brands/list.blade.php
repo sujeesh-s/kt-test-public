@@ -63,11 +63,11 @@
 																	<th class="align-top border-bottom-0 wd-5 notexport">Select</th>
 																	<th class="border-bottom-0 w-20">Brand Name</th>
 																	
-																	<th class="border-bottom-0 w-30">Description</th>
+																	<th class="border-bottom-0 w-20">Description</th>
 																	<th class="border-bottom-0 w-15">Created On</th>
-																	<th class="border-bottom-0 w-30">Status</th>
+																	<th class="border-bottom-0 w-15">Status</th>
 																															
-																	<th class="border-bottom-0 w-10 notexport">Actions</th>
+																	<th class="border-bottom-0 w-20 notexport">Actions</th>
 																</tr>
 															</thead>
 
@@ -81,9 +81,10 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
+																			@php	$brand_name = Str::of($row['brand_name'])->limit(20); @endphp
+																	
 																			
-																			
-																			<h6 class=" font-weight-bold"> <a href="{{ url('admin/brands/view/') }}/{{$row['id']}}" >{{$row['brand_name']}} </a></h6>
+																			<h6 class=" font-weight-bold"> <a href="{{ url('admin/brands/view/') }}/{{$row['id']}}" >{{$brand_name}} </a></h6>
 																				
 																			
 																		</div>

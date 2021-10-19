@@ -26,7 +26,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Master Settings</a></li>
+									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Auction Management</a></li>
 									
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
@@ -75,6 +75,7 @@
 																<tr>
 
 																	<th class="align-top border-bottom-0 wd-5 notexport">Select</th>
+																	<th class="align-top border-bottom-0 wd-5 notexport">Sl.No</th>
 																	<th class="border-bottom-0 w-15">Auction ID</th>
 																	
 																	<th class="border-bottom-0 w-15">Product Name</th>
@@ -104,12 +105,17 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
+																		    {{ $loop->iteration }}
+																	</div>
+																	</td>
+																	<td class="align-middle" >
+																		<div class="d-flex">
 																		<p><a href="{{ url('admin/auction/refund-log/') }}/{{$row['id']}}"   class="">{{$row['auction_code']}}</a></p>
 																	</div>
 																	</td>
 
 																	<td class="align-middle" >
-																	    @php $prod_img=url('storage/app/public/product/'.$row['product_img']);
+																	    @php $prod_img= config('app.storage_url').$row['product_img'];
 																	    @endphp
 																	    <div class="d-flex">
 																			@if($row['product_img'])

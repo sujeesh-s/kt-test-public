@@ -45,7 +45,7 @@
 										<div class="widget-user-image1 d-sm-flex row mb-4">
 											<div class="mt-1 col-lg-2">
 										    @if($auctions['product_img']!='')
-										    @php $prod_img=url('storage/app/public/product/'.$auctions['product_img']);
+										    @php $prod_img=config('app.storage_url').$auctions['product_img'];
 																	    @endphp
 										    <img alt="Product Image" class="rounded-circle border p-0" style="width:120px;height:130px;" src="{{ $prod_img }}">
 										    @else
@@ -105,7 +105,7 @@
 																<tr>
 																	<th class="align-top border-bottom-0 wd-5 notexport">Select</th>
 																	
-																	
+																	<th class="align-top border-bottom-0 wd-5 notexport">Sl.No</th>
 																	<th class="border-bottom-0 w-30">Customer</th>
 																	<th class="border-bottom-0 w-20">Order ID</th>
 																	<th class="border-bottom-0 w-30">Date of purchase</th>
@@ -118,7 +118,15 @@
 															<tbody>
 
 																@if($log && count($log) > 0)
+																@php $s=0; @endphp
                     											@foreach($log as $row)
+                    											
+                    											<?php 
+                    											       $s++;
+                    											       $user_id=$row['user_id'];
+                    											       $user_info =DB::table('usr_mst')->where('id', $user_id)->first();
+                                                                       $cust_id = date('y',strtotime($user_info->created_at)).date('m',strtotime($user_info->created_at)).str_pad($user_id, 6, "0", STR_PAD_LEFT);
+                                                                     ?> 
 																<tr>
 																	<td class="align-middle select-checkbox" id="moduleid" data-value="{{$row['id']}}">
 																		<label class="custom-control custom-checkbox">
@@ -126,10 +134,14 @@
 																			<!--{{ $loop->iteration }}-->
 																		</label>
 																	</td>
-																	
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																		<p>{{$row['user_name']}}</p>
+																		<p>{{ $loop->iteration }}</p>
+																	</div>
+																	</td>
+																	<td class="align-middle" >
+																		<div class="d-flex">
+																		<p>{{$row['user_name']}} <br>(<small>{{$cust_id}}</small>)</p>
 																	</div>
 																	</td>
 																	<td class="align-middle" >

@@ -60,7 +60,7 @@ class OfferController extends Controller{
         $data['title']              =   'Create Offer';
         $data['menu']               =   'offers';
      $products           =   Product::where('is_deleted',0)->where('is_active',1)->whereNotIn('id',function($query) {
-   $query->select('prd_id')->from('prd_special_offer');})->where('seller_id',auth()->user()->id)->get();
+   $query->select('prd_id')->from('prd_special_offer');})->where('visible',1)->where('seller_id',auth()->user()->id)->get();
      $prod_arr = [];
      if($products) {
         

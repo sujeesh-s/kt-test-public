@@ -149,7 +149,8 @@ class ChatsController extends Controller
         if(!$user = validateToken($request->post('access_token'))){ return invalidToken(); }
         $user_id = $user['user_id'];
         $validator=  Validator::make($request->all(),[
-            'chat_id'    => ['required','numeric']
+            'chat_id'    => ['required_without:seller_id','nullable','numeric'],
+            'seller_id'    => ['required_without:chat_id','nullable','numeric']
 
         ]);
         if ($validator->fails()) 
@@ -159,7 +160,13 @@ class ChatsController extends Controller
     else
     {
         $input = $request->all();
+        if($request->chat_id!=''){
         $chat= Chat::where('id',$input['chat_id'])->first();
+        }
+        else
+        {
+          $chat= Chat::where('seller_id',$input['seller_id'])->first();  
+        }
         if($chat)
         {   
             $store=Store::where('is_active',1)->where('is_deleted',0)->first();

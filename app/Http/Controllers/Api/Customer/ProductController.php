@@ -37,6 +37,8 @@ use App\Models\RelatedProduct;
 use App\Models\AssignedAttribute;
 use App\Models\UsrWishlist;
 use App\Models\UserVisit;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Lang;
 use Carbon\Carbon;
 use App\Rules\Name;
 use Validator;
@@ -106,7 +108,15 @@ class ProductController extends Controller
                     }
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
                     $prd_list['seller_id']=$row->seller_id;
+                    if($row->product_type==1){
+                    $prd_list['product_type']='simple';    
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
+                    }
+                    else
+                    {
+                     $prd_list['product_type']='config';    
+                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);   
+                    }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -487,7 +497,7 @@ class ProductController extends Controller
                         {
                             foreach($prd_ass as $rows)
                             {
-                            $product_visibility= Product::where('id',$rows->ass_prd_id)->where('is_active',1)->where('is_deleted',0)->where('visible',0)->where('is_approved',1)->first();
+                            $product_visibility= Product::where('id',$rows->ass_prd_id)->where('is_active',1)->where('is_deleted',0)->first();
                             if($product_visibility){
                             //$associative_prd[]=$this->ass_related_product($rows->ass_prd_id,$lang);
                             
@@ -813,7 +823,7 @@ class ProductController extends Controller
                         {
                             foreach($prd_ass as $rows)
                             {
-                            $product_visibility= Product::where('id',$rows->ass_prd_id)->where('is_active',1)->where('is_deleted',0)->where('visible',0)->where('is_approved',1)->first();
+                            $product_visibility= Product::where('id',$rows->ass_prd_id)->where('is_active',1)->where('is_deleted',0)->first();
                             if($product_visibility){
                             //$associative_prd[]=$this->ass_related_product($rows->ass_prd_id,$lang);
                             
@@ -1130,8 +1140,17 @@ class ProductController extends Controller
                     $prd_list['brand_id']='';
                     $prd_list['brand_name']='';  
                     }
+                    if($row->product_type==1){
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    $prd_list['product_type']='simple'; 
+                    }
+                    else
+                    {
+                    $prd_list['actual_price']='';
+                    $prd_list['sale_price']='';
+                    $prd_list['product_type']='config';
+                    }
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
                     $prd_list['rating']=$this->get_rates($row->id);
@@ -1299,11 +1318,13 @@ class ProductController extends Controller
                     {
                     $prd_list['actual_price']=$row->prdPrice->price;
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    $prd_list['product_type']='simple';
                     }
                     else
                     {
                     $prd_list['actual_price']='';
                     $prd_list['sale_price']=''; 
+                    $prd_list['product_type']='config';
                     }
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -1469,6 +1490,8 @@ class ProductController extends Controller
                     if($store_active)
                     {
                     $prd_list['product_id']=$row->id;
+                    $prd_list['seller_id']=$row->seller_id;
+                    $prd_list['seller']=$row->Store($row->seller_id)->store_name;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
                     $prd_list['category_name']=$this->get_content($row->category->cat_name_cid,$lang);
@@ -1658,6 +1681,8 @@ class ProductController extends Controller
                     if($store_active)
                     {
                     $prd_list['product_id']=$row->id;
+                    $prd_list['seller_id']=$row->seller_id;
+                    $prd_list['seller']=$row->Store($row->seller_id)->store_name;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
                     $prd_list['category_name']=$this->get_content($row->category->cat_name_cid,$lang);
@@ -1675,7 +1700,7 @@ class ProductController extends Controller
                     }
                     if($row->product_type==1)
                     {
-                    $prd_list['actual_price']=$row->prdPrice->price;
+                    $prd_list['actual_price']=$this->get_actual_price($row->id);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     }
                     else
@@ -2053,9 +2078,10 @@ class ProductController extends Controller
     function ass_related_product1($prd_id,$lang){
         $data     =   [];
         
-        $prod_data       =   AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->groupBy('prd_id')->get();
+        $prod_data       =   AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->orderBy('attr_id','DESC')->groupBy('attr_id')->get();
             if(count($prod_data)>0)   { 
                 foreach($prod_data as $row)  {
+                    //$attr_list['id']=$row->id;
                     $attr_list['attr_id']=$row->attr_id;
                    $attr_list['product_id']=$row->prd_id;
                     //$attr_list['attr_id']=$row->attr_id;
@@ -2069,10 +2095,12 @@ class ProductController extends Controller
                     
                     
                     $attr_list['image']=config('app.storage_url').$row->attrValue->image;
-                    $arrt_vals['list'][] =$this->inner_attribute($prd_id,$row->attr_id,$lang);
-                    if(empty($arrt_vals['list'][1]))
+                    $arrt_vals['list'][] =$this->inner_attribute($prd_id,$row->attr_id,$row->id,$lang);
+                    
+
+                    if(empty($arrt_vals['list'][0]))
                     {
-                    $attr_list['attr_value1'] = [];   
+                    $attr_list['sub_attributes'] = [];   
                     $actual_price = number_format($row->prdPrice->price,2);
                     $attr_list['actual_price_quote']= $actual_price;
                     $attr_list['actual_price']= $row->prdPrice->price;
@@ -2080,6 +2108,8 @@ class ProductController extends Controller
                     $attr_list['sale_price']=$sale_price;
                     $attr_list['stock']=$row->prdStock($row->prd_id);
                     $attr_list['sku']=$row->Product->sku;
+                    
+                    
                     if($row->Product->is_out_of_stock==0)
                         {
                             $attr_list['is_out_of_stock']=false;
@@ -2099,7 +2129,7 @@ class ProductController extends Controller
                     }
                     else
                     {
-                        $attr_list['attr_value1'][] =$this->inner_attribute($prd_id,$row->attr_id,$lang);
+                        $attr_list['sub_attributes'] =$this->inner_attribute($prd_id,$row->attr_id,$row->id,$lang);
                     }
                     $data             =   $attr_list;
                 }
@@ -2108,20 +2138,23 @@ class ProductController extends Controller
         
     }
     
-    function inner_attribute($prd_id,$attr_id,$lang)
+    function inner_attribute($prd_id,$attr_id,$rowId,$lang)
     {
         $data=[];
-        $rowss = AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->where('attr_id','!=',$attr_id)->first();
-                     if($rowss)
+        $rowss = AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->where('attr_id','!=',$attr_id)->where('id','!=',$rowId)->first();
+        //$rows1 = AssignedAttribute::where('is_deleted',0)->where('attr_id',$attr_id)->whereNotIn('id',[$rowId])->get();
+        
+                     if($rowss && $rowss->id!=$rowId)
                     {
-                        
-                        $atr_inn['attr_id']=$rowss->attr_id;    
+                        //$atr_inn['id']=$rowss->id;
+                        $atr_inn['attr_id']=$rowss->attr_id;
+                        $atr_inn['product_id']=$rowss->prd_id;
                         $atr_inn['attr_name']= $this->get_content($rowss->PrdAttr->name_cnt_id,$lang);
                         $atr_inn['attr_value']= $rowss->attr_value;
                         $atr_inn['image']=config('app.storage_url').$rowss->attrValue->image;
-                        $actual_price = number_format($rowss->prdPrice->price,2);
+                        $actual_price = number_format($rowss->Product->prdPrice->price,2);
                         $atr_inn['actual_price_quote']= $actual_price;
-                        $atr_inn['actual_price']= $rowss->prdPrice->price;
+                        $atr_inn['actual_price']= $rowss->Product->prdPrice->price;
                         $sale_price =$this->get_sale_price($rowss->prd_id);
                         $atr_inn['sale_price']=$sale_price;
                         $atr_inn['stock']=$rowss->prdStock($rowss->prd_id);
@@ -2142,10 +2175,53 @@ class ProductController extends Controller
                         {
                             $atr_inn['out_of_stock_selling']=true;
                         }
-                        $data             =   $atr_inn;
+                        //$atr_inn['subattr']=$this->inner_attribute_12($rowss->prd_id,$rowss->attr_id,$rowss->id,$lang);
+                        $data[]             =   $atr_inn;
                         
-                        
+                    
                     }return $data;
+    }
+    function inner_attribute_12($prd_id,$attr_id,$rowId,$lang)
+    {
+        $data=[];
+       // $rowss = AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->where('attr_id','!=',$attr_id)->whereNotIn('id',[$rowId])->first();
+        $rows1 = AssignedAttribute::where('is_deleted',0)->where('attr_id',$attr_id)->whereNotIn('id',[$rowId])->get();
+       foreach($rows1 as $rowss){
+                     if($rowss && $rowss->id!=$rowId)
+                    {
+                        //$atr_inn['id']=$rowss->id;
+                        $atr_inn['attr_id']=$rowss->attr_id;
+                        $atr_inn['product_id']=$rowss->prd_id;
+                        $atr_inn['attr_name']= $this->get_content($rowss->PrdAttr->name_cnt_id,$lang);
+                        $atr_inn['attr_value']= $rowss->attr_value;
+                        $atr_inn['image']=config('app.storage_url').$rowss->attrValue->image;
+                        $actual_price = number_format($rowss->Product->prdPrice->price,2);
+                        $atr_inn['actual_price_quote']= $actual_price;
+                        $atr_inn['actual_price']= $rowss->Product->prdPrice->price;
+                        $sale_price =$this->get_sale_price($rowss->prd_id);
+                        $atr_inn['sale_price']=$sale_price;
+                        $atr_inn['stock']=$rowss->prdStock($rowss->prd_id);
+                        $atr_inn['sku']=$rowss->Product->sku;
+                        if($rowss->Product->is_out_of_stock==0)
+                        {
+                            $atr_inn['is_out_of_stock']=false;
+                        }
+                        else
+                        {
+                            $atr_inn['is_out_of_stock']=true;
+                        }
+                        if($rowss->Product->out_of_stock_selling==0)
+                        {
+                            $atr_inn['out_of_stock_selling']=false;
+                        }
+                        else
+                        {
+                            $atr_inn['out_of_stock_selling']=true;
+                        }
+                        $data[]             =   $atr_inn;
+                        
+                    
+                    }}return $data;
     }
     function related_product($prd_id,$lang){
         $data     =   [];
@@ -2200,7 +2276,7 @@ class ProductController extends Controller
     function related_brand_product($brand_id,$prd_id,$lang){
         $data     =   [];
         
-        $brand_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('product_type',1)->where('brand_id',$brand_id)->where('visible',1)->whereNotIn('id', [$prd_id])->get();
+        $brand_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('brand_id',$brand_id)->where('visible',1)->whereNotIn('id', [$prd_id])->get();
             if(count($brand_data)>0)   {   
               foreach($brand_data as $prod_data) {
                   $store_active = Store::where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();
@@ -2223,10 +2299,21 @@ class ProductController extends Controller
                     $prd_list['brand_id']='';
                     $prd_list['brand_name']='';
                     }
+                    if($prod_data->product_type==1){
+                    $prd_list['actual_price']=$this->get_actual_price($prod_data->id);
+                    $prd_list['sale_price']=$this->get_sale_price($prod_data->id);
+                    $prd_list['product_type']='simple';
+                    }
+                    else
+                    {
+                     $prd_list['actual_price']='';
+                    $prd_list['sale_price']='';
+                    $prd_list['product_type']='config';
+                    }
                     $prd_list['short_description']=$this->get_content($prod_data->short_desc_cnt_id,$lang);
                     $prd_list['long_description']=$this->get_content($prod_data->desc_cnt_id,$lang);
                     $prd_list['content']=$this->get_content($prod_data->content_cnt_id,$lang);
-                    $prd_list['actual_price']=number_format($prod_data->prdPrice->price,2);
+                    $prd_list['actual_price']=$this->get_actual_price($prod_data->id);
                     $prd_list['sale_price']=$this->get_sale_price($prod_data->id);
                     $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
                     $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 
@@ -2278,11 +2365,17 @@ class ProductController extends Controller
                     $prd_list['long_description']=$this->get_content($prod_data->desc_cnt_id,$lang);
                     $prd_list['content']=$this->get_content($prod_data->content_cnt_id,$lang);
                     if($prod_data->product_type==1){
-                    $actual_price = number_format($prod_data->prdPrice->price,2);
+                    $actual_price = number_format($this->get_actual_price($prod_data->id));
                     $prd_list['actual_price_quote']= $actual_price;
-                    $prd_list['actual_price']= $prod_data->prdPrice->price;
+                    $prd_list['actual_price']= $this->get_actual_price($prod_data->id);
                     $sale_price =$this->get_sale_price($prod_data->id);
                     $prd_list['sale_price']=(float)$sale_price;
+                    }
+                    else{
+                      
+                    $prd_list['actual_price_quote']= '';
+                    $prd_list['actual_price']= '';
+                    $prd_list['sale_price']='';  
                     }
                     $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
                     $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 

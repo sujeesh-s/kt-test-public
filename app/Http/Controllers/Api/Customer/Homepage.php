@@ -230,8 +230,16 @@ class Homepage extends Controller
                     }
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
                     $prd_list['seller_id']=$row->seller_id;
+                    if($row->product_type==1)
+                    {
                     $prd_list['price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    }
+                    else
+                    {
+                     $prd_list['price']='';
+                    $prd_list['sale_price']='';   
+                    }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
                     $prd_list['rating']=$this->get_rates($row->id);
                     $prd_list['image']=$this->get_product_image($row->id); 
@@ -277,8 +285,16 @@ class Homepage extends Controller
                     }
                     $d_list['seller']=$row->Store($row->seller_id)->store_name;
                     $d_list['seller_id']=$row->seller_id;
+                    if($row->product_type==1)
+                    {
                     $d_list['price']=number_format($row->prdPrice->price,2);
                     $d_list['sale_price']=$this->get_sale_price($row->id);
+                    }
+                    else
+                    {
+                    $d_list['price']='';
+                    $d_list['sale_price']=''; 
+                    }
                     $d_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
                     $d_list['rating']=$this->get_rates($row->id);
                     $d_list['image']=$this->get_product_image($row->id); 
@@ -393,7 +409,12 @@ class Homepage extends Controller
             {
             foreach($auction as $rows)
             {
-                $store_active = Store::where('is_active',1)->where('seller_id',$rows->Product->seller_id)->first();
+                // $store_active = Store::where('is_active',1)->where('seller_id',$rows->Product->seller_id)->first();
+                if($rows->Product) {
+                 $store_active = Store::where('is_active',1)->where('seller_id',$rows->Product->seller_id)->first();   
+                }else{
+                    $store_active = '';
+                }
                     if($store_active)
                     {
                 

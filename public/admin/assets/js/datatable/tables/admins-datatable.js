@@ -106,7 +106,7 @@ $(document).ready(function () {
                 }
             }
         }
-    });
+    }).column(4).visible(false);
 
     table.columns().every(function () {
         var that = this;

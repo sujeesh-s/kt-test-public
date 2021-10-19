@@ -28,7 +28,9 @@
 
                 @foreach($sidebar as $row)
 @php  $pt = $row['parent'];  $child = $row['child']; @endphp
-                <li class="slide">
+@if($pt['is_active'] !=1) @php $pr_class="pr_hide"; @endphp  @else @php $pr_class=""; @endphp  @endif
+
+                <li class="slide {{ $pr_class }}">
                         <a class="side-menu__item {{ $pt['class'] }}" @if($child && count($child) > 0)  data-toggle="slide" @endif href="{{$pt['link']}}">
                                 @if($pt['menu_icon'] !="")
                                <svg class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"> <?php echo $pt['menu_icon']; ?> </svg>
@@ -41,10 +43,10 @@
                         <i class="angle fa fa-angle-right"></i></a>
                         <ul class="slide-menu">
                                 @foreach($child as $ch) 
-
+@if($ch['is_active'] !=1)  @php $ch_class="ch_hide"; @endphp @else  @php $ch_class=""; @endphp @endif
                                <?php $menu_link = $ch['link']; 
                                 ?>
-                                <li class='<?php echo activeMenu($menu_link); ?>'><a href='<?php echo url("$menu_link") ?>' class="slide-item">{{$ch['module_name']}}</a></li>
+                                <li class='<?php echo activeMenu($menu_link); ?> {{ $ch_class }}'><a href='<?php echo url("$menu_link") ?>' class="slide-item">{{$ch['module_name']}}</a></li>
                                 @endforeach
                         </ul>
                         @else
@@ -74,3 +76,8 @@ return $active;
 }
 @endphp
 <!--aside closed-->
+<style>
+    .pr_hide, .ch_hide {
+    display: none;
+}
+</style>

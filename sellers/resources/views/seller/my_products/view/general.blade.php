@@ -81,15 +81,15 @@
     <div class="col-lg-6 fl">
         <div class="form-group">
             
-             <label class="form-label view" for="fname">Description: </label>
-            <p class="view_value">{{ getContent($product->desc_cnt_id,2); }} </p>
+             <label class="form-label view" for="fname">Long Description: </label>
+            <p class="view_value"><?php echo getContent($product->desc_cnt_id,2); ?> </p>
         </div>
     </div>
     <div class="col-lg-6 fl">
         <div class="form-group">
   
              <label class="form-label view" for="fname">Content: </label>
-            <p class="view_value">{{ getContent($product->content_cnt_id); }} </p>
+            <p class="view_value"><?php echo getContent($product->content_cnt_id); ?> </p>
         </div>
     </div>
 </div>

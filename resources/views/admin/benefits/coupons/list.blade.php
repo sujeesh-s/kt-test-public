@@ -155,8 +155,8 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																	
-																	<h6 class=" font-weight-bold">{{$row['cpn_title']}} </h6>
+																		@php	$cpn_title = Str::of($row['cpn_title'])->limit(20); @endphp
+																	<h6 class=" font-weight-bold">{{$cpn_title}} </h6>
 																				
 																			
 																		</div>
@@ -192,7 +192,7 @@
 													?>		
 																		<p>{{ $valid_till }}</p>
 																	</td>
-																	<td class="text-nowrap align-middle"><span>{{date('d M Y',strtotime($row['created_at']))}}</span></td>
+																	<td class="text-nowrap align-middle"><p>{{date('d M Y',strtotime($row['created_at']))}}</p></td>
 																	<td class="text-nowrap align-middle"  data-search="@if($row['is_active'] ==1){{ "Active" }}@else{{ "Inactive" }}@endif">
 																		
 																	<div class="switch">

@@ -15,7 +15,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">Customer Wallet Log</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Wallet</a></li>
+									<li class="breadcrumb-item"><a href="{{ url('/admin/customer/wallet') }}"><i class="fe fe-grid mr-2 fs-14"></i>Wallet</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">Customer Wallet Log</a></li>
 								</ol>
 							</div>

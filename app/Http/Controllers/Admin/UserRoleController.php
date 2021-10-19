@@ -83,7 +83,7 @@ class UserRoleController extends Controller
         $validator= $request->validate([
         'usr_role_name'   =>  [
         'required',
-        Rule::unique('usr_role_lk')->ignore($input['id']),
+        Rule::unique('usr_role_lk')->ignore($input['id'])->where('is_deleted',0),
         ],
         'usr_role_desc' => ['required', 'string']
         ], [], 
@@ -138,7 +138,7 @@ class UserRoleController extends Controller
         $validator= $request->validate([
         'usr_role_name'   =>  [
         'required',
-        Rule::unique('usr_role_lk'),
+        Rule::unique('usr_role_lk')->where('is_deleted',0),
         ],
         'usr_role_desc' => ['required', 'string']
         ], [], 

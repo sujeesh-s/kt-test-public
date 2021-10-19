@@ -17,8 +17,8 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Master Settings</a></li>
-									
+									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Auction Management</a></li>
+									<li class="breadcrumb-item active" aria-current="page"><a href="{{ url('admin/auction/refund-request') }}">Auction Refund Requests</a></li>
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
 							</div>
@@ -45,7 +45,7 @@
 										<div class="widget-user-image1 d-sm-flex row mb-4">
 											<div class="mt-1 col-lg-2">
 										    @if($auctions['product_img']!='')
-										    @php $prod_img=url('storage/app/public/product/'.$auctions['product_img']);
+										    @php $prod_img=config('app.storage_url').$auctions['product_img'];
 																	    @endphp
 										    <img alt="Product Image" class="rounded-circle border p-0" style="width:120px;height:130px;" src="{{ $prod_img }}">
 										    @else
@@ -93,7 +93,7 @@
 						<div class="row ">
 						<div class="col-12">
 						<div class="btn btn-list fr mb-4">
-						<a   class="btn btn-primary process_refund"><i class="fe fe-plus mr-1"></i> Process Refund</a>
+						<a   class="btn btn-primary process_refund" style="display:none;"><i class="fe fe-plus mr-1"></i> Process Refund</a>
 						</div>
 						</div>
 							</div>
@@ -130,7 +130,13 @@
 
 																@if($log && count($log) > 0)
                     											@foreach($log as $row)
-
+                                                                        
+                                                                <?php 
+            											       
+            											       $user_id=$row['user_id'];
+            											       $user_info =DB::table('usr_mst')->where('id', $user_id)->first();
+                                                               $cust_id = date('y',strtotime($user_info->created_at)).date('m',strtotime($user_info->created_at)).str_pad($user_id, 6, "0", STR_PAD_LEFT);
+                                                             ?> 
                     										
 																<tr>
 																	<td class="align-middle process_selection" id="moduleid" data-value="{{$row['id']}}">
@@ -138,6 +144,11 @@
 																			
 																			@if($row['status'] == "pending")
 																			<input type="checkbox"  class="removeitem" name="to_process[]"  value="{{$row['id']}}" >
+																			<style>
+																			    a.process_refund { display:block;}
+																			</style>
+																			@else
+																			<i class="fa fa-check"></i>
 																			@endif
 
 																		</label>
@@ -145,7 +156,7 @@
 																	
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																		<p>{{$row['user_name']}}</p>
+																		<p>{{$row['user_name']}} <br>(<small>{{$cust_id}}</small>)</p>
 																	</div>
 																	</td>
 																	<td class="align-middle" >
@@ -160,7 +171,7 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																		<p>{{ ucfirst($row['status']) }}</p>
+																		<p>@if($row['status'] =="completed") {{ "Refunded" }} @else {{  ucfirst($row['status']) }} @endif</p>
 																	</div>
 																	</td>
 																	

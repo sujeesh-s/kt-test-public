@@ -23,6 +23,7 @@ use App\Models\PrdAttribute;
 use App\Models\PrdAttributeValue;
 use App\Models\AssignedAttribute;
 use App\Models\SellerInfo;
+use App\Models\RelatedProduct;
 
 use Validator;
 
@@ -88,6 +89,15 @@ class AdminProductController extends Controller
         if($type == 'view')         {   $title = 'View Product'; }else if($id > 0){ $title = 'Edit Product'; }else{ $title = 'Add Product'; }
         $data['title']              =   $title; 
         if($type                    ==  'new'){ $data['title']   =   'View Product Detail'; }
+        $data['langId'] = Language::where('is_active',1)->where('is_deleted',0)->first()->id;
+        $adminProducts                    =   AdminProduct::where('is_deleted',0);
+        $data['adminProducts']           =   $adminProducts->orderBy('id','desc')->get();
+        $products                   =   Product::where('is_approved',1)->where('visible',1)->where('is_deleted',0)->where('seller_id',auth()->user()->id);
+        $data['products']           =   $products->orderBy('id','desc')->get();
+        $data['relatedprods']         =  getDropdownData(RelatedProduct::where('prd_id',0)->where("is_deleted",0)->get(),'id','rel_prd_id');
+        $data['relatedprods']         = array_values($data['relatedprods'] );
+        $data['prdTypes']           =   getDropdownData(ProductType::where('is_deleted',0)->get(),'id','type_name');
+        $data['tags']             =   getDropdownCmsData(Tag::where('is_active',1)->where('is_deleted',0)->get(),'id','tag_name_cid');
         $data['categories']         =   getDropdownData(Category::where('is_deleted',0)->get(),'category_id','cat_name');
         $data['sub_cats']           =   getDropdownData(Subcategory::where('is_deleted',0)->get(),'subcategory_id','subcategory_name');
         $data['brands']             =   getDropdownCmsData(Brand::where('is_active',1)->where('is_deleted',0)->get(),'id','brand_name_cid');
@@ -97,7 +107,10 @@ class AdminProductController extends Controller
         $data['attributes']         =   $this->getAttributes();
         $data['images']             =   PrdImage::where('prd_id',$id)->where('is_deleted',0)->get();
         $data['isAdded']            =   Product::where('seller_id',auth()->user()->id)->where('admin_prd_id',$id)->where('is_deleted',0)->exists();
-        if($type == 'add'){ return view('admin_product.details',$data); }
+        if($type == 'add'){ 
+            // return view('admin_product.details',$data);
+            return view('admin_product.add_details',$data); 
+            }
         return view('admin_product.view',$data);
     }
     

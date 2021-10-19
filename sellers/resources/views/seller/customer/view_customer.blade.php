@@ -19,7 +19,7 @@
 							<div class="page-leftheader">
 								<h4 class="page-title mb-0">{{ $title }}</h4>
 								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
+									<li class="breadcrumb-item"><a href="{{ url('/customers') }}"><i class="fe fe-grid mr-2 fs-14"></i>Customer</a></li>
 
 									<li class="breadcrumb-item active" aria-current="page"><a href="#">{{ $title }}</a></li>
 								</ol>
@@ -47,7 +47,9 @@
 											<img alt="User Avatar" class="rounded-circle border p-0" src="{{URL::asset('admin/assets/images/users/2.jpg')}}">
 											@endif
 											<div class="mt-1 ml-lg-5">
-												<h4 class="pro-user-username mb-3 font-weight-bold">{{ $info->first_name." ".$info->middle_name." ".$info->last_name }} <i class="fa fa-check-circle text-success"></i></h4>
+											    @php 
+                                                    $cust_id = date('y',strtotime($customer_mst->created_at)).date('m',strtotime($customer_mst->created_at)).str_pad($customer_mst->id, 6, "0", STR_PAD_LEFT); @endphp
+												<h4 class="pro-user-username mb-3 font-weight-bold">{{ $info->first_name." ".$info->middle_name." ".$info->last_name }} <i class="fa fa-check-circle text-success"></i><br><p class="pt-2" style="font-size:13px;">( {{ "#".$cust_id }}  )</p></h4>
 
 												<ul class="mb-0 pro-details">
                                                     @foreach($telecom as $tele)
