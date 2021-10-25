@@ -158,12 +158,14 @@ class ReportController extends Controller
 
                 $rate =DB::table('prd_review')->select('*',DB::raw('AVG(rating) as rating'),DB::raw('count(user_id) as reviews'))->where('prd_id',$row->prd_id)->where('is_active',1)->where('is_deleted',0)->first();
 
+              if($row->product){
                 $prd['product_name'] = $row->product->get_content($row->product->name_cnt_id);
                 $prd['sold']         = $row->sold;
                 $prd['cust_repeat']  = $sale_repeat;
                 $prd['tot_review']   = $rate->reviews;
                 $prd['tot_rating']   = (int)$rate->rating;
                 $best[]              = $prd;
+              }
             }
        }
        // print_r($visitors);
@@ -227,12 +229,14 @@ class ReportController extends Controller
             foreach($visitors as $row)
             {
                 $latest = PrdReview::where('prd_id',$row->prd_id)->latest()->first();
+               if($row->product){
                 $prd['product_name'] = $row->product->get_content($row->product->name_cnt_id);
                 $prd['reviews']      = $row->reviews;
                 $prd['rating']       = $row->rating;
                 $prd['latest']       = $latest->comment;
                 $prd['view']         = $row->prd_id;
                 $best[]              = $prd;
+               } 
             }
        }
        // print_r($best);
