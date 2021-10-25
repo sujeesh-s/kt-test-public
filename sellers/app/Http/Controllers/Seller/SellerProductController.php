@@ -169,7 +169,7 @@ class SellerProductController extends Controller{
     function validateProduct(Request $request){
         $post                   =   (object)$request->post(); $error = $validName = false; 
         // dd($request->post('attr_1_value'));
-          // echo '<pre>'; print_r($post); echo '</pre>';
+        //   echo '<pre>'; print_r($post); echo '</pre>';
         $prd                   =   $request->post('prd'); 
 
         $price = $request->post('price');
@@ -228,7 +228,19 @@ class SellerProductController extends Controller{
           }     
 
         }
+         if($error) { return $error; }
+        $imgArr                   =   $request->post('imgArr'); 
+        if( $imgArr ) {
         
+        }else {
+        $validator              =   Validator::make(request()->all(),['image' => 'required',
+        'image.*' => 'image|mimes:jpg,jpeg,png']);
+        if ($validator->fails()){
+        $error['error']     =   'image_0';
+        foreach($validator->messages()->getMessages() as $k=>$row){ $error['image'][] = $row[0]; }
+        }  
+        if($error) { return $error; }  
+        }
         if($error) { return $error; }else{ return 'success'; }
     }   
 

@@ -48,7 +48,7 @@ class ChatsController extends Controller
             $list['unread_msg'] = $msg_count;
             $list['cust_id']    = $row->created_by;
             $list['cust_name']  = $cust_name;
-            if($row->cust_info->profile_image)
+            if($customer->profile_image)
             {
             $list['profile_img']= config('app.storage_url').'/app/public/customer_profile/'.$customer->profile_image;
             }
@@ -302,13 +302,13 @@ class ChatsController extends Controller
             }
             else{
                 $seller = SellerInfo::where('seller_id',$row->sender_id)->first(); 
-               if($seller->avatar)
+                if($seller->store($seller->id)->logo == NULL)
                {
-                $image=url('storage/'.$seller->avatar);
+               $image=url('/public/admin/assets/images/users/2.jpg');
                } 
                else
                {
-                $image=url('/public/admin/assets/images/users/2.jpg');
+                 $image= url('storage'.sellerData()->store(sellerData()->id)->logo);
                }
                
                if($row->msg_type=="image")

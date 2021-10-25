@@ -49,11 +49,14 @@ class InsertResponse extends Controller
         $user_id = $user['user_id'];
         $validator=  Validator::make($request->all(),[
             'seller_id' => ['required','numeric'],
+            'title' => ['required','string','max:255'],
             'comment'=> ['required','string','min:5','max:255'],
             'rating'=>['required','numeric','max:5'],
             'image'=> ['nullable','image','mimes:jpeg,png,jpg'],
         ]);
         $input = $request->all();
+        // echo $input['title'];
+        // die;
 
     if ($validator->fails()) 
     {    
@@ -68,6 +71,7 @@ class InsertResponse extends Controller
         $insert =  SellerReview::create(['seller_id' => $input['seller_id'],
                 'user_id' => $user_id,
                 'comment' => $input['comment'],
+                'title'=> $input['title'],
                 'rating'  => $input['rating'],
                 'is_active'=>1,
                 'created_at'=>date("Y-m-d H:i:s"),
@@ -134,7 +138,7 @@ class InsertResponse extends Controller
 
         $validator=  Validator::make($request->all(),[
             'product_id' => ['required','numeric'],
-            'headline'  =>['max:200','string','nullable'],
+            'title'  =>['max:200','string','required'],
             'comment'=> ['required','string','min:5','max:255'],
             'rating'=>['required','numeric','max:5'],
             'image'=> ['nullable','image','mimes:jpeg,png,jpg'],
@@ -143,7 +147,7 @@ class InsertResponse extends Controller
 
     if ($validator->fails()) 
     {    
-      return response()->json(['httpcode'=>400,'status'=>'error','errors'=>$validator->messages()]);
+      return response()->json(['httpcode'=>400,'status'=>'error',data=>['errors'=>$validator->messages()]]);
     }
 
     else
@@ -167,7 +171,7 @@ class InsertResponse extends Controller
                     }
         $insert =  PrdReview::create(['prd_id' => $input['product_id'],
                 'user_id' => $user_id,
-                'headline'=>$input['headline'],
+                'headline'=>$input['title'],
                 'comment' => $input['comment'],
                 'rating'  => $input['rating'],
                 'image'  =>$filename,
@@ -204,7 +208,7 @@ class InsertResponse extends Controller
 
     if ($validator->fails()) 
     {    
-      return response()->json(['httpcode'=>400,'status'=>'error','errors'=>$validator->messages()]);
+      return response()->json(['httpcode'=>400,'status'=>'error',data=>['errors'=>$validator->messages()]]);
     }
 
     else
@@ -311,7 +315,7 @@ class InsertResponse extends Controller
 
     if ($validator->fails()) 
     {    
-      return response()->json(['httpcode'=>400,'status'=>'error','errors'=>$validator->messages()]);
+      return response()->json(['httpcode'=>400,'status'=>'error',data=>['errors'=>$validator->messages()]]);
     }
 
     else
@@ -370,7 +374,7 @@ class InsertResponse extends Controller
 
     if ($validator->fails()) 
     {    
-      return response()->json(['httpcode'=>400,'status'=>'error','errors'=>$validator->messages()]);
+      return response()->json(['httpcode'=>400,'status'=>'error',data=>['errors'=>$validator->messages()]]);
     }
 
     else

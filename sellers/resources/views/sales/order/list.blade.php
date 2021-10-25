@@ -41,6 +41,21 @@
 </div>
 <div id="content_list">@include('sales.order.list.content')</div>
 <div id="content_detail"></div>
+<div id="modal_cnt" class="d-none">
+    <div class="col-12 mb-4">
+        <div class="modal-header">
+            <h5 class="modal-titlee" id="exampleModalLongTitle">Comment</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="col-12 mb-4 mt-4"> 
+            {{Form::text('title','',['id'=>'title','class'=>'form-control','placeholder'=>'EnterTitle'])}}<div id="title_error" class="error"></div>
+            {{Form::textarea('reply','',['id'=>'reply','class'=>'form-control','placeholder'=>'Enter cancel request comment','rows'=>5])}} <div id="reply_error" class="error"></div>
+            {{Form::hidden('cancelId','',['id'=>'cancelId'])}} {{Form::button('Submit',['id'=>'reply_submit','class'=>'btn btn-info fr'])}}
+        </div>
+    </div>
+</div>
 @section('js') 
  <script src="{{asset('admin/assets/js/datatable/tables/order-datatable.js')}}"></script>
 
@@ -193,23 +208,84 @@
             });
         });
         
+        
+            $('body').on('click','.updatestats',function(){
+            var id          =   $(this).data('id');
+            var status      =   $("#coupon_status").val();
+            // alert(id);
+            // alert(status);
+            var url         =   '{{url("sales/order/updateStatus")}}';
+            var smsg        =   'Order updated successfully!';
+            
+            swal({
+                title: "Order status change Confirmation",
+                text: "Are you sure want to change status of this order?",
+                // type: "input",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                confirmButtonText: 'Yes'
+            },function(inputValue){
+                if (inputValue == true) { 
+                    updateStatus(id,'',status,url,'sales.order_request','order_status',smsg,smsg);
+                }
+            });
+        });
+        
         $('body').on('click','.plus-minus-toggle', function() {
             $(this).toggleClass('collapsed');
             $('#filtersec').toggle('slow');
         });
+        
+        $('body').on('click','.denyBtn',function(){
+            var id          =   this.id.replace('denyBtn-','');  
+            $('.bd-example-modal-sm .modal-content').html($('#modal_cnt').html()); $('.modal-content #cancelId').val(id);
+        });
+        $('body').on('click', '#reply_submit', function(){ 
+            var res = true;
+           if($('.modal-content #title').val() == ''){ $('.modal-content #title_error').text('Title field is required'); res = false; }else{ $('.modal-content #title_error').text(''); }
+           if($('.modal-content #reply').val() == ''){ $('.modal-content #reply_error').text('Comment field is required'); res = false; }else{ $('.modal-content #reply_error').text(''); }
+           if(res == false) {   return false; }
+            var id          =   $('.modal-content #cancelId').val();  
+            var status      =   'cancel_initiated';     
+            var url         =   '{{url("sales/order/updateStatus")}}';
+            var smsg        =   'Order cancellation initiated successfully!';
+            var desc        =   'Order cancellation initiated by Seller';
+            updateStatus(id,'sales_orders',status,url,'sales.order_request','order_status',smsg,desc); return false;
+        });
 
     });
 
-    function updateStatus(id,rowId,status,url,row,field,smsg){
+    // function updateStatus(id,rowId,status,url,row,field,smsg){
+    //     $.ajax({
+    //         type: "POST",
+    //         url: url,
+    //         data: { "_token": "{{csrf_token()}}", id: id, value: status,field: field, field, page: row, start_date: $('#start_date').val(),
+    //         end_date: $('#date_date').val(),type: 'request'},
+    //         success: function (data) {
+    //             if(field == 'is_deleted'){ 
+    //               $('#active_filter').trigger('change'); toastr.success(smsg);
+    //             }else if(field == 'order_status'){
+    //                 $('#content_list').html(data); toastr.success(smsg); return false;
+    //             }else{ 
+    //                 if($('#active_filter').val() != ''){ $('#active_filter').trigger('change'); }
+    //                 if (data.type == 'warning' || data.type == 'error'){ toastr.error(smsg); }else{ toastr.success(smsg); }
+    //             } 
+    //         }
+    //     });
+    // }
+     function updateStatus(id,rowId,status,url,row,field,smsg,desc){
         $.ajax({
             type: "POST",
             url: url,
-            data: { "_token": "{{csrf_token()}}", id: id, value: status,field: field, field, page: row, start_date: $('#start_date').val(), end_date: $('#date_date').val(),type: 'request'},
+            data: { 
+                    "_token": "{{csrf_token()}}", id: id, value: status,field: field, field, page: row, reply: $('.modal-content #reply').val(), model: rowId,
+                     title: $('.modal-content #title').val(), start_date: $('#start_date').val(), end_date: $('#end_date').val(),type: 'request', desc: desc
+                },
             success: function (data) {
                 if(field == 'is_deleted'){ 
                   $('#active_filter').trigger('change'); toastr.success(smsg);
                 }else if(field == 'order_status'){
-                    $('#content_list').html(data); toastr.success(smsg); return false;
+                    $('#content_list').html(data); $('.bd-example-modal-sm').modal('hide'); toastr.success(smsg); statusEmail(id); return false;
                 }else{ 
                     if($('#active_filter').val() != ''){ $('#active_filter').trigger('change'); }
                     if (data.type == 'warning' || data.type == 'error'){ toastr.error(smsg); }else{ toastr.success(smsg); }

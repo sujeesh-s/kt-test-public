@@ -39,14 +39,18 @@ class AuctionUpdateController extends Controller
         public function auctionsCron()
         { 
 
-        $start_date = date('Y-m-d 00:00:00');
-        $end_date = date('Y-m-d 11:59:00');
+        // $start_date = date('Y-m-d 00:00:00');
+        // $end_date = date('Y-m-d 11:59:00');
+        date_default_timezone_set("Asia/Kolkata");
+        
         $auctions  =   Auction::where(function ($query) { $query->where('is_deleted', '=', NULL)->orWhere('is_deleted', '=', 0);})
         ->where("is_active",1)
         ->where("status","open")
-        ->whereBetween('auct_end', [$start_date, $end_date])
+        ->where('auct_end','=', date('Y-m-d H:i'))
         ->orderBy('id', 'DESC')
         ->get();
+        // echo date('Y-m-d H:i');
+        // dd($auctions);
         $refund_charges             = SettingOther::getOtherSettings();
 
 
@@ -84,8 +88,13 @@ class AuctionUpdateController extends Controller
                 
               }
                 $auct_arr = array();
+                if($winner){
                 $auct_arr['bid_allocated_to'] = $winner->user_id;
-                $auct_arr['sale_id'] = $winner->sale_id;
+                $auct_arr['sale_id'] = $winner->sale_id; 
+                }else{
+                $auct_arr['bid_allocated_to'] = 0;
+                $auct_arr['sale_id'] = 0; 
+                } 
                 $auct_arr['status'] = "processing";
                 $auct_arr['updated_at'] = date("Y-m-d H:i:s");
               
@@ -94,7 +103,7 @@ class AuctionUpdateController extends Controller
                 $to      = 1; 
                 $ntype= 'auction';
                 $title = 'Auction';
-                $desc = 'The winner of '.$row->auction_code.' auction is'.$winner->user_id;
+                $desc = 'The winner of '.$row->auction_code.' auction is'.$auct_arr['bid_allocated_to'];
                 $refId = $row->id;
                 $reflink = 'auctions/log';
                 $notify = 'admin';

@@ -248,17 +248,29 @@ function loadChat (id){
 //   }).hide();
 // });
 
+// $("#myInput").on('keyup', function(){
+//       var value = $(this).val().toLowerCase();
+//       $("#ChatList span").each(function () {
+//          if ($(this).text().toLowerCase().search(value) > -1) {
+//             $(this).show();
+//             $(this).prev('.sspan').last().show();
+//          } else {
+//             $(this).hide();
+//          }
+//       });
+//   })
+
 $("#myInput").on('keyup', function(){
       var value = $(this).val().toLowerCase();
-      $("#ChatList span").each(function () {
+      $("#ChatList .chatname").each(function () {
          if ($(this).text().toLowerCase().search(value) > -1) {
-            $(this).show();
-            $(this).prev('.sspan').last().show();
+            $(this).parents(".parent_a").show();
+            // $(this).prev('.sspan').last().show();
          } else {
-            $(this).hide();
+             $(this).parents(".parent_a").hide();
          }
       });
-   })
+   });
 function imgchange(er){   
     
         var img = $('<img/>', {

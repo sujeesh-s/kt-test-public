@@ -28,6 +28,7 @@ use App\Models\SettingOther;
 use App\Models\CustomerWallet_Model;
 use App\Models\PaymentMethod;
 use App\Models\ParentSale;
+use App\Models\AuctionRefundHist;
 
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
@@ -383,12 +384,19 @@ class AuctionController extends Controller
                             $data['auction_id']      =   $auction->id;
                             $data['product_id']      =   $auction->product_id;
                             $data['product_name']    =   $this->get_content($products->name_cnt_id,$lang);
-                            $data['seller_name']     =   $auction->sellerInfo->fname;
+                           if($auction->sellerInfo){ $data['seller_name']     =   $auction->sellerInfo->fname; } else { $data['seller_name']     =""; }
                             $data['start_date']      =   date('d/m/Y',strtotime($auction->auct_start));;
                             $data['end_date']        =   date('d/m/Y',strtotime($auction->auct_end));;
                             $data['bid_price']       =   $hist->bid_price;
                             $data['currency']        =   getCurrency()->name;
-                            $data['status']          =   $auction->status;  
+                            if($auction->status == 'closed')
+                            {
+                                $data['status']          =   'closed';  
+                            }
+                            else
+                            {
+                                $data['status']          =   'Auction Inprogress'; 
+                            }
                             if($auction->status == 'closed' && $auction->bid_allocated_to == $user_id && $auction->sale_id == $hist->sale_id)  
                             {
                                 $data['winner_status']   =   1; 
@@ -396,6 +404,29 @@ class AuctionController extends Controller
                             else
                             {
                                 $data['winner_status']   =   0; 
+                                if($auction->status == 'closed')
+                                {
+                                    
+                                    $ref_status = AuctionRefundHist::where('auction_id',$hist->auction_id)->where('user_id',$user_id);
+                                    if($ref_status->count() > 0)
+                                    {
+                                        $sts       =   $ref_status->first()->status;
+                                        if($sts == 'completed')
+                                        {
+                                            $refsts = 'Refunded';
+                                        }
+                                        else
+                                        {
+                                            $refsts = 'Refunnd Initiated';
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        $refsts = 'Refunnd Initiated';
+                                    }
+                                    $data['status']          =   $refsts;
+                                }
                             }
                                           
                             $val[] = $data;

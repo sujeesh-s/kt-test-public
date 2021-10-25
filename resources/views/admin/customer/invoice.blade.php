@@ -128,27 +128,42 @@
 												 @endphp
 												@endforeach
               													  @endif
-												
+													@php $currency = getCurrency()->name; @endphp
 												<tr>
 													<td colspan="7" class="font-weight-semibold text-right">Subtotal</td>
-													<td class="text-right">{{ number_format($totals, 2); }}</td>
+													<td class="text-right"> {{$currency}} {{ number_format($order->total, 2); }}</td>
 												</tr>
 												<tr>
 													<td></td>
 													<td class="plabels">Payment Method: <p class="font-weight-semibold ml-1">COD</p></td>
 													<td colspan="5" class="font-weight-semibold text-right">Tax</td>
-													<td class="text-right">{{ number_format($total_tax, 2); }}</td>
+													<td class="text-right">{{$currency}} {{ number_format($order->tax, 2); }}</td>
 												</tr>
 												<tr>
 													<td></td>
 													<td class="plabels">Payment Status:<p class="font-weight-semibold ml-1"> Paid</p></td>
 													<td colspan="5" class="font-weight-semibold text-right">Discount</td>
-													<td class="text-right">{{ number_format($total_disc, 2);  }}</td>
+													<td class="text-right">{{$currency}} {{ number_format($order->discount, 2);  }}</td>
 												</tr>
-
+                                                @if(isset($order->bid_charge) && ($order->bid_charge>0))
+                                                <tr>
+													<td colspan="7" class="font-weight-semibold text-right">Bid Charge </td>
+													<td class=" text-right ">{{$currency}} {{ number_format($order->bid_charge, 2);  }}</td>
+												</tr>
+												 @endif
+												  @if(isset($order->wallet_amount) && ($order->wallet_amount>0))
 												<tr>
-													<td colspan="7" class="font-weight-bold text-uppercase text-right h4 mb-0">Total </td>
-													<td class="font-weight-bold text-right h4 mb-0">{{ number_format($totals+$total_tax-$total_disc, 2);  }}</td>
+													<td colspan="7" class="font-weight-semibold text-right">Wallet Amount </td>
+													<td class=" text-right">{{$currency}} {{ number_format($order->wallet_amount, 2);  }}</td>
+												</tr>
+												 @endif
+												<tr>
+													<td colspan="7" class="font-weight-semibold text-right">Shipping Charge </td>
+													<td class="text-right">{{$currency}} {{ number_format($order->shiping_charge, 2);  }}</td>
+												</tr>
+												<tr>
+													<td colspan="7" class="font-weight-bold text-uppercase text-right h4 mb-0">Net Payable </td>
+													<td class="font-weight-bold text-right h4 mb-0">{{$currency}} {{ number_format($order->g_total, 2);  }}</td>
 												</tr>
 												<tr>
 													<td colspan="8" class="text-right">

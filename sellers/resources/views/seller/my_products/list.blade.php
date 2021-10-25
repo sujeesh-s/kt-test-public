@@ -11,9 +11,10 @@
                <link href="{{URL::asset('admin/assets/plugins/fancyuploder/fancy_fileupload.css')}}" rel="stylesheet" />
 <link href="{{URL::asset('admin/assets/plugins/fileupload/css/fileupload.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{URL::asset('admin/assets/css/chosen.min.css')}}" rel="stylesheet"/>
+
 @endsection
 @section('content') @php $n_img = 1; @endphp
-<style>.modal-sm { max-width: 420px; } .modal-body label{ font-size: 16px; }</style>
+<style>.modal-sm { max-width: 420px; } .modal-body label{ font-size: 16px; } .form-control.img{ padding:3px; } </style>
 <div id="content_list">@include('seller.my_products.list.content')</div>
 <div id="content_detail" class="row no-disp"></div>
 <div id="newAlertModal" style="display: none">   
@@ -188,7 +189,8 @@ ul li.prod_img {
                 data: {imgId :id},
                 url: '{{url("delete/product/image")}}',
                 success: function (data) { 
-                    if(data == 'success'){  toastr.success('Prduct image deleted successfully!'); $('#prdImg-'+id).remove(); }
+                    if(data == 'success'){  toastr.success('Prduct image deleted successfully!');  $('#img_arr_'+id).remove();
+                    $('#prdImg-'+id).remove(); }
                     else{ toastr.error('Somethng went wrong. Please try after some time.'); }
                 } 
             });
@@ -265,6 +267,9 @@ ul li.prod_img {
                                     else if(key == 'error' && value == 'attribute_2_val'){ $('#adminForm #nav_tab_2').trigger('click');
                                         $("#attribute_2_value").html("Attribute values are required.");
                                      }
+                                     else if(key == 'image'){ 
+                                    $('#adminForm #image_0').closest('div').find('.error').html(value);
+                                     $('#adminForm #nav_tab_3').trigger('click'); }
                                 }); 
                                 $('#'+errKey).focus();
                                 $('#adminForm #save_btn').attr('disabled',false); $('#adminForm #save_btn').text('Save'); return false;
@@ -670,7 +675,7 @@ required: "Status field is required."
                                  if($('#hidden_table [name="sku['+opt_name+']['+$(this).data("val")+']"]').val() !=null) {
                                 sku_set = $('#hidden_table [name="sku['+opt_name+']['+$(this).data("val")+']"]').val();
                                  }else { sku_set =0 }
-                            tbody_html += rwpan_s+'<td class="text-center"><input class="form-control" placeholder="Option" value="'+$(this).val()+'" type="text"></td><td class="text-center"><input class="form-control price_field" placeholder="Price" required value="'+price_set+'" name="price['+opt_name+']['+$(this).data("val")+']" type="number"></td><td class="text-center"><input class="form-control" required placeholder="Stock" type="number" value="'+stock_set+'" name="stock['+opt_name+']['+$(this).data("val")+']"></td><td class="text-center"><input class="form-control" placeholder="SKU" value="'+sku_set+'" name="sku['+opt_name+']['+$(this).data("val")+']" type="text"><input type="hidden" class="field_name"  value="['+opt_name+']['+$(this).data("val")+']"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" name="dyn_prds['+$(this).data("val")+']" value="1"><input type="hidden" name="dyn_prds_names['+opt_name+"~"+$(this).data("val")+']" value="'+opt_title+" - "+$(this).val()+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>'+rwpan_e;
+                            tbody_html += rwpan_s+'<td class="text-center"><input class="form-control" placeholder="Option" value="'+$(this).val()+'" type="text"></td><td class="text-center"><input class="form-control price_field" placeholder="Price" max="9999999" required value="'+price_set+'" name="price['+opt_name+']['+$(this).data("val")+']" type="number"></td><td class="text-center"><input class="form-control" required placeholder="Stock" type="number" max="9999999" value="'+stock_set+'" name="stock['+opt_name+']['+$(this).data("val")+']"></td><td class="text-center"><input class="form-control" placeholder="SKU" value="'+sku_set+'" name="sku['+opt_name+']['+$(this).data("val")+']" type="text"><input type="hidden" class="field_name"  value="['+opt_name+']['+$(this).data("val")+']"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" name="dyn_prds['+$(this).data("val")+']" value="1"><input type="hidden" name="dyn_prds_names['+opt_name+"~"+$(this).data("val")+']" value="'+opt_title+" - "+$(this).val()+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>'+rwpan_e;
                             }else {
 
                                 if($('#hidden_table [name="price['+opt_name+']"]').val() !=null) {
@@ -685,7 +690,7 @@ required: "Status field is required."
 
 
 
-                                tbody_html +=rwpan_s+'<td class="text-center"><input class="form-control" placeholder="Option" value="Option" type="text"></td><td class="text-center"><input class="form-control price_field" placeholder="Price" value="'+price_set+'" required name="price['+opt_name+']" type="number"></td><td class="text-center"><input class="form-control" name="stock['+opt_name+']" required placeholder="Stock" value="'+stock_set+'" type="number"></td><td class="text-center"><input class="form-control" placeholder="SKU" value="'+sku_set+'" name="sku['+opt_name+']" type="text"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" class="field_name"  value="['+opt_name+']"><input type="hidden" name="dyn_prds_names['+opt_name+']" value="'+opt_title+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>'+rwpan_e;
+                                tbody_html +=rwpan_s+'<td class="text-center"><input class="form-control" placeholder="Option" value="Option" type="text"></td><td class="text-center"><input class="form-control price_field" placeholder="Price" value="'+price_set+'" max="9999999" required name="price['+opt_name+']" type="number"></td><td class="text-center"><input class="form-control" name="stock['+opt_name+']" max="9999999" required placeholder="Stock" value="'+stock_set+'" type="number"></td><td class="text-center"><input class="form-control" placeholder="SKU" value="'+sku_set+'" name="sku['+opt_name+']" type="text"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" class="field_name"  value="['+opt_name+']"><input type="hidden" name="dyn_prds_names['+opt_name+']" value="'+opt_title+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>'+rwpan_e;
                             }
                             });
                 tbody_html = tbody_html+"</tr></tbody>";
@@ -708,7 +713,7 @@ required: "Status field is required."
                                 sku_set = $('#hidden_table [name="sku['+opt_name+']"]').val();
                                  }else { sku_set =0 }
 
-                                tbody_html +='<td class="text-center"><input class="form-control price_field" required name="price['+opt_name+']" placeholder="Price" value="'+price_set+'" type="number"></td><td class="text-center"><input class="form-control" value="'+stock_set+'" placeholder="Stock" required name="stock['+opt_name+']" type="number"></td><td class="text-center"><input class="form-control"  value="'+sku_set+'" name="sku['+opt_name+']" placeholder="SKU" type="text"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" class="field_name"  value="['+opt_name+']"><input type="hidden" name="dyn_prds_names['+opt_name+']" value="'+opt_title+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>';
+                                tbody_html +='<td class="text-center"><input class="form-control price_field" required name="price['+opt_name+']" placeholder="Price" max="9999999" value="'+price_set+'" type="number"></td><td class="text-center"><input class="form-control" value="'+stock_set+'" placeholder="Stock" max="9999999" required name="stock['+opt_name+']" type="number"></td><td class="text-center"><input class="form-control"  value="'+sku_set+'" name="sku['+opt_name+']" placeholder="SKU" type="text"><input type="hidden" name="dyn_prds['+opt_name+']" value="1"><input type="hidden" class="field_name"  value="['+opt_name+']"><input type="hidden" name="dyn_prds_names['+opt_name+']" value="'+opt_title+'"></td><td><i class="fe fe-edit shipping mr-1"></i></td>';
                            
                            
                 tbody_html = tbody_html+"</tr></tbody>";

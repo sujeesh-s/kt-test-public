@@ -133,16 +133,16 @@
             <div class="card-header"><div class="card-title">Shipping Detail</div></div>
             <div class="card-body">
                 <div class="mb-3">
-                    <div class="text-muted">Shipping Method</div><div class="font-weight-bold">{{$order->shipping->ship_method}}</div>
+                    <div class="text-muted">Shipping Method</div><div class="font-weight-bold">@if($order->shipping) {{$order->shipping->ship_method}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Amount</div><div class="font-weight-bold">{{$currency}} {{$order->shipping->price}}</div>
+                    <div class="text-muted">Amount</div><div class="font-weight-bold">@if($order->shipping) {{$currency}} {{$order->shipping->price}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Weight</div><div class="font-weight-bold">{{$order->shipping->weight}}</div>
+                    <div class="text-muted">Weight</div><div class="font-weight-bold">@if($order->shipping) {{$order->shipping->weight}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Shipping Status</div><div class="font-weight-bold">{{$order->shipping->ship_status}}</div>
+                    <div class="text-muted">Shipping Status</div><div class="font-weight-bold">@if($order->shipping) {{$order->shipping->ship_status}} @endif</div>
                 </div>
             </div>
         </div>

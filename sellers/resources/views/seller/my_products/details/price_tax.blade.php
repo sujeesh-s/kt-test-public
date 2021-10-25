@@ -26,7 +26,7 @@
             {{Form::number('price[sale_price]',$sPrice,['id'=>'sale_price','class'=>'form-control ','placeholder'=>'Sale Price','max'=>9999999999])}}
             <span class="error"></span>
         </div>
-    </div> 
+    </div> <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('sale_start_date','Sale From Date',['class'=>''])}}
@@ -49,7 +49,7 @@
             
             <span class="error"></span>
         </div>
-    </div> 
+    </div> <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('tax','Tax',['class'=>''])}}

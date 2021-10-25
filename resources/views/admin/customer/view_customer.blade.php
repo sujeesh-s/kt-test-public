@@ -153,26 +153,24 @@
 													<h5 class="font-weight-bold">Address</h5>
 													
 													<div class="main-profile-contact-list d-lg-flex">
-														<div class="media mr-5">
-															<div class="media-icon bg-danger text-white mr-4">
-																<i class="fa fa-briefcase"></i>
-															</div>
-															<div class="media-body">
-																<h6 class="font-weight-bold mb-1">Home Address </h6>
-																<span>2008vv</span>
-																<p>Cac Lorem lupsm artitoselm</p>
-															</div>
-														</div>
-                                                        <div class="media mr-5">
-															<div class="media-icon bg-danger text-white mr-4">
-																<i class="fa fa-briefcase"></i>
-															</div>
-															<div class="media-body">
-																<h6 class="font-weight-bold mb-1">Office address</h6>
-																<span>57668</span>
-																<p>Cac Lorem lupsm artitoselm</p>
-															</div>
-														</div>
+														@if($customer_addr && count($customer_addr)>0)
+													
+														@foreach($customer_addr as $address)
+
+																<div class="media-body">
+																<h6 class="font-weight-bold mb-1">{{ $address->name }}</h6>
+																<span>{{ $address->address_1}}</span>
+																<span>{{ $address->address_2}}</span>
+																<p>{{ implode(", ",getCities($address->city_id)) }} <br> {{ $address->pincode }}</p>
+																
+																</div>
+
+																
+
+														@endforeach
+														@else
+													    <div class="media-body">	<p>No Address found.</p> </div>
+														@endif
 													</div>
 												</div>
 

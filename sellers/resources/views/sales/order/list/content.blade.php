@@ -48,6 +48,7 @@
                                                     <td><span class="badge badge-{{$pstat}} mt-2">{{ucfirst($row->payment_status)}}</span></td>
                                                     <td><span class="badge badge-{{$ostat}} mt-2">{{ucfirst($row->order_status)}}</span></td>
                                                     <td class="text-center">
+                                                           @if($row->order_status =="accepted" || $row->order_status =="pending"  ) <button id="denyBtn-{{$row->id}}" class="mr-2 btn btn-danger btn-sm denyBtn" data-val="cancel_initiated" data-toggle="modal" data-target=".bd-example-modal-sm"><i class="fa fa-ban mr-1"></i>Cancel</button> @endif
                                                         <button id="editBtn-{{$row->id}}" class="mr-2 btn btn-success btn-sm editBtn"><i class="fa fa-file mr-1"></i></i>Invoice</button>
                                                     </td> 
                                             @endforeach

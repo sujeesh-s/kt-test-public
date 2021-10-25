@@ -87,29 +87,29 @@
 																@if($products && count($products) > 0)
                     											@foreach($products as $row)
 																<tr>
-																	<td class="align-middle select-checkbox" id="moduleid" data-value="{{$row['id']}}">
+																	<td class=" select-checkbox" id="moduleid" data-value="{{$row['id']}}">
 																		<label class="custom-control custom-checkbox">
 																			
 																			<!--{{ $loop->iteration }}-->
 																		</label>
 																	</td>
-																	<td class="align-middle" >
+																	<td class="" >
 																		<div class="d-flex">
 																		<p>{{$row['title']}}</p>
 																	</div>
 																	</td>
 
-																	<td class="align-middle" >
+																	<td class="" >
 																		<div class="d-flex">
 																			<p>{{date('Y-m-d H:i A', strtotime($row['start_time']))}}</p>
 																		</div>
 																	</td>
-																	<td class="align-middle" >
+																	<td class="" >
 																		<div class="d-flex">
 																			<p>{{date('Y-m-d H:i A', strtotime($row['end_time']))}}</p>
 																		</div>
 																	</td>
-																	<td class="align-middle" >
+																	<td class="" >
 																		@if(isset($row['products']) && $row['products'] !="")
 																		@php $disabled_status = 0; @endphp
 																		<div class="d-flex">
@@ -128,7 +128,7 @@
 																		</div>
 																		@endif
 																	</td>
-																	<td class="text-nowrap align-middle"  data-search="@if($row['is_active'] ==1){{ "Active" }}@else{{ "Inactive" }}@endif">
+																	<td class="text-nowrap"  data-search="@if($row['is_active'] ==1){{ "Active" }}@else{{ "Inactive" }}@endif">
 																		
 																	<div class="switch">
 																	<input class="switch-input status-btn ser_status" data-selid="{{$row['prd_sale_id']}}"  id="status-{{$row['prd_sale_id']}}" @if($disabled_status ==1) {{ 'disabled' }} @endif type="checkbox"  @if($row['is_active'] ==1) {{ "checked" }} @endif >

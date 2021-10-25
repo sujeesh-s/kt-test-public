@@ -72,7 +72,7 @@
             
             <span class="error"></span>
         </div>
-    </div>
+    </div><div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('sub_category_id','Sub Category',['class'=>''])}} <span class="text-red">*</span>
@@ -88,7 +88,7 @@
             {{Form::select('prd[brand_id]',$brands,$brandId,['id'=>'brand_id','class'=>'form-control admin', 'placeholder'=>'Select Brand'])}}
             <span class="error"></span>
         </div>
-    </div>
+    </div><div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('short_desc','Short Description',['class'=>''])}} <span class="text-red">*</span>

@@ -431,6 +431,7 @@ class SellerController extends Controller
             $destinationPath    =   storage_path($path);
             $image->move($destinationPath, $imgName);
             $imgData[$k]        =   $path.'/'.$imgName;
+            $imgUpload          =   uploadFile($path,$imgName);
             Store::where('id',$storeId)->update($imgData);
         } }
       

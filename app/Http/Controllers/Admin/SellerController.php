@@ -104,8 +104,28 @@ class SellerController extends Controller{
         $data['title']              =   'New Seller Request List';
         $data['menuGroup']          =   'userGroup';
         $data['menu']               =   'seller';
+        $data['active']         =   ''; 
         $data['sellers']            =   SellerInfo::where('is_approved','!=',1)->where('is_deleted',0)->orderBy('id','desc')->get();
         return view('admin.new_seller.list',$data);
+    }
+    
+     public function newSellersFilter(Request $request)
+    { 
+        $input = $request->all();
+        // dd($input);
+        $data['title']              =   'New Seller Request List';
+        $data['menuGroup']          =   'userGroup';
+        $data['menu']               =   'seller';
+        $sellers           =   SellerInfo::where('is_deleted',0);
+        if(isset($request->active)     &&  $request->active != ''){ 
+        $sellers                =   $sellers->where('is_approved',$request->active); 
+        $data['active']         =   $request->active;
+        }else{
+         $sellers                =   $sellers->where('is_approved','!=',1);
+         $data['active']         =   '';   
+        }
+         $data['sellers']            =  $sellers->orderBy('id','desc')->get();
+        return view('admin.new_seller.list.content',$data);
     }
     
     function seller(Request $request, $id=0,$type=''){

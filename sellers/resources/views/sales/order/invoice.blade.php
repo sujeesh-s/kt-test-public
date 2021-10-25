@@ -22,13 +22,13 @@
                             <div class=""><i class="fa fa-map mr-1"></i>{{$order->address->address1}}<br />{{$order->address->address2}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->city}}</div>
+                            <div class="">@if($order->address->bcity) {{$order->address->bcity->city_name}} @endif</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->state}}</div>
+                            <div class="">@if($order->address->bstate) {{$order->address->bstate->state_name}} @endif</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->country}}</div>
+                            <div class="">@if($order->address->bcountry) {{$order->address->bcountry->country_name}} @endif</div>
                         </div>
                         <div class="pl-4">
                             <div class="">{{$order->address->zip_code}}</div>
@@ -52,13 +52,13 @@
                             <div class=""><i class="fa fa-map mr-1"></i>{{$order->address->s_address1}}<br />{{$order->address->s_address2}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->s_city}}</div>
+                            <div class="">@if($order->address->scity) {{$order->address->scity->city_name}} @endif</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->s_state}}</div>
+                            <div class="">@if($order->address->sstate) {{$order->address->sstate->state_name}} @endif</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->s_country}}</div>
+                            <div class="">@if($order->address->scountry) {{$order->address->scountry->country_name}} @endif</div>
                         </div>
                         <div class="pl-4">
                             <div class="">{{$order->address->s_zip_code}}</div>
@@ -114,10 +114,22 @@
                                     <th colspan="4" class="text-right">Tax</th>
                                     <th class="text-right">{{$currency}} {{$order->tax}}</th>
                                 </tr>
+                                @if(isset($order->bid_charge) && ($order->bid_charge>0))
+                                <tr>
+                                    <th colspan="4" class="text-right">Bid Charge</th>
+                                    <th class="text-right">{{$currency}} {{$order->bid_charge}}</th>
+                                </tr>
+                                @endif
                                 <tr>
                                     <th colspan="4" class="text-right">Discount</th>
                                     <th class="text-right">{{$currency}} {{$order->discount}}</th>
                                 </tr>
+                                @if(isset($order->wallet_amount) && ($order->wallet_amount>0))
+                                <tr>
+                                    <th colspan="4" class="text-right">Wallet Amount</th>
+                                    <th class="text-right">{{$currency}} {{$order->wallet_amount}}</th>
+                                </tr>
+                                 @endif
                                 <tr>
                                     <th colspan="4" class="text-right">Shiping Charge</th>
                                     <th class="text-right">{{$currency}} {{$order->shiping_charge}}</th>

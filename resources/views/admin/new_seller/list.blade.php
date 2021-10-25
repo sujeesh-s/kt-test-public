@@ -53,6 +53,22 @@
             
             
         });
+        $('body').on('change','#active_filter',function(){ 
+            
+            
+             $.ajax({
+            type: "POST",
+            url: '{{url("admin/new-sellers")}}',
+            data: { active:this.value,'_token': '{{ csrf_token()}}'},
+            success: function (data) { 
+            console.log(data);
+             $('#content_list').html(data);  $('#content_list').fadeIn(700); $('#content_detail').hide(); ;
+                return false;
+            
+            } 
+        });
+        
+        });
         $('body').on('submit','#adminForm',function(e){ 
             
                     if($('#adminForm #can_submit').val() > 0){ return true; }

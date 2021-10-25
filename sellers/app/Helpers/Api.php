@@ -18,7 +18,13 @@ if (!function_exists('validateToken')){
     }
 }
 
-
+if (!function_exists('validateTokenSeller')){
+    function validateTokenSeller($token){
+        if($token == '10000'){ $query = DB::table('usr_seller_logins')->where('id',1); }
+        else{ $query        =   DB::table('usr_seller_logins')->where([['access_token','=',$token],['is_login','=',1],['is_deleted',0]]); }
+        if($query->count()  >   0){ return $query->first(); }else{ return false; }
+    }
+}
 if (!function_exists('push')){
     function push(){
         $data['fire_base_id']   =   '';

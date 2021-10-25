@@ -15,11 +15,11 @@
 													</div>
 												</div>
 												
-												<div class="main-chat-list" id="ChatList">
+												<div class="main-chat-list" id="ChatList" style="min-height:300px;">
 													@if(count($list)>0)
 													@foreach($list as $row)
 													@php $view=$row['chat_id']; @endphp
-													<a href="#" id="viewBtn-@php echo $view @endphp" onclick="loadChat({{$view}})">
+													<a href="#" id="viewBtn-@php echo $view @endphp" class="parent_a" onclick="loadChat({{$view}})">
 														@if($row['chat_id']==$chat_id_latest)
 														<input type="hidden" name="chat_categories" id="chat_categories" class="chat_categories" value="{{$chat_id_latest}}">
 														<div class="media selected">
@@ -36,7 +36,7 @@
 															</div>
 															<div class="media-body" id="media-body">
 																<div class="media-contact-name" id="media-contact-name">
-																	<span class=".sspan">{{$row['cust_name']}}</span> 
+																	<span class=".sspan chatname">{{$row['cust_name']}}</span> 
 																	<span>{{$row['last_msg_on']}}</span>
 																</div>
 																<p style="white-space: nowrap; width: 100px; overflow: hidden;text-overflow: ellipsis;">{{$row['latest_msg']}}</p>

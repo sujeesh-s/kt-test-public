@@ -207,12 +207,12 @@
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																			<p>{{date('Y-m-d', strtotime($row['auct_start']))}}</p>
+																			<p>{{date('Y-m-d H:i:s', strtotime($row['auct_start']))}}</p>
 																		</div>
 																	</td>
 																	<td class="align-middle" >
 																		<div class="d-flex">
-																			<p>{{date('Y-m-d', strtotime($row['auct_end']))}}</p>
+																			<p>{{date('Y-m-d H:i:s', strtotime($row['auct_end']))}}</p>
 																		</div>
 																	</td>
 																	<td class="align-middle" >

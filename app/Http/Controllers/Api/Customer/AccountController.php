@@ -435,6 +435,7 @@ class AccountController extends Controller
                                     }
                                      $data['auction_status']=   'False';
                                      $data['bid_charge']    =   0;
+                                    
                                      $saddr['address_type'] = $adddr->stype->usr_addr_typ_name;
                                      $saddr['name']         = $adddr->s_name; 
                                      $saddr['phone']        = $adddr->s_phone; 

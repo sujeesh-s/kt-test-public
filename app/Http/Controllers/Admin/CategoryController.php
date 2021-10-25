@@ -228,6 +228,20 @@ class CategoryController extends Controller
         return redirect(route('admin.category'));
 
     }  
+      public function subcat_sort_order(Request $request)
+    {
+        $id_ary = explode(",",$request->row_order);
+       
+        for($i=1;$i<=count($id_ary);$i++) 
+        {
+            Subcategory::where('subcategory_id', $id_ary[$i-1])
+            ->update(['sort_order' => $i]);
+            
+        }
+        Session::flash('message', ['text'=>'Sorted successfully','type'=>'success']);
+        return redirect(route('admin.subcategory'));
+
+    } 
     
     public function view_category($cat_id)
     {
@@ -432,6 +446,7 @@ class CategoryController extends Controller
         $data['menu']               =   'SubCategory';
         $data['active']             =   '';
         $data['category']           =    Subcategory::where('is_deleted',NULL)->orWhere('is_deleted',0)->orderBy('subcategory_id','DESC')->get();
+        $data['subcategory_sort']      =    Subcategory::where('is_deleted',NULL)->orWhere('is_deleted',0)->orderBy('sort_order')->get();
         return view('admin.master.subcategory_list',$data);
     }
     public function delete_subcategory()

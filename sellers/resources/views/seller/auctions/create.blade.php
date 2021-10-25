@@ -8,7 +8,7 @@
 		<link href="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.css')}}" rel="stylesheet" />
 		<link href="{{URL::asset('admin/assets/css/combo-tree.css')}}" rel="stylesheet" />
 		<link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.0.45/css/materialdesignicons.min.css">
-		<link href="{{URL::asset('admin/assets/css/datepicker.css')}}" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="{{URL::asset('admin/assets/css/bootstrap-datetimepicker.min.css')}}">
 @endsection
 @section('page-header')
 						<!--Page header-->
@@ -139,12 +139,21 @@
 																		<div class="form-group">
 																			<label class="form-label">Start Date <span class="text-red">*</span></label>
 																			
-																			<div id="valid_from"  class="datepicker input-group date"
-																			data-date-format="yyyy-mm-dd">
-																			<input class="form-control" name="auct_start" type="text" readonly  onchange="date_check()" />
-																			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-																			</div>
+																			<!--<div id="valid_from"  class="datepicker input-group date"-->
+																			<!--data-date-format="yyyy-mm-dd">-->
+																			<!--<input class="form-control" name="auct_start" type="text" readonly  onchange="date_check()" />-->
+																			<!--<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>-->
+																			<!--</div>-->
+																			
+                                                                            <div class="input-group date" id="auct_start" data-target-input="nearest">
+                                                                            <input type="text" class="form-control datetimepicker-input" name="auct_start" data-target="#auct_start"  />
+                                                                            <div class="input-group-append" data-target="#auct_start" data-toggle="datetimepicker">
+                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                            </div>
+                                                                            </div>
+
 																		</div>
+																		<p style="color: red" id="errNm3"></p>
 																		@error('auct_start')
 																	<p style="color: red" class="error">{{ $message }}</p>
 																	@enderror
@@ -155,12 +164,19 @@
 																		<div class="form-group">
 																			<label class="form-label">End Date <span class="text-red">*</span></label>
 																			
-																			<div id="valid_to" class="datepicker input-group date"
-																			data-date-format="yyyy-mm-dd">
-																			<input class="form-control"  name="auct_end" type="text" readonly  onchange="date_check()" />
-																			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-																			</div>
+																			<!--<div id="valid_to" class="datepicker input-group date"-->
+																			<!--data-date-format="yyyy-mm-dd">-->
+																			<!--<input class="form-control"  name="auct_end" type="text" readonly  onchange="date_check()" />-->
+																			<!--<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>-->
+																			<!--</div>-->
+                                                                            <div class="input-group date" id="auct_end" data-target-input="nearest">
+                                                                            <input type="text" class="form-control datetimepicker-input" name="auct_end" data-target="#auct_end"  />
+                                                                            <div class="input-group-append" data-target="#auct_end" data-toggle="datetimepicker">
+                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                            </div>
+                                                                            </div>
 																		</div>
+																		<p style="color: red" id="errNm4"></p>
 																		@error('auct_end')
 																	<p style="color: red" class="error">{{ $message }}</p>
 																	@enderror
@@ -237,7 +253,8 @@
 @section('js')
 		<!-- INTERNAl Data tables -->
 <script src="{{URL::asset('admin/assets/js/jquery.validate.min.js')}}"></script>
-
+<script type="text/javascript" src="{{URL::asset('admin/assets/js/moment.js')}}"></script>
+<script src="{{URL::asset('admin/assets/js/bootstrap-datetimepicker.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/datatables.js')}}"></script>
 	<!-- INTERNAL Popover js -->
 		<script src="{{URL::asset('admin/assets/js/popover.js')}}"></script>
@@ -249,8 +266,37 @@
 		<script src="{{URL::asset('admin/assets/js/sweet-alert.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/comboTreePlugin.js')}}"></script>
 <script type="text/javascript">
-	jQuery(document).ready(function(){
 
+
+$(function () {                
+$('#auct_start').datetimepicker({
+format: 'YYYY-MM-DD HH:mm',
+minDate: moment()
+});
+
+$('#auct_end').datetimepicker({
+format: 'YYYY-MM-DD HH:mm',
+minDate: moment(),
+useCurrent: false //Important! See issue #1075
+});
+
+$("#auct_start").on("dp.change", function (e) {
+$("#errNm3").empty();
+$('#auct_end').data("DateTimePicker").minDate(e.date);
+});      
+
+$("#auct_end").on("dp.change", function (e) {
+$("#errNm4").empty();
+// $('#auct_start').data("DateTimePicker").maxDate(e.date);
+});
+});
+
+jQuery(document).ready(function(){
+
+jQuery.validator.addMethod("greaterStart", function (value, element, params) {
+
+    return this.optional(element) || new Date(value) >= new Date($("["+params+"]").val());
+},'End Date must be greater than start date.');
 
 $("#frontval").click(function(){
 
@@ -278,7 +324,8 @@ required: true
 },
 
 auct_end: {
-required: true
+required: true,
+greaterStart: 'name="auct_start"'
 },
 min_bid_price: {
 required: true,
@@ -332,6 +379,12 @@ required: "Status is required."
                 
             }else if (element.attr("name") == "product_id" ) {
                 $("#errNm2").text($(error).text());
+                
+            }else if (element.attr("name") == "auct_start" ) {
+                $("#errNm3").text($(error).text());
+                
+            }else if (element.attr("name") == "auct_end" ) {
+                $("#errNm4").text($(error).text());
                 
             }else {
                error.insertAfter(element)

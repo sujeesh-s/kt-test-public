@@ -6,6 +6,7 @@
         <div id="prdImg-{{$img->id}}" class="col-md-3 col-sm-6 mb-3 fl imgDiv">
             <img class="prdImg" src="{{config('app.storage_url').$img->thumb}}" alt="Product Image" height="120px" />
             <i id="del-img-{{$img->id}}" class="fa fa-trash del-img" aria-hidden="true"></i>
+             {{Form::hidden('imgArr[]',0,['id'=>'img_arr_'.$img->id])}}
         </div>
         @endforeach
     </div>
@@ -16,6 +17,7 @@
                 <div class="form-group">
                     {{Form::hidden('imgId[]',0,['id'=>'img_id_'.$n_img])}}
                     {{Form::file('image[]',['id'=>'image_'.$n_img,'class'=>'form-control img','placeholder'=>'Choose Image','accept'=>'image/*'])}}
+                     <span class="error"></span>
                 </div>
             </div>
         <div class="col-lg-5 col-8 fl">
@@ -49,7 +51,7 @@
         </div>
         <div class="col-lg-5 col-8 fl">
             <div class="form-group">
-                <img src="" alt="Image" id="image_disp_id" class="no-disp" />
+                <img src="" alt="Image" id="image_disp_id" class="no-disp" height="90" />
             </div>
         </div>
         <div class="col-lg-1 col-2 pl-0 mb-2 fl">
@@ -62,7 +64,8 @@
     </div>
 </div>
 
-<div class="card-header mb-4"><div class="card-title">Product Video</div></div>
+<div class="card-header mb-4"><div class="card-title">Product Video<br></div></div>
+<p>(Video Types: mp4, mpeg, mov, avi, flv. Max: Size: 30MB) </p>
 <div class="row">
     
     <?php if(isset($videos)){ $video_link = config('app.storage_url').$videos->video;  }else { $video_link = ""; } ?>

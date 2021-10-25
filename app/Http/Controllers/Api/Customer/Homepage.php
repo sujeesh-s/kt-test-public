@@ -16,6 +16,7 @@ use App\Models\UserRoles;
 use App\Models\Admin;
 use App\Models\Auction;
 use App\Models\AuctionHist;
+use App\Models\AssociatProduct;
 use App\Models\UserRole;
 use App\Models\Category;
 use App\Models\Cart;
@@ -54,7 +55,7 @@ class Homepage extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -212,6 +213,7 @@ class Homepage extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;    
                     $prd_list['product_id']=$row->id;
                     $prd_list['product_name']=$row->get_content($row->name_cnt_id,$lang_id);
                     $prd_list['category_id']=$row->category_id;
@@ -232,13 +234,15 @@ class Homepage extends Controller
                     $prd_list['seller_id']=$row->seller_id;
                     if($row->product_type==1)
                     {
+                    $prd_list['product_type']='simple';    
                     $prd_list['price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     }
                     else
                     {
-                     $prd_list['price']='';
-                    $prd_list['sale_price']='';   
+                        $prd_list['product_type']='config'; 
+                     $prd_list['price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);   
                     }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
                     $prd_list['rating']=$this->get_rates($row->id);
@@ -267,6 +271,7 @@ class Homepage extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $d_list['service_status']=$store_active->service_status;    
                     $d_list['product_id']=$row->id;
                     $d_list['product_name']=$row->get_content($row->name_cnt_id,$lang_id);
                     $d_list['category_id']=$row->category_id;
@@ -287,13 +292,15 @@ class Homepage extends Controller
                     $d_list['seller_id']=$row->seller_id;
                     if($row->product_type==1)
                     {
+                    $d_list['product_type']='simple';    
                     $d_list['price']=number_format($row->prdPrice->price,2);
                     $d_list['sale_price']=$this->get_sale_price($row->id);
                     }
                     else
                     {
-                    $d_list['price']='';
-                    $d_list['sale_price']=''; 
+                    $d_list['product_type']='config';     
+                    $d_list['price']=$this->config_product_price($row->id);
+                    $d_list['sale_price']=$this->get_sale_price($row->id); 
                     }
                     $d_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
                     $d_list['rating']=$this->get_rates($row->id);
@@ -324,14 +331,27 @@ class Homepage extends Controller
 
 
             //Shocking sales
+            //Shocking sales
             $shock_data=[];
             $current_date=Carbon::now();
             $shock = PrdShock_Sale::join('prd_shock_sale_products','prd_shock_sale.id','=','prd_shock_sale_products.shock_sale_id')
             ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->whereDate('prd_shock_sale.start_time','<=',$current_date)->whereDate('prd_shock_sale.end_time','>=',$current_date)
             ->where('prd_shock_sale_products.is_active',1)->where('prd_shock_sale_products.is_deleted',0)
-            ->select('prd_shock_sale.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->get();
+            ->select('prd_shock_sale.*','prd_shock_sale_products.seller_id','prd_shock_sale_products.prd_id as shock_prd_id')->
+            get();
+            $shock_page_data=[];
             if(count($shock)>0)
             {
+                $usr_visit =UserVisit::create([
+                            'org_id' =>1,
+                            'device_id'=>$request->device_id,
+                            'is_login'=>$login,
+                            'os'=>$request->os_type,
+                            'url'=>$request->page_url,
+                            'visited_on'=>date("Y-m-d H:i:s"),
+                            'created_at'=>date("Y-m-d H:i:s"),
+                            'updated_at'=>date("Y-m-d H:i:s")]);
+                            
             foreach($shock as $rows)
             {
                 $store_active = Store::where('is_active',1)->where('seller_id',$rows->seller_id)->first();
@@ -339,7 +359,7 @@ class Homepage extends Controller
                     {
                 foreach(explode(',',$rows->shock_prd_id) as $shock_rows)
                 {
-                    $valid_prduct = Product::where('id',$shock_rows)->where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->first();
+                    $valid_prduct = Product::where('id',$shock_rows)->where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->first();
                     if($valid_prduct){
                     $category_cid = $rows->category_data($rows->product_data($shock_rows)->category_id)->cat_name_cid;
                     $subcategory_cid = $rows->subcategory_data($rows->product_data($shock_rows)->sub_category_id)->sub_name_cid;
@@ -347,7 +367,16 @@ class Homepage extends Controller
                     {
                      $brand_cid = $rows->brand_data($rows->product_data($shock_rows)->brand_id)->brand_name_cid;
                     }
-                    $actual_price = $rows->price_data($shock_rows)->price;
+                    if($valid_prduct->product_type==1)
+                    {
+                        $a_price =$rows->price_data($shock_rows)->price;
+                    }
+                    else
+                    {
+                        $a_price =$this->config_product_price($shock_rows);
+                    }
+                    $actual_price = $a_price;
+                $shock_list['service_status']=$store_active->service_status;    
                 $shock_list['shock_sale_id']=$rows->id;
                 $shock_list['shock_sale_title']=$this->get_content($rows->title_cid,$lang_id);
                 $shock_list['product_id']=$shock_rows;
@@ -366,6 +395,8 @@ class Homepage extends Controller
                 $shock_list['end_time']=$rows->end_time;
                 $shock_list['actual_price']=$actual_price;
                 //$actual_price=$rows->Product->prdPrice->price;
+                if($valid_prduct->product_type==1)
+                    {
                 if($rows->discount_type=="percentage")
                 {
                     $shock_list['offer']=$rows->discount_value."% OFF";
@@ -380,27 +411,41 @@ class Homepage extends Controller
                     $ofr_price=(float)$actual_price-(float)$rows->discount_value;
                     $shock_list['offer_price']=number_format($ofr_price,2);
                 }
-
+                    }
+                    
+                    else
+                    {
+                       if($rows->discount_type=="percentage")
+                {
+                    $shock_list['offer']='';
+                    $shock_list['offer_price']='';
+                }
+                else
+                {
+                    $shock_list['offer']='';
+                    $shock_list['offer_price']='';
+                } 
+                    }
                 $shock_list['rating']=$this->get_rates($shock_rows);
                 $shock_list['seller']=$rows->Store($rows->seller_id)->store_name;
                 $shock_list['image']=$this->get_product_image($shock_rows);
                 
                     $shock_data[]=$shock_list;
-                }//end valid prod
+                    }//end valid
                   }
                   
             }//Active store
-                  
                 }
                     $order = array_column($shock_data, 'rating');
 
                     array_multisort($order, SORT_DESC, $shock_data);
+                    $shock_page = $this->paginate($shock_data);
+                    $shock_page_data = $shock_page->items();
             }
             else
             {
                 $shock_data=[];
             }
-
             //Auction
             $auction_data=[];
             $current_date=Carbon::now();
@@ -427,6 +472,7 @@ class Homepage extends Controller
                 {
                     $highest_bid ='';
                 }
+                $auction_list['service_status']=$store_active->service_status;    
                 $auction_list['auction_id']=$rows->id;
                 $auction_list['auction_code']=$rows->auction_code;
                 $auction_list['product_id']=$rows->product_id;
@@ -446,7 +492,12 @@ class Homepage extends Controller
                 $auction_list['short_desc']=$this->get_content($rows->Product->short_desc_cnt_id,$lang_id);
                 $auction_list['start_date']=$rows->auct_start;
                 $auction_list['end_date']=$rows->auct_end;
+                if($rows->Product->product_type==1){
                 $auction_list['price']=number_format($rows->Product->prdPrice->price,2);
+                }
+                else{
+                    $auction_list['price']=$this->config_product_price($rows->product_id);
+                }
                 $auction_list['sale_price']=$this->get_sale_price($rows->product_id);
                 $auction_list['min_bid_price']=$rows->min_bid_price;
                 $auction_list['latest_bid_amt']=$highest_bid;
@@ -487,6 +538,7 @@ class Homepage extends Controller
                 $store_list['store_id']=$str->id;
                 $store_list['seller_id']=$str->seller_id;
                 $store_list['store_name']=$str->store_name;
+                $store_list['service_status']=$str->service_status;
                 $store_list['store_rating']=$this->get_seller_rating($str->seller_id);
                 $store_list['store_prd_rating']=$this->get_seller_product_rating($str->seller_id);
                 $store_list['total_products']=$total_seller_prds;
@@ -543,9 +595,11 @@ class Homepage extends Controller
             if(!empty($search_dir))
             {
             foreach($search_dir as $dir)
-            {   
+            {  
+                if(strlen($dir->keyword)>2){
                 if($dir->type_name!='brand')
                 {
+                //$dir_list['length']  =  strlen($dir->keyword);
                 $dir_list['keyword']= ucwords($dir->keyword);
                 $dir_list['keyword_id']=$dir->type_id;
                 $dir_list['keyword_type']=$dir->type_name;
@@ -562,6 +616,7 @@ class Homepage extends Controller
                     $dir_list['url']=url('/api/customer/product-subcategory');
                 }
                 $most_search[]    = $dir_list;
+                }
                 }
             }
             foreach($search_dir as $dir1)
@@ -662,7 +717,7 @@ class Homepage extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -675,7 +730,8 @@ class Homepage extends Controller
         }
 
            //Shocking sales
-           $shock_data=[];
+           //Shocking sales
+            $shock_data=[];
             $current_date=Carbon::now();
             $shock = PrdShock_Sale::join('prd_shock_sale_products','prd_shock_sale.id','=','prd_shock_sale_products.shock_sale_id')
             ->where('prd_shock_sale.is_active',1)->where('prd_shock_sale.is_deleted',0)->whereDate('prd_shock_sale.start_time','<=',$current_date)->whereDate('prd_shock_sale.end_time','>=',$current_date)
@@ -710,7 +766,16 @@ class Homepage extends Controller
                     {
                      $brand_cid = $rows->brand_data($rows->product_data($shock_rows)->brand_id)->brand_name_cid;
                     }
-                    $actual_price = $rows->price_data($shock_rows)->price;
+                    if($valid_prduct->product_type==1)
+                    {
+                        $a_price =$rows->price_data($shock_rows)->price;
+                    }
+                    else
+                    {
+                        $a_price =$this->config_product_price($shock_rows);
+                    }
+                    $actual_price = $a_price;
+                $shock_list['service_status']=$store_active->service_status;    
                 $shock_list['shock_sale_id']=$rows->id;
                 $shock_list['shock_sale_title']=$this->get_content($rows->title_cid,$lang_id);
                 $shock_list['product_id']=$shock_rows;
@@ -729,6 +794,8 @@ class Homepage extends Controller
                 $shock_list['end_time']=$rows->end_time;
                 $shock_list['actual_price']=$actual_price;
                 //$actual_price=$rows->Product->prdPrice->price;
+                if($valid_prduct->product_type==1)
+                    {
                 if($rows->discount_type=="percentage")
                 {
                     $shock_list['offer']=$rows->discount_value."% OFF";
@@ -743,7 +810,21 @@ class Homepage extends Controller
                     $ofr_price=(float)$actual_price-(float)$rows->discount_value;
                     $shock_list['offer_price']=number_format($ofr_price,2);
                 }
-
+                    }
+                    
+                    else
+                    {
+                       if($rows->discount_type=="percentage")
+                {
+                    $shock_list['offer']='';
+                    $shock_list['offer_price']='';
+                }
+                else
+                {
+                    $shock_list['offer']='';
+                    $shock_list['offer_price']='';
+                } 
+                    }
                 $shock_list['rating']=$this->get_rates($shock_rows);
                 $shock_list['seller']=$rows->Store($rows->seller_id)->store_name;
                 $shock_list['image']=$this->get_product_image($shock_rows);
@@ -845,7 +926,13 @@ class Homepage extends Controller
 
 
         $filter_id =$request->category_id;
-
+        
+        $products_p = [];
+        $products_c=[];
+        $products_s=[];
+        $products_b=[];
+        $products_t=[];
+        $product_collect =[];
         if($filter_id!='')
         {
         $data_product = DB::table('cms_content')
@@ -896,7 +983,7 @@ class Homepage extends Controller
         ->where('cms_content.content', 'Like', '%' . $request->keyword . '%')
         ->get();
      }
-
+      
         if(count($data_product)>0)
         {
             foreach($data_product as $key)
@@ -904,7 +991,7 @@ class Homepage extends Controller
                 $arrays=$this->get_search_products($key->id,$category='',$subcategory='',$brand='',$tag='',$request->lang_id,$request->keyword,$user_id);
                 if($arrays!='' && !empty($arrays))
                 {
-                    $products=$arrays;
+                    $products_p=collect($arrays);
                 }
             }
         }
@@ -917,7 +1004,7 @@ class Homepage extends Controller
                 $arrays=$this->get_search_products($prd_id='',$row->category_id,$subcategory='',$brand='',$tag='',$request->lang_id,$request->keyword,$user_id);
                 if($arrays!='' && !empty($arrays))
                 {
-                    $products=$arrays;
+                    $products_c=collect($arrays);
                 }
                }
             }
@@ -932,7 +1019,7 @@ class Homepage extends Controller
                 $arrays=$this->get_search_products($prd_id='',$category='',$row->subcategory_id,$brand='',$tag='',$request->lang_id,$request->keyword,$user_id);
                 if($arrays!='' && !empty($arrays))
                 {
-                    $products=$arrays;
+                    $products_s=collect($arrays);
                 }
                }
             }
@@ -947,7 +1034,7 @@ class Homepage extends Controller
                 $arrays=$this->get_search_products($prd_id='',$category='',$subcategory='',$brand=$row->id,$tag='',$request->lang_id,$request->keyword,$user_id);
                 if($arrays!='' && !empty($arrays))
                 {
-                    $products=$arrays;
+                    $products_b=collect($arrays);
                 }
                }
 
@@ -963,14 +1050,19 @@ class Homepage extends Controller
                 $arrays=$this->get_search_products($prd_id='',$category='',$subcategory='',$brand='',$row->id,$request->lang_id,$request->keyword,$user_id);
                 if($arrays!='' && !empty($arrays))
                 {
-                    $products=$arrays;
+                    $products_t=collect($arrays);
                 }
                }
             }
         }
-       $no_of_prds= count($products);
-       $products_page = $this->paginate($products);
+         if(count($products_p)>0 || count($products_c)>0 || count($products_s)>0 || count($products_b)>0 || count($products_t)>0){
+       $product_collect = $products_p->concat($products_c)->concat($products_s)->concat($products_b)->concat($products_t);
+       
+         }
+       $no_of_prds= count($product_collect);
+       $products_page = $this->paginate($product_collect);
        $products_page_data = $products_page->items();
+       $products_page_data=array_unique($product_collect, SORT_REGULAR);
         
         return ['httpcode'=>200,'status'=>'success','message'=>'search','data'=>['keyword'=>$request->keyword,'no_of_products'=>$no_of_prds,'products'=>$products_page_data]];
 
@@ -983,7 +1075,7 @@ class Homepage extends Controller
     $prod_data=[];
     if($prd_id!='')
     {
-    $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('id',$prd_id)->where('product_type',1)->where('is_approved',1)->get();
+    $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('id',$prd_id)->where('is_approved',1)->get();
         foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -1000,7 +1092,7 @@ class Homepage extends Controller
     }
     if($category!='')
     {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('category_id',$category)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->where('category_id',$category)->get(); 
      foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -1017,7 +1109,7 @@ class Homepage extends Controller
     }
     if($subcategory!='')
     {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('sub_category_id',$subcategory)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->where('sub_category_id',$subcategory)->get(); 
      foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -1035,7 +1127,7 @@ class Homepage extends Controller
     }
     if($brand!='')
     {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('brand_id',$brand)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->where('brand_id',$brand)->get(); 
      foreach($prod_data as $key)
         {
             $store_active = Store::where('is_active',1)->where('seller_id',$key->seller_id)->first();
@@ -1055,7 +1147,7 @@ class Homepage extends Controller
      $prod_tags= PrdAssignedTag::where('is_deleted',0)->where('tag_id',$tag)->first();
      if($prod_tags)
      {
-     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('product_type',1)->where('is_approved',1)->where('id',$prod_tags->prd_id)->get(); 
+     $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('visible',1)->where('is_approved',1)->where('id',$prod_tags->prd_id)->get(); 
      }
    
 
@@ -1078,8 +1170,17 @@ class Homepage extends Controller
                     }
                     $prd_list['seller_id']=$row->seller_id;
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
+                    if($row->product_type==1){
+                    $prd_list['product_type']='simple';        
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    }
+                    else
+                    {
+                    $prd_list['product_type']='config';        
+                    $prd_list['actual_price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);    
+                    }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
                     $prd_list['rating']=$this->get_rates($row->id);
@@ -1355,6 +1456,41 @@ class Homepage extends Controller
         else
             { return false; }
         }
-
+   
+   //CONFIG PRODUCT PRICE
+        
+        function config_product_price($prd_id)
+        {
+            $val = '';
+            $prd_ass = AssociatProduct::where('prd_id',$prd_id)->where('is_deleted',0)->get(['ass_prd_id']);
+            if($prd_ass){
+            $join = Product::join('prd_prices', 'prd_products.id', '=', 'prd_prices.prd_id')
+                    ->selectRaw("MAX(prd_prices.price) AS max_val, MIN(prd_prices.price) AS min_val")
+                    ->whereIn('prd_products.id',$prd_ass)->first();
+                    if($join)
+                    {
+                        $min = $join->min_val;
+                        $max = $join->max_val;
+                        if($min > 0 && $max > 0 && $min!=$max){
+                        $val = $min."-".$max;
+                        }
+                        else if($min > 0 && $max ==0)
+                        {
+                            $val = $min;
+                        }
+                        else if($min==$max)
+                        {
+                           $val = $min; 
+                        }
+                        else
+                        {
+                            $val = $max;
+                        }
+                    }
+            }
+            
+            return $val;
+                    
+        }
    
 }

@@ -783,7 +783,7 @@ class CartController extends Controller
                     $prd_list['total_actual_price']=$tot_actual;
                     $tax_amt=$prod_data->getTaxValue($prod_data->tax_id);
                     $total_tax_amount = $tot_actual * ($tax_amt/100);
-                    $prd_list['total_tax_value']=number_format($total_tax_amount,2);
+                    $prd_list['total_tax_value']=$total_tax_amount;
                      
                     
                     //Available offers for this product
@@ -922,7 +922,7 @@ class CartController extends Controller
                     $prd_list['total_actual_price']=(int)$tot_actual;
                     $tax_amt=$prod_data->getTaxValue($prod_data->tax_id);
                     $total_tax_amount = $tot_actual * ($tax_amt/100);
-                    $prd_list['total_tax_value']=number_format($total_tax_amount,2);
+                    $prd_list['total_tax_value']=$total_tax_amount;
                      
                     
                     //Available offers for this product
@@ -1023,13 +1023,13 @@ function get_cart_ofr_products($prd_id,$cart_id,$qty,$lang,$cat_id,$sub_id,$sell
                         $prd_list['brand_name']=$this->get_content($prod_data->brand->brand_name_cid,$lang);
                     }
                     
-                    $actual_price =number_format($prod_data->prdPrice->price,2);
+                    $actual_price =$prod_data->prdPrice->price;
                     $prd_list['unit_actual_price']=number_format($prod_data->prdPrice->price,2);
                     $tot_actual=$actual_price*$qty;
                     $prd_list['total_actual_price']=number_format($tot_actual,2);
                     $tax_amt=$prod_data->getTaxValue($prod_data->tax_id);
                     $total_tax_amount = $tot_actual * ($tax_amt/100);
-                    $prd_list['total_tax_value']=number_format($total_tax_amount,2);
+                    $prd_list['total_tax_value']=$total_tax_amount;
                      
                     
              

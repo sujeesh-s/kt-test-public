@@ -53,6 +53,7 @@
     </div>
 </div>
 <div class="card-header mb-4"><div class="card-title">Product Video</div></div>
+<p>(Video Types: mp4, mpeg, mov, avi, flv. Max: Size: 30MB) </p>
 <div class="row">
     
     <?php if(isset($videos)){ $video_link = config('app.storage_url').$videos->video;  }else { $video_link = ""; } ?>

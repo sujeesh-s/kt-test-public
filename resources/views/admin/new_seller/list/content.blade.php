@@ -6,6 +6,13 @@
             <li class="breadcrumb-item active" aria-current="page"><a href="#">{{$title}}</a></li>
         </ol>
     </div>
+    <div class="page-rightheader" style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+        <label class="form-label mr-2" for="filterSel">Filter </label>
+        {{Form::select('active',[0=>'Pending',2=>'Denied'],$active,['id'=>'active_filter','class'=>'form-control mr-4','placeholder'=>'All Status'])}}
+        <div class="btn btn-list">
+            
+        </div>
+    </div>
 </div>
 <div class="row flex-lg-nowrap">
     <div class="col-12">
@@ -58,4 +65,4 @@
     </div>
 </div>
 
-    
+    <script src="{{asset('admin/assets/js/datatable/tables/new_seller-datatable.js')}}"></script>

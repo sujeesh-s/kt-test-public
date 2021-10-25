@@ -297,7 +297,7 @@
 						<div class="form-group">
 						<label>Product Stock <span class="text-red">*</span></label>
 
-						{!! Form::text('stock',$products->prdStock($row->id), ['class' => 'form-control','disabled','id'=>'stock']) !!}
+						{!! Form::text('stock',$products->prdStock($products->id), ['class' => 'form-control','disabled','id'=>'stock']) !!}
 						</div>
 						</div>
 
@@ -308,7 +308,7 @@
 						<div class="form-group">
 						<label>Price <span class="text-red">*</span></label>
 
-						{!! Form::number('price', null, ['class' => 'form-control','required','id'=>'price','max'=>999999]) !!}
+						{!! Form::number('price', $products->prdPrice->price, ['class' => 'form-control','required','id'=>'price','max'=>999999]) !!}
 						</div>
 						</div>
 						</div>

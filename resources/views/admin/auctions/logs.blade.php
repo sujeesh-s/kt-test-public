@@ -68,8 +68,8 @@
 
 												<ul class="mb-0 pro-details">
                                                    
-													<li><span class="h6 mt-3">Start Date: {{date('Y-m-d', strtotime($auctions['auct_start']))}}</span></li>
-													<li><span class="h6 mt-3">End Date: {{date('Y-m-d', strtotime($auctions['auct_end']))}}</span></li>
+													<li><span class="h6 mt-3">Start Date: {{date('Y-m-d H:i:s', strtotime($auctions['auct_start']))}}</span></li>
+													<li><span class="h6 mt-3">End Date: {{date('Y-m-d H:i:s', strtotime($auctions['auct_end']))}}</span></li>
 													<li><span class="h6 mt-3">Seller: {{$auctions['seller_name']}}</span></li>
 													<li><span class="h6 mt-3">Status:  @if($auctions['is_active'] ==1) {{ "Active" }} @else {{ "Inactive" }} @endif</span></li>
 													<li><span class="h6 mt-3">Min. Bid Price: {{$auctions['min_bid_price']}}</span></li>

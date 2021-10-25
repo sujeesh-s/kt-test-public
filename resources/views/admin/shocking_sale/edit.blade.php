@@ -230,15 +230,23 @@ $lang_id = $content_table->lang_id;
 		<script src="{{URL::asset('admin/assets/js/comboTreePlugin.js')}}"></script>
 <script type="text/javascript">
 
-  $(function () {                
+  $(function () {      
+      var sminDate = $('[name="sale_start"]').val();
+      if(moment(sminDate) > moment()) {
+          sminDate = moment();
+      }
                 $('#sale_start').datetimepicker({
     format: 'YYYY-MM-DD HH:mm',
-    minDate: new Date()
+  minDate: moment(sminDate),
+useCurrent: false //Important! See issue #1075
 });
-                
+                var eminDate = $('[name="sale_end"]').val();
+     if(moment(sminDate) > moment()) {
+          eminDate = moment();
+      }
                 $('#sale_end').datetimepicker({
                 	format: 'YYYY-MM-DD HH:mm',
-                	minDate: moment(),
+                	minDate: moment(eminDate),
                   useCurrent: false //Important! See issue #1075
                 });
                 
@@ -250,7 +258,7 @@ $lang_id = $content_table->lang_id;
                 
                 $("#sale_end").on("dp.change", function (e) {
                 	$("#errNm2").empty();
-                    $('#sale_start').data("DateTimePicker").maxDate(e.date);
+                    // $('#sale_start').data("DateTimePicker").maxDate(e.date);
                 });
             });
 

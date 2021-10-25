@@ -6,6 +6,15 @@
 		<link href="{{URL::asset('admin/assets/plugins/datatable/responsive.bootstrap4.min.css')}}" rel="stylesheet" />
 		<link href="{{URL::asset('admin/assets/plugins/sweet-alert/jquery.sweet-modal.min.css')}}" rel="stylesheet" />
 		<link href="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.css')}}" rel="stylesheet" />
+		<style>
+        #sortable-row { list-style: none; color: black; }
+        #sortable-row li { margin-bottom:4px; padding:10px; background-color:#BBF4A8;cursor:move;}
+        #sortable-row li.ui-state-highlight { height: 1.0em; background-color:#F0F0F0;border:#ccc 2px dotted;}
+        .modal-open 
+        {
+        overflow: scroll;
+        }
+    </style>
 @endsection
 @section('page-header')
 						<!--Page header-->
@@ -31,6 +40,7 @@
 									<!-- <a href="#" class="btn btn-info"><i class="fe fe-settings mr-1"></i> General Settings </a>
 									<a href="#" class="btn btn-danger"><i class="fe fe-printer mr-1"></i> Print </a> -->
 									<a href="{{ route('subcategory.new') }}"   class="btn btn-primary addmodule"><i class="fe fe-plus mr-1"></i> Add New</a>
+									<button style="" data-backdrop="static" class="btn btn-warning" data-toggle="modal"  data-target="#sort-modal" data-container=""><i class="fa fa-sort mr-1"></i> Sort Order</button>
 								</div>
 							</div>
 						</div>
@@ -184,6 +194,38 @@
 				</div><!-- end app-content-->
             </div>
 
+        <!-- sort order modal -->              
+			<div id="sort-modal" class="modal fade">
+			<div class="modal-dialog modal-confirm">
+			<div class="modal-content">
+			<div class="modal-header">
+			<h3 class="modal-title">Change Order</h3>  
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			</div>
+			<form  action="{{route('subcategory.sort-order')}}" method="POST" >
+			@csrf
+			<div class="modal-body">
+
+			@if($subcategory_sort && count($subcategory_sort) > 0)
+			<input type = "hidden" name="row_order" id="row_order" /> 
+			<ul id="sortable-row">
+			@foreach($subcategory_sort as $row)
+			<?php  $default_lang =DB::table('glo_lang_lk')->where('is_active', 1)->first();
+			   $subcategory_name=DB::table('cms_content')->where('cnt_id', $row->sub_name_cid)->where('lang_id', $default_lang->id)->first();
+			    ?>
+			<li id={{$row->subcategory_id}}>{{$subcategory_name->content}}</li>
+			@endforeach
+			</ul>
+			@endif
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+			<button type="submit" id="" onClick="saveOrder();" class="btn btn-success"> Save </button>
+			</div>
+			</form>
+			</div>
+			</div>
+			</div>
             <!-- Modal -->
 			<div class="modal  fade" id="del_modal" tabindex="-1" role="dialog" aria-labelledby="smallmodal" aria-hidden="true">
 				<div class="modal-dialog modal-sm" role="document">
@@ -227,8 +269,18 @@
 		<script src="{{URL::asset('admin/assets/plugins/sweet-alert/jquery.sweet-modal.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/plugins/sweet-alert/sweetalert.min.js')}}"></script>
 		<script src="{{URL::asset('admin/assets/js/sweet-alert.js')}}"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-
+    function saveOrder() 
+    {
+      var selectedLanguage = new Array();
+      $('ul#sortable-row li').each(function() 
+      {
+          selectedLanguage.push($(this).attr("id"));
+      });
+      document.getElementById("row_order").value = selectedLanguage;
+    }
+    
 	function delete_cat(cat_id){
        $('body').removeClass('timer-alert');
     swal({
@@ -258,6 +310,10 @@
     }
 
     $(function() {
+        $( "#sortable-row" ).sortable(
+      {
+        placeholder: "ui-state-highlight"
+      }); 
     $('.ser_status').change(function() {
         var status = $(this).prop('checked') == true ? 1 : 0;
         var cat_id = $(this).data('id');

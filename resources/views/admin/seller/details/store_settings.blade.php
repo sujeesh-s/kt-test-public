@@ -34,7 +34,7 @@
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('commission','Commission',['class'=>''])}} <span class="text-red">*</span>
-            {{Form::number('storeSet[commission]',$comi,['id'=>'commission','class'=>'form-control','placeholder'=>'Commission'])}}
+            {{Form::number('storeSet[commission]',$comi,['id'=>'commission','class'=>'form-control','placeholder'=>'Commission','max'=>99])}}
             <span class="error"></span>
         </div>
     </div>

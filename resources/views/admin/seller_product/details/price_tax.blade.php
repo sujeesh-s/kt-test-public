@@ -27,6 +27,7 @@
             <span class="error"></span>
         </div>
     </div> 
+    <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('sale_start_date','Sale From Date',['class'=>''])}}
@@ -50,6 +51,7 @@
             <span class="error"></span>
         </div>
     </div> 
+    <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('tax','Tax',['class'=>''])}}

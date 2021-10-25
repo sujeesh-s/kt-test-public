@@ -40,7 +40,9 @@ class ChatsController extends Controller
         foreach($support as $row)
         {
             $seller_name = $row->seller_info->fname."".$row->seller_info->mname.$row->seller_info->lname;
-            $cust_name = $row->cust_info->first_name."".$row->cust_info->middle_name." ".$row->cust_info->last_name;
+           $customer = CustomerInfo::where('user_id',$row->created_by)->first();
+            $cust_name = $customer->first_name."".$customer->middle_name." ".$customer->last_name; 
+            
             $list['chat_id']      = $row->id;
             $list['seller']       = $seller_name;
             $list['customer']     = $cust_name;
@@ -83,14 +85,22 @@ class ChatsController extends Controller
                } 
              $seller = SellerInfo::where('seller_id',$support->seller_id)->first(); 
                 $seller_name_p = $seller->fname."".$seller->mname." ".$seller->lname;
-               if($seller->avatar)
+                if($seller->store($seller->id)->logo == NULL)
                {
-                $images=url('storage/'.$seller->avatar);
+               $images=url('/public/admin/assets/images/users/2.jpg');
                } 
                else
                {
-                $images=url('/public/admin/assets/images/users/2.jpg');
-               }     
+                 $images=config('app.storage_url').$seller->store($seller->id)->logo;
+               }
+            //   if($seller->avatar)
+            //   {
+            //     $images=url('storage/'.$seller->avatar);
+            //   } 
+            //   else
+            //   {
+            //     $images=url('/public/admin/assets/images/users/2.jpg');
+            //   }     
             $html.='<div class="action-header">
             <div class="float-left hidden-xs d-flex ml-2">
                                 <div class="img_cont mr-3">
@@ -157,14 +167,14 @@ class ChatsController extends Controller
               {
                 $seller = SellerInfo::where('seller_id',$row->sender_id)->first(); 
                 $seller_name = $seller->fname."".$seller->mname." ".$seller->lname;
-               if($seller->avatar)
+                if($seller->store($seller->id)->logo == NULL)
                {
-                $image=$image=url('storage/'.$seller->avatar);
+               $image=url('/public/admin/assets/images/users/2.jpg');
                } 
                else
                {
-                $image=url('/public/admin/assets/images/users/2.jpg');
-               } 
+                 $image= config('app.storage_url').$seller->store($seller->id)->logo;
+               }
                 if($row->msg_type=="text")
                {
              $html.='<div class="d-flex justify-content-end ">

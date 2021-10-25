@@ -219,7 +219,7 @@ class SupportSeller extends Controller
                $admin = Admin::where('id',$row->sender_id)->first(); 
                if($admin->avatar)
                {
-                $image=url('storage/'.$admin->avatar);
+                $image=config('app.storage_url').$admin->avatar;
                } 
                else
                {
@@ -250,14 +250,15 @@ class SupportSeller extends Controller
               }
               else
               {
-                $seller = SellerInfo::where('seller_id',$row->sender_id)->first(); 
-               if($seller->avatar)
+                $seller = SellerInfo::where('seller_id',$row->sender_id)->first();
+                
+               if($seller->store($seller->id)->logo == NULL)
                {
-                $image=url('storage/'.$seller->avatar);
+               $image=url('/public/admin/assets/images/users/2.jpg');
                } 
                else
                {
-                $image=url('/public/admin/assets/images/users/2.jpg');
+                 $image=url('storage'.$seller->store($seller->id)->logo);
                }
                
                if($row->msg_type=='text')

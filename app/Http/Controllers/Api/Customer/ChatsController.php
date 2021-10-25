@@ -127,16 +127,26 @@ class ChatsController extends Controller
         $msg_list = [];
         foreach($chat as $row)
         {   $store=Store::where('is_active',1)->where('is_deleted',0)->first();
-            $msg_count  =ChatMessage::where('chat_id',$row->id)->where('read_status',0)->where('sender_id','!=',$user_id)->count();
-            if($store)
+        if($store)
             {
+            if($store->logo)
+            { 
+                $image= config('app.storage_url').$store->logo;
+                
+            }
+            else
+               {
+                 $image=url('/public/admin/assets/images/users/2.jpg');
+               }
+            $msg_count  =ChatMessage::where('chat_id',$row->id)->where('read_status',0)->where('sender_id','!=',$user_id)->count();
+            
             $seller_name = $row->seller_info->fname."".$row->seller_info->mname.$row->seller_info->lname;
             $list['chat_id']    = $row->id;
             $list['unread_msg'] = $msg_count;
             $list['seller_id']  = $row->seller_id;
             $list['seller_name']= $seller_name;
             $list['store_name'] = $row->Store($row->seller_id)->store_name;
-            $list['logo']       = url($store->logo);
+            $list['logo']       = $image;
             $msg_list[]         = $list;
             }
         }
@@ -160,23 +170,28 @@ class ChatsController extends Controller
     else
     {
         $input = $request->all();
+        $chat =[];
         if($request->chat_id!=''){
         $chat= Chat::where('id',$input['chat_id'])->first();
-        }
-        else
-        {
-          $chat= Chat::where('seller_id',$input['seller_id'])->first();  
-        }
         if($chat)
         {   
             $store=Store::where('is_active',1)->where('is_deleted',0)->first();
+            if($store->logo)
+            { 
+                $image= config('app.storage_url').$store->logo;
+                
+            }
+            else
+               {
+                 $image=url('/public/admin/assets/images/users/2.jpg');
+               }
             $chat_msg  =ChatMessage::where('chat_id',$chat->id)->get();
             $seller_name = $chat->seller_info->fname."".$chat->seller_info->mname.$chat->seller_info->lname;
             $list['chat_id']    = $chat->id;
             $list['seller_id']  = $chat->seller_id;
             $list['seller_name']= $seller_name;
             $list['store_name'] = $chat->Store($chat->seller_id)->store_name;
-            $list['logo']       = url($store->logo);
+            $list['logo']       = $image;
             $list['messages']   = $this->get_chat_msgs($chat->id,$user_id);
             
             $msg_list         = $list;
@@ -185,7 +200,47 @@ class ChatsController extends Controller
         }
         else
         {
-            return ['httpcode'=>400,'status'=>'error','message'=>'Invalid parameters','data'=>['errors'=>'Invalid Chat ID']];
+            return ['httpcode'=>404,'status'=>'error','message'=>'No Chat found','data'=>['errors'=>'No chat found']];
+        }
+        }
+        else if($request->seller_id)
+        {
+          $chat= Chat::where('seller_id',$input['seller_id'])->where('created_by',$user_id)->first();  
+          if($chat)
+        {   
+            $store=Store::where('is_active',1)->where('is_deleted',0)->first();
+            if($store->logo)
+            { 
+                $image= config('app.storage_url').$store->logo;
+                
+            }
+            else
+               {
+                 $image=url('/public/admin/assets/images/users/2.jpg');
+               }
+            $chat_msg  =ChatMessage::where('chat_id',$chat->id)->get();
+            $seller_name = $chat->seller_info->fname."".$chat->seller_info->mname.$chat->seller_info->lname;
+            $list['chat_id']    = $chat->id;
+            $list['seller_id']  = $chat->seller_id;
+            $list['seller_name']= $seller_name;
+            $list['store_name'] = $chat->Store($chat->seller_id)->store_name;
+            $list['logo']       = $image;
+            $list['messages']   = $this->get_chat_msgs($chat->id,$user_id);
+            
+            $msg_list         = $list;
+
+            return ['httpcode'=>200,'status'=>'success','message'=>'Chat','data'=>['messages'=>$msg_list]];
+        }
+        
+        else
+        {
+            return ['httpcode'=>404,'status'=>'error','message'=>'No Chat found','data'=>['errors'=>'No chat found']];
+        }
+        }
+        
+        else
+        {
+            return ['httpcode'=>400,'status'=>'error','message'=>'Invalid parameters','data'=>['errors'=>'Invalid Chat ID/seller Id']];
         }
     }
 

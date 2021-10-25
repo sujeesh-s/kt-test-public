@@ -126,6 +126,7 @@ Route::post('/admin/category/change-status-subcategory/', [App\Http\Controllers\
 Route::post('/admin/update-subcategory/{id}', [App\Http\Controllers\Admin\CategoryController::class, 'update_subcategory'])->name('subcategory.update');
 Route::get('/admin/subcategory/edit/{id}', [App\Http\Controllers\Admin\CategoryController::class, 'edit_subcategory']);
 Route::get('/admin/subcategory/view/{id}', [App\Http\Controllers\Admin\CategoryController::class, 'view_subcategory']);
+Route::post('/admin/subcategory/sort-order', [App\Http\Controllers\Admin\CategoryController::class, 'subcat_sort_order'])->name('subcategory.sort-order');
 
 Route::get('/admin/product/list', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('admin.productlist');
 Route::post('/admin/product/list', [App\Http\Controllers\Admin\ProductController::class, 'index']);

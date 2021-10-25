@@ -13,6 +13,7 @@ use App\Models\UserRoles;
 use App\Models\Admin;
 use App\Models\Auction;
 use App\Models\AuctionHist;
+use App\Models\AssociatProduct;
 use App\Models\Banner;
 use App\Models\Brand;
 use App\Models\UserRole;
@@ -78,7 +79,7 @@ class OrderController extends Controller
             'reward_amt'            => ['nullable'],
             'reward_id'             => ['nullable','numeric'],
             'payment_type'          => ['required'],
-            'address_id'            => ['required']
+            'address_id'            => ['required','numeric']
 
         ]);
         $input = $request->all();
@@ -89,7 +90,9 @@ class OrderController extends Controller
     }
     else
     {
-
+    //   $sale_items = $this->insert_seller_products(12,48,$user_id,$lang);
+    //   return $sale_items;
+    //   die;
         $carts = Product::join('usr_cart_item','prd_products.id','=','usr_cart_item.product_id')
                         ->join('usr_cart','usr_cart_item.cart_id','=','usr_cart.id')
                         ->where('usr_cart.user_id',$user_id)    
@@ -289,9 +292,15 @@ class OrderController extends Controller
                                                           'updated_at'    =>date("Y-m-d H:i:s")]); 
         }
         
-
+            $latestorder_ids=1;
             $latestOrder = SaleOrder::orderBy('created_at','DESC')->first();
-            $saleorder_id = date('y').date('m').str_pad($latestOrder->id + 1, 6, "0", STR_PAD_LEFT);
+            
+            if($latestOrder)
+            {
+                $latestorder_ids = $latestOrder->id;
+            }
+           
+            $saleorder_id = date('y').date('m').str_pad($latestorder_ids + 1, 6, "0", STR_PAD_LEFT);
             // echo $saleorder_id;
             // die;
             
@@ -344,7 +353,7 @@ class OrderController extends Controller
                 'ecom_commission' => 0,
                 'discount_type'   => $rows['discount_type'],  
                 'coupon_id'       => $rows['coupon_id'],
-                'order_status'    => 'pending',
+                'order_status'    => 'accepted',
                 'payment_status'  => 'pending',
                 'shipping_status' => 'pending',
                 'cancel_process'  => 0,
@@ -380,7 +389,7 @@ class OrderController extends Controller
                 'payment_data'     => '',
                 'amount'           => $grnd_tot_sale,
                 'payment_status'  => 'pending']);
-                $sale_items = $this->insert_seller_products($sale_id,$rows['seller_id'],$user_id,$lang);
+                 $sale_items = $this->insert_seller_products($sale_id,$rows['seller_id'],$user_id,$lang);
                 
                 $insert_address = SalesOrderAddress::create(['sales_id' => $sale_id,
                 'order_id'        => $saleorder_id,
@@ -853,43 +862,57 @@ class OrderController extends Controller
 
     function insert_seller_products($sale_id,$seller_id,$user_id,$lang){
         
-        
+        $product=[];
         $prod_datas  = Product::join('usr_cart_item','prd_products.id','=','usr_cart_item.product_id')
-                        ->join('usr_cart','usr_cart_item.cart_id','=','usr_cart.id')
-                        ->where('prd_products.seller_id',$seller_id)
-                        ->where('prd_products.is_active',1)->where('prd_products.is_deleted',0)
-                        ->where('prd_products.is_approved',1)
-                        ->where('usr_cart.user_id',$user_id)    
-                        ->where('usr_cart.is_active',1)
-                        ->where('usr_cart.is_deleted',0)
-                        ->where('usr_cart_item.is_active',1)
-                        ->where('usr_cart_item.is_deleted',0)
-                        ->get();
-            if($prod_datas)   {    
+                            ->join('usr_cart','usr_cart_item.cart_id','=','usr_cart.id')
+                            ->where('usr_cart.user_id',$user_id)    
+                            ->where('usr_cart.is_active',1)
+                            ->where('usr_cart.is_deleted',0)
+                            ->where('usr_cart_item.is_active',1)
+                            ->where('usr_cart_item.is_deleted',0)
+                            ->where('prd_products.is_active',1)->where('prd_products.is_deleted',0)
+                            ->where('prd_products.seller_id',$seller_id)
+                            ->select('prd_products.*','usr_cart.*','usr_cart_item.*','usr_cart_item.product_id as cart_prd_id')
+                            ->get();
+        
+            if(count($prod_datas)>0)   {    
                 foreach($prod_datas as $prod_data)
                 {   $qty = $prod_data->quantity;
                     $prd_list['product_id']=$prod_data->product_id;
-                    $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
-                    $prd_list['quantity']=$prod_data->quantity;
-                    $prd_list['seller']=$prod_data->Store($prod_data->seller_id)->store_name;
-                    $prd_list['seller_id']=$prod_data->seller_id;
-                    $prd_list['category_id']=$prod_data->category_id;
-                    $prd_list['category_name']=$this->get_content($prod_data->category->cat_name_cid,$lang);
-                    $prd_list['subcategory_id']=$prod_data->sub_category_id;
-                    $prd_list['subcategory_name']=$this->get_content($prod_data->subCategory->sub_name_cid,$lang);
+                    if($prod_data->product_type==1){
+                    $prd_list['product_name']=$product_name=$this->get_content($prod_data->name_cnt_id,$lang);
+                    }
+                    else
+                    {
+                     $associate= AssociatProduct::where('ass_prd_id',$prod_data->product_id)->first();   
+                    $prd_list['product_name']=$product_name=$this->get_content($associate->product->name_cnt_id,$lang);    
+                    }
+                    
                     
                     $prd_list['currency']=getCurrency()->name;
-                    if($prod_data->brand_id)
-                    {
-                    $prd_list['brand_name']=$this->get_content($prod_data->brand->brand_name_cid,$lang);
-                    $prd_list['brand_id']=$prod_data->brand_id;
+                    
+                    $actual_prices =$this->get_price($prod_data->product_id);
+                    $sale_price =$this->get_sale_price($prod_data->product_id);
+                    if($sale_price!='')
+                    { 
+                        $actual_prices=$sale_price;
                     }
-                    $actual_price =$this->get_price($prod_data->product_id);
-                    $prd_list['unit_actual_price']=number_format($actual_price,2);
-                    $tot_actual=(int)$actual_price*(int)$qty;
+                    else
+                    {
+                      $actual_prices =$this->get_price($prod_data->product_id);  
+                    }
+                    $actual_price=$actual_prices;
+                    $prd_list['unit_actual_price']=$actual_price;
+                    $tot_actual=$actual_price*$qty;
                     $prd_list['total_actual_price']=$tot_actual;
+                    if($prod_data->tax_id){
                     $tax_amt=$prod_data->getTaxValue($prod_data->tax_id);
                     $total_tax_amount = $tot_actual * ($tax_amt/100);
+                    }
+                    else
+                    {
+                        $total_tax_amount=0;
+                    }
                     $prd_list['total_tax_value']=number_format($total_tax_amount,2);
                      
                     
@@ -905,23 +928,24 @@ class OrderController extends Controller
             {
                  $prd_list['offer_available']= 1;
                  $prd_list['offer_name']= 'Shocking Sale'; 
+                 $actual_price_sh = $this->get_price($prod_data->product_id);  
                 if($shock->discount_type=="amount")
-                    {
+                    {  
                         $prd_list['offer']=getCurrency()->name." ".$shock->discount_value." Off";
                         $discount_value = $shock->discount_value;
-                        $unit_price = (int)$actual_price-(int)$discount_value;
-                        $prd_list['unit_discount_price']= $unit_price;
-                        $prd_list['total_discount_price']=$unit_price * $qty;
+                        $unit_price = (int)$actual_price_sh-(int)$discount_value;
+                        $actual_price =$unit_price;
                        
 
                     }
                     else
                     {
                         $prd_list['offer']=$shock->discount_value."% Off";
-                        $per=($shock->discount_value/100)*$actual_price;
-                        $discount=(float)$actual_price-(float)$per;
+                        $per=($shock->discount_value/100)*$actual_price_sh;
+                        $discount=(float)$actual_price_sh-(float)$per;
                         $round= (int)$discount;
                         $prd_list['unit_discount_price']=$round;
+                        $actual_price =$round;
                         $prd_list['total_discount_price']=(int)$round * (int)$qty;
                     }
             }
@@ -931,28 +955,26 @@ class OrderController extends Controller
                 $prd_list['offer_available']= 0;
                 $prd_list['offer_name']= ''; 
                 $sale_price =$this->get_sale_price($prod_data->product_id);
+                
                 if($sale_price!='')
                 {
-                $prd_list['unit_discount_price']=$sale_price;
                 $tot= $sale_price * $qty;
                 $prd_list['total_discount_price']=number_format($tot,2);
                 }
-                else
-                {
-                    $prd_list['unit_discount_price']=0;
-                    $prd_list['total_discount_price']=0;
-                }
+                
             }
 
             $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
             $discount_price =$prd_list['total_discount_price'];
+            
+            $tot_actual=$actual_price*$qty;
           
             $create_saleorder = SaleorderItems::create([
                 'sales_id'        => $sale_id,
                 'parent_id'       => $sale_id,
                 'prd_id'          => $prod_data->product_id,
                 'prd_type'        => $prod_data->product_type,
-                'prd_name'        => $this->get_content($prod_data->name_cnt_id,$lang),
+                'prd_name'        => $product_name,
                 'price'           => $actual_price,
                 'qty'             => $prod_data->quantity,
                 'total'           => $tot_actual,
@@ -973,16 +995,9 @@ class OrderController extends Controller
                                                  'sale_id'    => $sale_id,
                                                  'created_at' => date("Y-m-d H:i:s"),
                                                  'updated_at' => date("Y-m-d H:i:s")
-                                                 ]);           
-
-
-               }//foreachend    
-
-              foreach($prod_datas as $prod_data)
-                { 
-              $cart_update= Cart::where('id',$prod_data->cart_id)->update([
-             'is_active'=>0,   
-            'updated_at'=>date("Y-m-d H:i:s")]);
+                                                 ]);     
+                $cart_update= Cart::where('id',$prod_data->cart_id)->update([
+             'is_active'=>0,'updated_at'=>date("Y-m-d H:i:s")]);
 
             $cart_item_update=CartItem::where('cart_id',$prod_data->cart_id)->update([
             'is_active'=>0,
@@ -998,9 +1013,15 @@ class OrderController extends Controller
                 'created_by'=>$user_id,
                 'updated_by'=>$user_id,
                 'created_at'=>date("Y-m-d H:i:s"),
-                'updated_at'=>date("Y-m-d H:i:s")]);
-            }
-             }
+                'updated_at'=>date("Y-m-d H:i:s")]);                                 
+
+       //$product[]=$prd_list;
+               }      //foreachend    
+
+       
+            
+            
+             }return $prod_datas;
            
         
     }

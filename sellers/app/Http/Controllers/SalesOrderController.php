@@ -152,7 +152,7 @@ class SalesOrderController extends Controller
         }else{ 
             $update                 =   SalesOrder::where('id',$post->id)->update([$post->field => $post->value]);
             $cInsId                 =   SalesOrderCancel::create(['sales_id'=>$post->id,'seller_id'=>auth()->user()->id,'created_by'=>auth()->user()->id,'role_id'=>auth()->user()->role_id])->id;
-                                        $this->addCancelNote($cInsId,$post->title,$post->desc);
+                                   if(isset($post->title) && isset($post->desc) ){   $this->addCancelNote($cInsId,$post->title,$post->desc); }   
             $orders                 =   SalesOrder::where('seller_id',auth()->user()->id); $salesId = $post->id;
             if($cInsId)
             {
@@ -200,7 +200,7 @@ class SalesOrderController extends Controller
     function orderStatusEmail(Request $request){
         $post                       =   (object)$request->post();
         $sales                      =   SalesOrder::where('id',$post->id)->first();
-        $msg = '<h4>Hi, ' . $sales->address->name . ' </h4>';
+      if(isset($sales->address)){ $cst_name = $sales->address->name; }else {  $cst_name = ""; }  $msg = '<h4>Hi, ' . $cst_name . ' </h4>';
         $msg .= '<p>You order has been '.$sales->order_status. ' by Seller</p>';
         $msg .= '<p>Order ID : <span>'.$sales->order_id.'</span></p><p>Order Date : <span>'.date('d M Y',strtotime($sales->created_at)).'</span</p>';
         Email::sendEmail(geAdminEmail(), $sales->address->email, '#'.$sales->order_id.' :: Order '.$sales->order_status, $msg);

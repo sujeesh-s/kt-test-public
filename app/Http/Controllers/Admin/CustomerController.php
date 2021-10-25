@@ -20,6 +20,7 @@ use App\Models\customer\CustomerMaster;
 use App\Models\customer\CustomerInfo;
 use App\Models\customer\CustomerSecurity;
 use App\Models\customer\CustomerTelecom;
+use App\Models\customer\CustomerAddress;
 use App\Rules\Name;
 use Validator;
 use Illuminate\Support\Facades\Hash;
@@ -145,6 +146,7 @@ class CustomerController extends Controller
         $data['role']               =    UserRole::where('is_deleted',NULL)->orWhere('is_deleted',0)->where('usr_role_name','Customer')->where('is_active',1)->get();
         $data['customer_mst']       =    CustomerMaster::where('is_deleted',0)->where('id',$user_id)->first();
         $data['telecom']            =    CustomerTelecom::where('user_id',$user_id)->where('is_active',1)->where('is_deleted',0)->get();
+        $data['customer_addr']       =    CustomerAddress::where('is_deleted',0)->where('user_id',$user_id)->get();
         $data['info']               =    CustomerInfo::where('user_id',$user_id)->where('is_active',1)->where('is_deleted',0)->first();
         $data['wallet']             =    DB::table("usr_cust_wallet")->select(DB::raw("SUM(credit)-SUM(debit) as wallet"))->where("is_deleted",0)->where("user_id",$user_id)->first();
         $data['order']              =    SaleOrder::where('cust_id',$user_id)->get();

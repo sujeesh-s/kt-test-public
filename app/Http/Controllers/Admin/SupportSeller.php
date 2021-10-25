@@ -176,13 +176,14 @@ class SupportSeller extends Controller
              if($row->sender_role_id==3)
              {  
                $seller = SellerInfo::where('seller_id',$row->sender_id)->first(); 
-               if($seller->avatar)
+
+               if($seller->store($seller->id)->logo == NULL)
                {
-                $image=url('storage/'.$seller->avatar);
+               $image=url('/public/admin/assets/images/users/2.jpg');
                } 
                else
                {
-                $image=url('/public/admin/assets/images/users/2.jpg');
+                 $image=url('storage'.$seller->store($seller->id)->logo);
                }
                
                if($row->msg_type=='text')

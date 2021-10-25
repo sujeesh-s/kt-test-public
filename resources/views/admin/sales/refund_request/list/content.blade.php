@@ -32,6 +32,10 @@
                                                 if($row->order_status == 'pending'){ $ostat = 'primary'; }else if($row->order_status == 'processing'){ $ostat = 'info'; }else if($row->order_status == 'canceled'){ $ostat = 'error'; }
                                                 else if($row->order_status == 'accepted'){ $ostat = 'success'; }else{ $ostat = 'default'; }
                                                 @endphp
+                                                <?php if($row->returninfo->status == 'refund_initiated' || $row->returninfo->status == 'refund_completed')
+                                                {
+                                                ?>
+                                                
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></td>
                                                     <td><a id="dtlBtn-{{$row->id}}" class="font-weight-bold viewDtl">{{$row->order_id}}</a></td> 
@@ -51,9 +55,15 @@
                                                         <td><span class="badge badge-{{$ostat}} mt-2">{{ucfirst($row->order_status)}}</span></td>
                                                     <?php } ?>
                                                     <td class="text-center">
+                                                        <?php if($row->returninfo->status == 'refund_initiated')
+                                                        {
+                                                        ?>
                                                         <button id="acceptBtn-{{$row->id}}" class="mr-2 btn btn-success btn-sm acceptBtn" data-val="refunded"><i class="fa fa-check mr-1"></i>Accept</button>
+                                                        <?php } ?>
                                                         <button id="editBtn-{{$row->id}}" class="mr-2 btn btn-success btn-sm editBtn"><i class="fa fa-eye mr-1"></i>View</button>
                                                     </td> 
+                                                </tr>
+                                               <?php } ?> 
                                             @endforeach
                                         @endif
                                     </tbody>
@@ -70,4 +80,3 @@
 </div>
 
  <script src="{{asset('admin/assets/js/datatable/tables/order_request-datatable.js')}}"></script>
- 

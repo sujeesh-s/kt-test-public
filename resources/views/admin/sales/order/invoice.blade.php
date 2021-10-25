@@ -25,13 +25,13 @@
                             <div class="">{{$order->address->address2}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->city}}</div>
+                            <div class="">@if($order->address->bcity) {{$order->address->bcity->city_name}} @endif</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->state}}</div>
+                            <div class="">{{$order->address->bstate->state_name}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->country}}</div>
+                            <div class="">{{$order->address->bcountry->country_name}}</div>
                         </div>
                         <div class="pl-4">
                             <div class="">{{$order->address->zip_code}}</div>
@@ -58,13 +58,13 @@
                             <div class="">{{$order->address->s_address2}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->s_city}}</div>
+                            <div class="">{{$order->address->scity->city_name}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->s_state}}</div>
+                            <div class="">{{$order->address->sstate->state_name}}</div>
                         </div>
                         <div class="pl-4">
-                            <div class="">{{$order->address->s_country}}</div>
+                            <div class="">{{$order->address->scountry->country_name}}</div>
                         </div>
                         <div class="pl-4">
                             <div class="">{{$order->address->s_zip_code}}</div>
@@ -141,7 +141,7 @@
                                 </tr>
                                 <tr>
                                     <td class="plabels">Order Status:<p class="font-weight-semibold ml-1"> {{ucwords(str_replace('_',' ',$order->order_status))}}</p></td>
-                                    <th colspan="3" class="text-right">Shiping Charge</th>
+                                    <th colspan="3" class="text-right">Shipping Charge</th>
                                     <th class="text-right">{{$currency}} {{$order->shiping_charge}}</th>
                                 </tr>
                                 <tr>

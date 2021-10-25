@@ -57,7 +57,7 @@ class ProductController extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -91,6 +91,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;    
                     $prd_list['product_id']=$row->id;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
@@ -115,7 +116,7 @@ class ProductController extends Controller
                     else
                     {
                      $prd_list['product_type']='config';    
-                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);   
+                     $prd_list['actual_price']=$this->config_product_price($row->id);
                     }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
@@ -166,7 +167,7 @@ class ProductController extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -181,7 +182,7 @@ class ProductController extends Controller
         if($request->subcat_id!='')
         {
             $products=[];
-            $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('visible',1)->where('sub_category_id',$request->subcat_id)->get();
+            $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('visible',1)->where('sub_category_id',$request->subcat_id)->paginate(12);
             if(!empty($prod_data))
             {
                 $usr_visit =UserVisit::create([
@@ -199,6 +200,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;    
                     $prd_list['id']=$row->id;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
@@ -217,7 +219,15 @@ class ProductController extends Controller
                     }
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
                     $prd_list['seller_id']=$row->seller_id;
+                    if($row->product_type==1){
+                    $prd_list['product_type']='simple';    
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
+                    }
+                    else
+                    {
+                     $prd_list['product_type']='config';    
+                     $prd_list['actual_price']=$this->config_product_price($row->id);
+                    }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -258,7 +268,7 @@ class ProductController extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -273,7 +283,7 @@ class ProductController extends Controller
         if($request->brand_id!='')
         {
             $products=[];
-            $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('visible',1)->where('brand_id',$request->brand_id)->get();
+            $prod_data= Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('visible',1)->where('brand_id',$request->brand_id)->paginate(12);
             if(!empty($prod_data))
             {
                 $usr_visit =UserVisit::create([
@@ -291,6 +301,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;    
                     $prd_list['id']=$row->id;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
@@ -309,7 +320,15 @@ class ProductController extends Controller
                     }
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
                     $prd_list['seller_id']=$row->seller_id;
+                    if($row->product_type==1){
+                    $prd_list['product_type']='simple';    
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
+                    }
+                    else
+                    {
+                     $prd_list['product_type']='config';    
+                     $prd_list['actual_price']=$this->config_product_price($row->id);
+                    }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -422,7 +441,7 @@ class ProductController extends Controller
                                 'updated_at'=>date("Y-m-d H:i:s")]);
                                 }
                      }
-                
+                    $prd_list['service_status']=$store_active->service_status;
                     $prd_list['product_id']=$prod_data->id;
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
                     if($prod_data->product_type == 2)
@@ -460,9 +479,8 @@ class ProductController extends Controller
                     $actual_price = number_format($prod_data->prdPrice->price,2);
                     $prd_list['actual_price_quote']= $actual_price;
                     $prd_list['actual_price']= $prod_data->prdPrice->price;
-                    $sale_price =$this->get_sale_price($prod_data->id);
-                    $prd_list['sale_price']=(float)$sale_price;
-                    $prd_list['in_stock']=$prod_data->prdStock($prod_data->id);
+                    
+                    $prd_list['stock']=$prod_data->prdStock($prod_data->id);
                     if($prod_data->is_out_of_stock==0)
                         {
                             $prd_list['is_out_of_stock']=false;
@@ -481,6 +499,12 @@ class ProductController extends Controller
                         }
                     
                     }
+                    else
+                    {
+                        $prd_list['actual_price']= $this->config_product_price($prod_data->id);
+                    }
+                    $sale_price =$this->get_sale_price($prod_data->id);
+                    $prd_list['sale_price']=$sale_price;    
                     $prd_list['in_wishlist']=$wishlist;
                     $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 
                     $prd_list['image']=$this->get_product_image($prod_data->id);
@@ -555,6 +579,7 @@ class ProductController extends Controller
 
                     $store_detail=Store::where('seller_id',$prod_data->seller_id)->first();
                         if ($store_detail) {
+                            //$store_list['service_status']=$store_active->service_status;
                             $store_list['store_id']=$store_detail->id;
                             $store_list['seller_id']=$store_detail->seller_id;
                             $store_list['store_name']=$store_detail->store_name;
@@ -595,6 +620,7 @@ class ProductController extends Controller
                 $offer['offer_name']= 'Shocking Sale';   
                 $offer['offer_id']=$shock->id;
                 $offer['url']=url('api/customer/shock-sale');
+                if($prod_data->product_type==1){
                 $actual_price=$prod_data->prdPrice->price;
                 if($shock->discount_type=="amount")
                     {
@@ -614,6 +640,7 @@ class ProductController extends Controller
                         $round= number_format($discount, 2);
                         $offer['offer_price']=$discount;
                     }
+                }
                 $offer_list[]=$offer;
             }
             else
@@ -674,8 +701,18 @@ class ProductController extends Controller
                     $d_list['content']=$this->get_content($product_id->content_cnt_id,$lang);
                     $d_list['is_out_of_stock']=$product_id->is_out_of_stock;
                     $d_list['seller']=$daily->Store($product_id->seller_id)->store_name;
-                    $d_list['actual_price']=number_format($daily->ProductPrice($daily->prd_id)->price,2);
+                    if($row->product_type==1){
+                    $d_list['product_type']='simple';    
+                    $d_list['actual_price']=$this->get_actual_price($daily->prd_id);
+                    }
+                    else
+                    {
+                     $d_list['product_type']='config';    
+                     $d_list['actual_price']=$this->config_product_price($daily->prd_id);
+                    }
                     $d_list['sale_price']=$this->get_sale_price($daily->prd_id);
+                    // $d_list['actual_price']=number_format($daily->ProductPrice($daily->prd_id)->price,2);
+                    // $d_list['sale_price']=$this->get_sale_price($daily->prd_id);
                     if($daily->discount_type=="amount")
                     {
                         $d_list['offer']=$daily->discount_value." Off";
@@ -765,7 +802,7 @@ class ProductController extends Controller
                 
                 $real_product = Product::where('id',$request->product_id)->first();
                 if($real_product){
-                
+                $shock_list['service_status']=$store_active->service_status;
                 $shock_list['product_id']=$real_product->id;
                 $shock_list['product_name']=$this->get_content($real_product->name_cnt_id,$lang);
                 $shock_list['category']=$this->get_content($real_product->category->cat_name_cid,$lang);
@@ -802,8 +839,8 @@ class ProductController extends Controller
                 }
                 else
                 {
-                $shock_list['actual_price']="";
-                $shock_list['sale_price']="";
+                $shock_list['actual_price']=$this->config_product_price($real_product->id);;
+                $shock_list['sale_price']=$this->get_sale_price($real_product->id);;
                 $shock_list['offer']='';
                 $shock_list['offer_price']='';
                 }
@@ -870,7 +907,7 @@ class ProductController extends Controller
             'auction_id' => ['required'],
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -920,6 +957,7 @@ class ProductController extends Controller
                 $auction_list['auction_code']=$rows->auction_code;
                 $auction_list['auction_status']=$auction_status;
                 $auction_list['product_id']=$rows->product_id;
+                $auction_list['service_status']=$rows->Store($rows->Product->seller_id)->service_status;
                 $auction_list['product_name']=$this->get_content($rows->Product->name_cnt_id,$lang);
                 $auction_list['category']=$this->get_content($rows->Product->category->cat_name_cid,$lang);
                 $auction_list['subcategory']=$this->get_content($rows->Product->subCategory->sub_name_cid,$lang);
@@ -932,7 +970,15 @@ class ProductController extends Controller
                 $auction_list['content']=$this->get_content($rows->Product->content_cnt_id,$lang);
                 $auction_list['start_date']=$rows->auct_start;
                 $auction_list['end_date']=$rows->auct_end;
+                
+                if($rows->Product->product_type==1)
+                {
                 $auction_list['actual_price']=number_format($rows->Product->prdPrice->price,2);
+                }
+                else
+                {
+                 $auction_list['actual_price']='';   
+                }
                 $auction_list['sale_price']=$this->get_sale_price($rows->product_id);
                 $auction_list['min_bid_price']=$rows->min_bid_price;
                 $auction_list['latest_bid_amt']=$highest_bid;
@@ -974,7 +1020,7 @@ class ProductController extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -999,12 +1045,19 @@ class ProductController extends Controller
                             'visited_on'=>date("Y-m-d H:i:s"),
                             'created_at'=>date("Y-m-d H:i:s"),
                             'updated_at'=>date("Y-m-d H:i:s")]);
-                            
+                            $store_list['service_status']=$store_detail->service_status;
                             $store_list['store_id']=$store_detail->id;
                             $store_list['seller_id']=$store_detail->seller_id;
                             $store_list['store_name']=$store_detail->store_name;
+                            if($store_detail->incharge_phone){
+                            $store_list['contact_num']=$store_detail->incharge_isd_code." ".$store_detail->incharge_phone;
+                            }
+                            else{
+                            $store_list['contact_num']='';        
+                            }
                             $store_list['store_rating']=$this->get_seller_rating($store_detail->seller_id);
-                            $store_list['store_prd_rating']=$this->get_seller_product_rating($store_detail->seller_id);
+                            $store_list['store_prd_rating']=$this->get_seller_product_rating($store_detail->seller_id); 
+                            $store_list['postive_review']=$this->get_per_seller_review($store_detail->seller_id);
                             $store_list['join_date']=date('d M Y',strtotime($store_detail->created_at));
                             $store_list['about']=$store_detail->about;
                             $store_list['logo']=url($store_detail->logo);
@@ -1020,8 +1073,8 @@ class ProductController extends Controller
                             $store_data[]=$store_list;
 
                     $rang_products=[];
-                     $dropdown= $this->seller_products($store_detail->seller_id,$lang,$total_pro='');
-                    $total_products=$this->seller_products($store_detail->seller_id,$lang,$total_pro='true');
+                     $dropdown= $this->seller_products($store_detail->seller_id,$lang,$total_pro='',$store_detail->service_status);
+                    $total_products=$this->seller_products($store_detail->seller_id,$lang,$total_pro='true',$store_detail->service_status);
                     $seller_review=$this->get_seller_review($store_detail->id);
                     if(count($dropdown)>0)
                     {
@@ -1029,6 +1082,7 @@ class ProductController extends Controller
                         {
                             if($prod_data['rating']>3)
                             {
+                            $prd_list['service_status']=$prod_data['service_status'];    
                             $prd_list['product_id']=$prod_data['product_id'];
                     $prd_list['product_name']=$prod_data['product_name'];
                     $prd_list['seller']=$prod_data['seller'];
@@ -1089,7 +1143,7 @@ class ProductController extends Controller
         $validator=  Validator::make($request->all(),[
             'device_id' => ['required'],
             'os_type'=> ['required','string','min:3','max:3'],
-            'page_url'=>['required','url']
+            'page_url'=>['required']
         ]);
         if ($validator->fails()) 
             {    
@@ -1124,6 +1178,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;    
                     $prd_list['product_id']=$row->id;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
@@ -1147,14 +1202,15 @@ class ProductController extends Controller
                     }
                     else
                     {
-                    $prd_list['actual_price']='';
-                    $prd_list['sale_price']='';
+                    $prd_list['actual_price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['product_type']='config';
                     }
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
                     $prd_list['rating']=$this->get_rates($row->id);
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
+                    $prd_list['seller_id']=$row->seller_id;
                     $prd_list['image']=$this->get_product_image($row->id); 
             
 
@@ -1298,6 +1354,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;     
                     $prd_list['product_id']=$row->id;
                     $prd_list['product_name']=$this->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
@@ -1322,14 +1379,15 @@ class ProductController extends Controller
                     }
                     else
                     {
-                    $prd_list['actual_price']='';
-                    $prd_list['sale_price']=''; 
+                    $prd_list['actual_price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id); 
                     $prd_list['product_type']='config';
                     }
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
                     $prd_list['rating']=$this->get_rates($row->id);
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
+                    $prd_list['seller_id']=$row->seller_id;
                     $prd_list['image']=$this->get_product_image($row->id); 
             
 
@@ -1489,6 +1547,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;     
                     $prd_list['product_id']=$row->id;
                     $prd_list['seller_id']=$row->seller_id;
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
@@ -1514,8 +1573,8 @@ class ProductController extends Controller
                     }
                     else
                     {
-                    $prd_list['actual_price']='';
-                    $prd_list['sale_price']=''; 
+                    $prd_list['actual_price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);
                     }
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -1680,6 +1739,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;     
                     $prd_list['product_id']=$row->id;
                     $prd_list['seller_id']=$row->seller_id;
                     $prd_list['seller']=$row->Store($row->seller_id)->store_name;
@@ -1705,8 +1765,8 @@ class ProductController extends Controller
                     }
                     else
                     {
-                    $prd_list['actual_price']='';
-                    $prd_list['sale_price']=''; 
+                    $prd_list['actual_price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id); 
                     }
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -1891,7 +1951,7 @@ class ProductController extends Controller
                     $store_active = Store::where('is_active',1)->where('seller_id',$row->seller_id)->first();
                     if($store_active)
                     {
-                    
+                    $prd_list['service_status']=$store_active->service_status; 
                     $prd_list['product_id']=$row->id;
                     $prd_list['product_name']=$row->get_content($row->name_cnt_id,$lang);
                     $prd_list['category_id']=$row->category_id;
@@ -1908,8 +1968,14 @@ class ProductController extends Controller
                     $prd_list['brand_id']='';
                     $prd_list['brand_name']='';
                     }
-                    $prd_list['actual_price']=number_format($row->prdPrice->price,2);
-                    $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    if($row->product_type==1){
+                    $prd_list['actual_price']=$row->prdPrice->price;
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);}
+                    else
+                    {
+                    $prd_list['actual_price']=$this->config_product_price($row->id);
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);    
+                    }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
                     $prd_list['rating']=$this->get_rates($row->id);
@@ -2034,6 +2100,7 @@ class ProductController extends Controller
                 $store_active = Store::where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;     
                     $prd_list['product_id']=$prod_data->id;
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
                     $prd_list['category_id']=$prod_data->category_id;
@@ -2231,6 +2298,7 @@ class ProductController extends Controller
                 $store_active = Store::where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;     
                     $prd_list['product_id']=$prod_data->id;
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
                     $prd_list['category_id']=$prod_data->category_id;
@@ -2282,6 +2350,7 @@ class ProductController extends Controller
                   $store_active = Store::where('is_active',1)->where('seller_id',$prod_data->seller_id)->first();
                     if($store_active)
                     {
+                    $prd_list['service_status']=$store_active->service_status;     
                     $prd_list['product_id']=$prod_data->id;
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang);
                     $prd_list['seller']=$prod_data->Store($prod_data->seller_id)->store_name;
@@ -2333,7 +2402,7 @@ class ProductController extends Controller
 
 
     //Related seller products
-    function seller_products($seller_id,$lang,$total_pro){
+    function seller_products($seller_id,$lang,$total_pro,$service_status){
         $data     =   [];
 
         $seller_data       =   Product::where('is_active',1)->where('is_deleted',0)->where('is_approved',1)->where('visible',1)->where('seller_id',$seller_id)->paginate(12);
@@ -2341,7 +2410,8 @@ class ProductController extends Controller
            if($total_pro==''){
             if(count($seller_data)>0)   {   
               foreach($seller_data as $prod_data) {
-                  
+                    
+                    $prd_list['service_status']=$service_status;
                     $prd_list['product_id']=$prod_data->id;
                     $prd_list['product_name']=$this->get_content($prod_data->name_cnt_id,$lang='');
                     $prd_list['seller']=$prod_data->Store($prod_data->seller_id)->store_name;
@@ -2369,13 +2439,13 @@ class ProductController extends Controller
                     $prd_list['actual_price_quote']= $actual_price;
                     $prd_list['actual_price']= $this->get_actual_price($prod_data->id);
                     $sale_price =$this->get_sale_price($prod_data->id);
-                    $prd_list['sale_price']=(float)$sale_price;
+                    $prd_list['sale_price']=$sale_price;
                     }
                     else{
                       
                     $prd_list['actual_price_quote']= '';
-                    $prd_list['actual_price']= '';
-                    $prd_list['sale_price']='';  
+                    $prd_list['actual_price']=$this->config_product_price($prod_data->id);
+                    $prd_list['sale_price']=$this->get_sale_price($prod_data->id); 
                     }
                     $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
                     $prd_list['tag']=$this->get_product_tag($prod_data->id,$lang); 
@@ -2439,6 +2509,7 @@ class ProductController extends Controller
             {
             $user=$row->customerinfo($row->user_id);    
             $list['customer_name']=$list['customer_name']=$user->first_name." ".$user->middle_name." ".$user->last_name;
+            $list['title']=$row->title;
             $list['rating']=$row->rating;
             $list['comment']=$row->comment;
             $data[]=$list;
@@ -2487,6 +2558,28 @@ class ProductController extends Controller
         if($rate){ 
         $return_val = round($rate->rating);
         return $return_val;
+        }
+        else
+            { $return_val=0;
+                return $return_val; }
+        }
+        
+        function get_per_seller_review($field_id){ 
+
+        $rate = DB::table('prd_products')
+        ->select(DB::raw('AVG(prd_review.rating) as rating'))
+            ->leftJoin('prd_review', 'prd_review.prd_id', 'prd_products.id')
+            ->where('prd_products.seller_id',$field_id)
+            ->groupBy('prd_products.seller_id')->first(); 
+        $count_rate = DB::table('prd_products')
+            ->leftJoin('prd_review', 'prd_review.prd_id', 'prd_products.id')
+            ->where('prd_products.seller_id',$field_id)
+            ->groupBy('prd_products.seller_id')->count();     
+        if($rate){ 
+        $return_val = $rate->rating;
+        $count_review = $count_rate;
+        $percentage = ($return_val/$count_review)*100;
+        return $percentage;
         }
         else
             { $return_val=0;
@@ -2556,10 +2649,18 @@ class ProductController extends Controller
        $rows = PrdPrice::where('is_deleted',0)->where('prd_id',$field_id)->whereDate('sale_end_date','>=',$current_date)->first();        
         if($rows){ 
         $return_val = $rows->sale_price;
-        return $return_val;
+        if($return_val>0)
+        {
+            return $return_val;
         }
         else
-            { $return_val='';
+        {
+             return false;
+        }
+        
+        }
+        else
+            { $return_val=false;
                 return $return_val; }
         }
         
@@ -2571,10 +2672,12 @@ class ProductController extends Controller
        $rows = PrdPrice::where('is_deleted',0)->where('prd_id',$field_id)->first();        
         if($rows){ 
         $return_val = $rows->price;
-        return $return_val;
+        
+            return $return_val;
+        
         }
         else
-            { $return_val='';
+            { $return_val=false;
                 return $return_val; }
         }
 
@@ -2610,6 +2713,42 @@ class ProductController extends Controller
         }
         else
             { return false; }
+        }
+        
+        //CONFIG PRODUCT PRICE
+        
+        function config_product_price($prd_id)
+        {
+            $val = '';
+            $prd_ass = AssociatProduct::where('prd_id',$prd_id)->where('is_deleted',0)->get(['ass_prd_id']);
+            if($prd_ass){
+            $join = Product::join('prd_prices', 'prd_products.id', '=', 'prd_prices.prd_id')
+                    ->selectRaw("MAX(prd_prices.price) AS max_val, MIN(prd_prices.price) AS min_val")
+                    ->whereIn('prd_products.id',$prd_ass)->first();
+                    if($join)
+                    {
+                        $min = $join->min_val;
+                        $max = $join->max_val;
+                        if($min > 0 && $max > 0 && $min!=$max){
+                        $val = $min."-".$max;
+                        }
+                        else if($min > 0 && $max ==0)
+                        {
+                            $val = $min;
+                        }
+                        else if($min==$max)
+                        {
+                           $val = $min; 
+                        }
+                        else
+                        {
+                            $val = $max;
+                        }
+                    }
+            }
+            
+            return $val;
+                    
         }
 
 }

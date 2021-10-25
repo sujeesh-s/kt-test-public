@@ -61,16 +61,16 @@
                     <div class="text-muted">Address</div><div class="font-weight-bold">{{$order->address->address1}}<br />{{$order->address->address2}}</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">City</div><div class="font-weight-bold">{{$order->address->city }}</div>
+                    <div class="text-muted">City</div><div class="font-weight-bold">@if($order->address->bcity) {{$order->address->bcity->city_name}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">State</div><div class="font-weight-bold">{{$order->address->state }}</div>
+                    <div class="text-muted">State</div><div class="font-weight-bold">@if($order->address->bstate) {{$order->address->bstate->state_name}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">State</div><div class="font-weight-bold">{{$order->address->country }}</div>
+                    <div class="text-muted">Country</div><div class="font-weight-bold">@if($order->address->bcountry) {{$order->address->bcountry->country_name}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Country</div><div class="font-weight-bold">{{$order->address->zip_code }}</div>
+                    <div class="text-muted">Zip Code</div><div class="font-weight-bold">{{$order->address->zip_code }}</div>
                 </div>
             </div>
         </div>
@@ -93,16 +93,16 @@
                     <div class="text-muted">Address</div><div class="font-weight-bold">{{$order->address->s_address1}}<br />{{$order->address->address2}}</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">City</div><div class="font-weight-bold">{{$order->address->s_city }}</div>
+                    <div class="text-muted">City</div><div class="font-weight-bold">@if($order->address->scity) {{$order->address->scity->city_name}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">State</div><div class="font-weight-bold">{{$order->address->s_state }}</div>
+                    <div class="text-muted">State</div><div class="font-weight-bold">@if($order->address->sstate) {{$order->address->sstate->state_name}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">State</div><div class="font-weight-bold">{{$order->address->s_country }}</div>
+                    <div class="text-muted">Country</div><div class="font-weight-bold">@if($order->address->scountry) {{$order->address->scountry->country_name}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Country</div><div class="font-weight-bold">{{$order->address->s_zip_code }}</div>
+                    <div class="text-muted">Zip Code</div><div class="font-weight-bold">{{$order->address->s_zip_code }}</div>
                 </div>
             </div>
         </div>
@@ -133,16 +133,16 @@
             <div class="card-header"><div class="card-title">Shipping Detail</div></div>
             <div class="card-body">
                 <div class="mb-3">
-                    <div class="text-muted">Shipping Method</div><div class="font-weight-bold">{{$order->shipping->ship_method}}</div>
+                    <div class="text-muted">Shipping Method</div><div class="font-weight-bold">@if($order->shipping) {{$order->shipping->ship_method}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Amount</div><div class="font-weight-bold">{{$currency}} {{$order->shipping->price}}</div>
+                    <div class="text-muted">Amount</div><div class="font-weight-bold">@if($order->shipping) {{$currency}} {{$order->shipping->price}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Weight</div><div class="font-weight-bold">{{$order->shipping->weight}}</div>
+                    <div class="text-muted">Weight</div><div class="font-weight-bold">@if($order->shipping) {{$order->shipping->weight}} @endif</div>
                 </div>
                 <div class="mb-3">
-                    <div class="text-muted">Shipping Status</div><div class="font-weight-bold">{{$order->shipping->ship_status}}</div>
+                    <div class="text-muted">Shipping Status</div><div class="font-weight-bold">@if($order->shipping) {{$order->shipping->ship_status}} @endif</div>
                 </div>
             </div>
         </div>
@@ -151,7 +151,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                    <h3 class="card-title">Proucts</h3>
+                    <h3 class="card-title">Products</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -181,6 +181,39 @@
                     </table>
                 </div>
             </div>
+            
+            <div class="card-header">
+                    <h3 class="card-title">Update Order</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    {{ Form::open(array('url' => "sales/order/updateStatus", 'id' => 'ordUpdate', 'name' => 'ordUpdate', 'class' => '','files'=>'true')) }}
+                <div class="col-6">
+                    <div class="col">
+                    <div class="form-group">
+                    <label class="form-label">Status </label>
+                    
+                    
+                    @php $ord_stats = array('accepted'=>"Accepted",'shipped'=>"Shipped",'delivered'=>"Delivered"); @endphp
+                    {!! Form::select('is_active', $ord_stats, $order->order_status,['class' => 'form-control','required','id'=>'coupon_status']); !!}
+                   
+                    
+                    </div>
+                    </div>
+                    <div class="col">
+                        <div class="col d-flex justify-content-end">
+                        <input class="btn btn-primary updatestats" type="button" id="updatestats" data-id="{{$order->id}}" value="Save">
+                        </div>
+                    </div>
+                </div>
+                    
+                    
+                    {{Form::close()}}
+                    
+                    
+                </div>
+            </div>
+            
             <div class="col-lg-12">
                 <div class="card-footer text-right">
                      <button id="cancel_btn" type="button" class="btn btn-secondary">Back</button>

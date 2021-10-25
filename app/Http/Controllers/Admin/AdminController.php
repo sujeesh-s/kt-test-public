@@ -212,6 +212,7 @@ class AdminController extends Controller
             })->save($destinationPath.'/'.$input['imagename']);
             $destinationPath = storage_path($path);
             $image->move($destinationPath, $input['imagename']);
+            $imgUpload          =   uploadFile($path,$input['imagename']);
             Admin::where('id',auth()->user()->id)->update(['avatar'=>$path.'/'.$input['imagename']]); 
             }
         if($profile){   return      back()->with('success',' Profile updated successfully! '); }else{ return back(); }
@@ -346,6 +347,7 @@ class AdminController extends Controller
         })->save($destinationPath.'/'.$input['imagename']);
         $destinationPath = storage_path($path);
         $image->move($destinationPath, $input['imagename']);
+        $imgUpload          =   uploadFile($path,$input['imagename']);
         Admin::where('id',$insId)->update(['avatar'=>$path.'/'.$input['imagename']]); 
         }
         $data['title']              =   'Admins';

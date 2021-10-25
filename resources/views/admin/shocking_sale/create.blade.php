@@ -239,12 +239,16 @@
                 
                 $("#sale_end").on("dp.change", function (e) {
                 	$("#errNm2").empty();
-                    $('#sale_start').data("DateTimePicker").maxDate(e.date);
+                    // $('#sale_start').data("DateTimePicker").maxDate(e.date);
                 });
             });
 
 	jQuery(document).ready(function(){
 
+jQuery.validator.addMethod("greaterStart", function (value, element, params) {
+
+    return this.optional(element) || new Date(value) >= new Date($("["+params+"]").val());
+},'End Date must be greater than start date.');
 
 $("#frontval").click(function(){
 
@@ -263,7 +267,8 @@ required: true
 },
 
 sale_end: {
-required: true
+required: true,
+greaterStart: 'name="sale_start"'
 },
 offer_value : {
 required: true,

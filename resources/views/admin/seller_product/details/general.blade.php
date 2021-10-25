@@ -68,7 +68,7 @@
             {{Form::label('category_id','Category',['class'=>''])}} <span class="text-red">*</span>
             <!--{{Form::select('prd[category_id]',$categories,$catId,['id'=>'category_id','class'=>'form-control admin', 'placeholder'=>'Select Category'])}}-->
             
-            <select class="form-control select2 @error('category') is-invalid @enderror" id="categoryList" onchange="loadsubcat()"  name="prd[category_id]">
+            <select class="form-control select2 @error('category') is-invalid @enderror" id="category_id" onchange="loadsubcat()"  name="prd[category_id]">
             <option value="">Select</option>
           
             @foreach($categories as $key=>$cat )
@@ -79,11 +79,12 @@
             <span class="error"></span>
         </div>
     </div>
+    <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('sub_category_id','Sub Category',['class'=>''])}} <span class="text-red">*</span>
             <!--{{Form::select('prd[sub_category_id]',$sub_cats,$subCatId,['id'=>'sub_category_id','class'=>'form-control admin', 'placeholder'=>'Select Sub Category'])}}-->
-            <input type="text" id="sub-category-id" placeholder="Type to filter" name="prd[sub_category_id]" autocomplete="off" value="@if(isset($subCatId)) {{ $subCatId }} @endif" hidden />
+            <input type="text" id="sub_category_id" placeholder="Type to filter" name="prd[sub_category_id]" autocomplete="off" value="@if(isset($subCatId)) {{ $subCatId }} @endif" hidden />
             <input type="text" id="sub-category-drop" class="form-control " value="" placeholder="Select Subcategory" readonly style="background-color: #fff !important;">
 																
             <span class="error"></span>
@@ -96,6 +97,7 @@
             <span class="error"></span>
         </div>
     </div>
+    <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('short_desc','Short Description',['class'=>''])}} <span class="text-red">*</span>
@@ -304,15 +306,15 @@ $(".chosen-select").chosen({
     isMultiple: false
     });
     loadsubcat('1');
-    var selectionIdList = new Array($("#sub-category-id").val());
+    var selectionIdList = new Array($("#sub_category_id").val());
     instance.setSelection(selectionIdList);
  function loadsubcat(clear='',selected='')
     {
-        var category_id=$("#categoryList").val();
+        var category_id=$("#category_id").val();
         // alert(category_id);
         if(clear!='1')
         {
-            $("#sub-category-id").val('');
+            $("#sub_category_id").val('');
         }
         
          $.ajax({
@@ -333,9 +335,9 @@ $(".chosen-select").chosen({
                 $('#sub-category-drop').attr("placeholder", "No subcategory to display"); 
             }
             instance.setSource(obj.subdata);
-            if($("#sub-category-id").val())
+            if($("#sub_category_id").val())
             {
-                var selectionIdList = new Array($("#sub-category-id").val());
+                var selectionIdList = new Array($("#sub_category_id").val());
                 instance.setSelection(selectionIdList);
 
             }
@@ -352,13 +354,13 @@ $(".chosen-select").chosen({
             //alert(selected_subcatid);
             if(instance.getSelectedIds())
             {
-                $("#sub-category-id").val(instance.getSelectedIds()[0]);
+                $("#sub_category_id").val(instance.getSelectedIds()[0]);
             }
             
-            if(selected_subcatid!=$("#sub-category-id").val())
+            if(selected_subcatid!=$("#sub_category_id").val())
             {
-                var cat_id = $('#categoryList').val();
-            var subcat_id = $('#sub-category-id').val();
+                var cat_id = $('#category_id').val();
+            var subcat_id = $('#sub_category_id').val();
             $.ajax({
             url:"{{ route('taglist_ajax') }}",
             type:"POST",

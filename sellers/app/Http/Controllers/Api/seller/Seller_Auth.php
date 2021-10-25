@@ -45,18 +45,24 @@ class Seller_Auth extends Controller
         $rules['email']                 = 'required|nullable|email|max:255|unique:usr_seller_telecom,value';
         $rules['phone_number']          = 'required|nullable|numeric|digits_between:7,12|unique:usr_seller_telecom,value';
         $rules['address']               = 'required|string';
-        $rules['state']                 = 'required|numeric';
+        $rules['commission']            = 'required|numeric';
         $rules['country']               = 'required|numeric';
         $rules['state']                 = 'required|numeric';
         $rules['city']                  = 'required|numeric';
         $rules['zip_code']              = 'required|numeric';
         $rules['store_categories']      = 'required';
-        $rules['certificate']           = 'nullable|mimes:jpg,bmp,png,pdf,docx|max:1024';
+        $rules['certificate']           = 'nullable';
+       // $rules['certificate']           = 'nullable|mimes:jpg,bmp,png,pdf,docx';
         $validator  =   Validator::make($request->all(), $rules);
         if ($validator->fails()) 
             {
-                foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; $errorMag[] = $row[0]; }  
-                return array('httpcode'=>'400','status'=>'error','message'=>$errorMag[0],'data'=>array('errors' =>(object)$error));
+                $str='';
+                foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; $errorMag[] = $row[0];
+                  $pos = str_replace('.', ',', $row[0]);//strrpos($row[0], '.');
+                  $str.=  $pos;//substr_replace($row[0],'.',$pos).",";
+                } 
+                $error_str=substr($str,0,-1);
+                return array('httpcode'=>'400','status'=>'error','message'=>$error_str,'data'=>array('errors' =>(object)$error));
             }
         else
             { 
@@ -224,6 +230,49 @@ class Seller_Auth extends Controller
         
     }
     }
+    
+    public function login_username(Request $request){  
+
+        $post                       =   (object)$request->post(); 
+        $error = [];  
+        $user = false;
+        $rules                      =   ['email' => 'required|string|email|max:100'];
+        $validator                 =   Validator::make($request->post(),$rules);
+        if ($validator->fails()) {
+            
+         return array('httpcode'=>400,'status'=>'error','message'=>'Invalid Credential','data'=>array('errors' =>(object)['error_msg'=>'Invalid Email']));
+            
+        }
+        else
+            { 
+            $seller_mst = Seller::where('username',$request->email)->first(); 
+            
+            if($seller_mst) { 
+                if(SellerInfo::where('seller_id', $seller_mst->id)->first()) {
+                if(SellerInfo::where('seller_id', $seller_mst->id)->first()->is_approved == 1){
+                 $seller_data= SellerInfo::where('seller_id', $seller_mst->id)->first();   
+                 
+                  return ['httpcode'=>200,'status'=>'success','message'=>'Username accepted','data'=>['status'=>'Accepted','username'=>$request->email]];
+                 //$this->authenticateUserSeller($seller_data,$post);
+                  }
+                  else if(SellerInfo::where('seller_id', $seller_mst->id)->first()->is_approved == 2)
+                            {
+                                return array('httpcode'=>'400','status'=>'error','message'=>'Rejected','data'=>array('status'=>'Rejected','errors' =>'Admin rejected your seller account!'));
+                            }
+                else{
+                    // Auth::guard('seller')->logout(); $request->session()->flush(); $request->session()->regenerate();
+                    return array('httpcode'=>200,'status'=>'success','message'=>'Waiting for approval','data'=>array('status' =>'Waiting for approval'));
+                }
+              }
+            }//if seller mst end
+            else
+            {
+              return array('httpcode'=>400,'status'=>'error','message'=>'Invalid credientials','data'=>array('errors' =>(object)['error_msg'=>'Invalid credientials']));   
+            }
+        }
+
+
+        }
     
     public function check_username(Request $request)
     {

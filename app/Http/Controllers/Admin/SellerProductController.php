@@ -310,6 +310,20 @@ class SellerProductController extends Controller{
           }     
 
         }
+         if($error) { return $error; }
+         $imgArr                   =   $request->post('imgArr'); 
+         if( $imgArr ) {
+             
+         }else {
+           $validator              =   Validator::make(request()->all(),['image' => 'required',
+        'image.*' => 'image|mimes:jpg,jpeg,png']);
+        if ($validator->fails()){
+        $error['error']     =   'image_0';
+        foreach($validator->messages()->getMessages() as $k=>$row){ $error['image'][] = $row[0]; }
+        }  
+        if($error) { return $error; }  
+         }
+        
         
         if($error) { return $error; }else{ return 'success'; }
     }   
