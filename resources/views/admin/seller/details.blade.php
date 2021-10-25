@@ -16,18 +16,20 @@
     $active     =   ($store)?   $store->is_active : 1;                          $storeId    =   ($store)?   $store->id : 0;
     $logo       =   ($store)?   $store->logo : NULL;                            $banner     =   ($store)?   $store->banner : NULL;
     $packOption =   ($store)?   $store->pack_option : 0;
-    $catIds     =   $assSlotIds = $assSpotIds = [];
+    $catIds     =   $assSlotIds = $assSpotIds = []; $post_office        =   ($store)?   $store->post_office : '';
+     $certificate     =   ($store)?   $store->certificate : NULL;
      $icPhoneISD    =   ($store)?   $store->incharge_isd_code : '';   $isd_code    =   ($seller)?   $seller->isd_code : ''; 
     if($storeId     >   0){ foreach($assCategories as $strCat){    $catIds[]       =   $strCat->category_id; } }
     if($assSlots    &&  count($assSlots) > 0){  foreach($assSlots as $row){ $assSlotIds[]   =   $row->slot_id;  }   }
     if($assSpots    &&  count($assSpots) > 0){  foreach($assSpots as $row){ $assSpotIds[]   =   $row->slot_id;  }   }
     if($packOption  >   0){ $packChargeY = true; $packChargeN = false; }else{ $packChargeY  =   false; $packChargeN = true; }   
-    if($logo        !=  NULL && $logo   != ''){ $logoImg    = url('storage'.$logo); }else{ $logoImg = url('storage/app/public/no-avatar.png'); }
-    if($banner      !=  NULL && $banner != ''){ $bannerImg  = url('storage'.$banner); }else{ $bannerImg = url('storage/app/public/no-banner.png'); }
+       if($logo        !=  NULL && $logo   != ''){ $logoImg    = config('app.storage_url').$logo; }else{ $logoImg = url('storage/app/public/no-avatar.png'); }
+    if($banner      !=  NULL && $banner != ''){ $bannerImg  = config('app.storage_url').$banner; }else{ $bannerImg = url('storage/app/public/no-banner.png'); }
        $bank_id       =   (isset($bank['id']))?    $bank['id'] : 0;  $ac_no       =   (isset($bank['ac_no']))?    $bank['ac_no'] : '';  
     $ac_holder       =   (isset($bank['ac_holder']))?    $bank['ac_holder'] : '';  $bank_name       =   (isset($bank['bank_name']))?    $bank['bank_name'] : '';  
     $acc_type       =   (isset($bank['acc_type']))?    $bank['acc_type'] : 0;  $ifsc       =   (isset($bank['ifsc']))?    $bank['ifsc'] : '';  
     $branch       =   (isset($bank['branch']))?    $bank['branch'] : '';  
+     if($certificate      !=  NULL && $certificate != ''){ $cert_file  = config('app.storage_url').$certificate; }else{ $cert_file = ''; }
     
 @endphp  <?php // echo '<pre>'; print_r($catIds); echo '</pre>'; ?>
 <div class="page-header">

@@ -183,7 +183,7 @@ class SupportSeller extends Controller
                } 
                else
                {
-                 $image=url('storage'.$seller->store($seller->id)->logo);
+                 $image=config('app.storage_url').$seller->store($seller->id)->logo;
                }
                
                if($row->msg_type=='text')

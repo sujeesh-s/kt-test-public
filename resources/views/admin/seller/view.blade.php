@@ -1,7 +1,9 @@
  @php  
     if($store->is_active    ==  1){ $active     = '<span class="badge badge-success">Active</span>'; }else{ $active = '<span class="badge badge-error">Inactive</span>'; }
-    if($store->logo         !=  NULL && $store->logo   != ''){ $logoImg    = url('storage'.$store->logo); }else{ $logoImg = url('storage/app/public/no-avatar.png'); }
-    if($store->banner       !=  NULL && $store->banner != ''){ $bannerImg  = url('storage'.$store->banner); }else{ $bannerImg = url('storage/app/public/no-banner.png'); }
+    if($store->logo         !=  NULL && $store->logo   != ''){ $logoImg    = config('app.storage_url').$store->logo; }else{ $logoImg = url('storage/app/public/no-avatar.png'); }
+    if($store->banner       !=  NULL && $store->banner != ''){ $bannerImg  = config('app.storage_url').$store->banner; }else{ $bannerImg = url('storage/app/public/no-banner.png'); }
+    $certificate     =   ($store)?   $store->certificate : NULL;
+    if($certificate      !=  NULL && $certificate != ''){ $cert_file  = config('app.storage_url').$certificate; }else{ $cert_file = ''; }
 @endphp
 <div class="page-header">
     <div class="page-leftheader">

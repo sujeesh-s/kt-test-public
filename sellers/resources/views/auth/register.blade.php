@@ -2,9 +2,15 @@
 @section('css')
 <link rel="stylesheet" href="{{URL::asset('admin/assets/css/toastr.min.css')}}" />
 <style> 
-    .container{ max-width: 960px; } .fw{ width: 100%; } .error{ position: absolute; top: 43px; right: 15px; font-weight: bold; } .form-control{ border-radius: 0; }
+    .container{ max-width: 960px; } .fw{ width: 100%; } .error{ position: absolute; bottom: -20px;; right: 15px; font-weight: bold; color:#fff !important; }
+    .error.phn{ position: absolute;; right: 15px; font-weight: bold; }
+    
+    .form-control{ border-radius: 0; }
     .custom-radio .custom-control-input:checked~.custom-control-label::before { background-color: #00ffff !important; border-color:#00ffff !important; } 
-    .error.mlt-select{ bottom: 0; right: 35px; top: auto}
+    .error.mlt-select{  right: 35px; top: auto}
+    input[type="file"] {
+        padding: 3px;
+    }
 </style>
 @endsection
 @section('content')
@@ -56,7 +62,7 @@
                                         </div>
                                         <div class="col-9 pl-0 input-group">
                                         <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone Number" >
-                                        <span class="error"></span>
+                                        <span class="error phn"></span>
                                         </div>
                                         </div>
                                         <span class="error"></span>
@@ -68,8 +74,8 @@
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Store License</strong></label>
-                                            <input type="text" id="licence" name="store[licence]" class="form-control fw" placeholder="Store License">
+                                            <label class="col-12" for="phone"><strong>Store License No</strong></label>
+                                            <input type="text" id="licence" name="store[licence]" class="form-control fw" placeholder="Store License No">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
@@ -83,7 +89,7 @@
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Incharge Name</strong></label>
+                                            <label class="col-12" for="phone"><strong>In Charge Name</strong></label>
                                             <input type="text" id="incharge_name" name="store[incharge_name]" class="form-control fw" placeholder="Incharge Name">
                                             <span class="error"></span>
                                         </div>
@@ -93,7 +99,7 @@
                                         <!--    <span class="error"></span>-->
                                         <!--</div>-->
                                         <div class=" col-md-6 fl mb-2">
-                                        <label for="incharge_phone">Incharge Contact Number</label>
+                                        <label for="incharge_phone">In Charge Contact Number</label>
                                         
                                         <div class="row">
                                         <div class="col-3 pr-0 input-group">
@@ -113,13 +119,13 @@
                                         <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="store_desc"><strong>Store Description</strong></label>
-                                            <textarea id="store_desc" name="store[store_desc]" class="form-control fw" placeholder="Store Description"></textarea>
+                                            <label class="col-12" for="store_desc"><strong>Business Description</strong></label>
+                                            <textarea id="store_desc" name="store[store_desc]" class="form-control fw" placeholder="Business Description"></textarea>
                                             <span class="error"></span>
                                         </div>
-                                        <div class="input-group col-md-6 fl mb-2 d-none">
+                                        <div class="input-group col-md-6 fl mb-2 ">
                                             <label class="col-12" for="store_certificate"><strong>Certificate</strong></label>
-                                            <input type="file" id="store_certificate" name="certi[]" class="form-control fw">
+                                            <input type="file" id="store_certificate" name="certificate" accept=".xlsx,.xls,.doc, .docx,.ppt, .pptx,.txt,.pdf"  class="form-control fw">
                                         </div>
                                         
                                         <h4 class="col-12 mb-2 mt-4 text-white">Store Address </h4>
@@ -149,18 +155,23 @@
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
+                                            <label class="col-12" for="post_office"><strong>Post Office</strong></label>
+                                            <input type="text" id="post_office" name="store[post_office]" class="form-control fw" placeholder="Post Office">
+                                            <span class="error"></span>
+                                        </div>
+                                        <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="phone"><strong>Zip Code</strong></label>
                                             <input type="text" id="zip_code" name="store[zip_code]" class="form-control fw" placeholder="Zip Code">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="phone"><strong>Latitude</strong></label>
-                                            <input type="number" id="latitude" name="store[latitude]" class="form-control fw" placeholder="Latitude">
+                                            <input type="number" step="0.01" id="latitude" name="store[latitude]" class="form-control fw" placeholder="Latitude">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
                                             <label class="col-12" for="phone"><strong>Longitude</strong></label>
-                                            <input type="number" id="longitude" name="store[longitude]" class="form-control fw" placeholder="Longitude">
+                                            <input type="number" step="0.01" id="longitude" name="store[longitude]" class="form-control fw" placeholder="Longitude">
                                             <span class="error"></span>
                                         </div>
                                         
@@ -189,8 +200,8 @@
                                             <span class="error mlt-select"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="logo"><strong>Certificate</strong></label>
-                                            <div class="col-7 fl"><input type="file" id="logo" name="logo" class="form-control fw"></div>
+                                            <label class="col-12" for="logo"><strong>Store Logo</strong></label>
+                                            <div class="col-7 fl"><input type="file" id="logo" name="logo" accept="image/*"  class="form-control fw"></div>
                                             <div class="col-5 fl"><img id="logoImg" src="{{url('storage/app/public/no-avatar.png')}}" alt="Logo" height="70" /></div>
                                         </div>
                                     </div>

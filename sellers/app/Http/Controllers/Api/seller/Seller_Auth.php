@@ -231,6 +231,31 @@ class Seller_Auth extends Controller
     }
     }
     
+    public function logout(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'seller_id'              =>['required','numeric']]);
+        $input = $request->all();
+        if ($validator->passes()) {
+      
+        $login = SellerLogin::where('seller_id',$input['seller_id'])->first();
+        if($login){   
+
+            $loginData = ['access_token'=>'','is_login'=>0]; 
+            SellerLogin::where('seller_id',$input['seller_id'])->where('is_deleted',0)->update($loginData);
+            return ['httpcode'=>200,'status'=>'success','message'=>'logout successfully','data'=>['message'=>'logout successfully']];
+          }
+          else
+          {
+            return response()->json(['httpcode'=>404,'status'=>'error','message'=>'No seller found','data'=>'No seller found']);
+          }
+         }
+         else
+        {
+            return response()->json(['httpcode'=>400,'status'=>'error','message'=>'Invalid parameter','data'=>['errors'=>$validator->errors()->all()]]);
+        }
+    }
+    
     public function login_username(Request $request){  
 
         $post                       =   (object)$request->post(); 

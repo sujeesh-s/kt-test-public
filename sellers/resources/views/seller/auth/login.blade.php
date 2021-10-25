@@ -49,7 +49,7 @@
                                                 <div class="row">
 												<div class="col-12">
 												<label class="custom-control custom-checkbox">
-													<input type="checkbox" class="custom-control-input" name="example-checkbox2" value="option2">
+													<input type="checkbox" class="custom-control-input" name="remember" >
 													<span class="custom-control-label">Remember me</span>
 												</label>
 											  </div>

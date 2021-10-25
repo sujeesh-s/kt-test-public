@@ -442,16 +442,16 @@ required: "Status field is required."
             var id          =   this.id.replace('delBtn-',''); 
             var status      =   1;
             var url         =   '{{url("my-products/product/updateStatus")}}';
-            var smsg        =   'Seller deleted successfully!';
+            var smsg        =   ' Product deleted successfully!';
             swal({
                 title: "Delete Confirmation",
-                text: "Are you sure you want to delete this Seller?",
+                text: "Are you sure you want to delete this Product?",
                 // type: "input",
                 showCancelButton: true,
                 closeOnConfirm: true,
                 confirmButtonText: 'Yes'
             },function(inputValue){
-                if (inputValue == true) { alert('id');
+                if (inputValue == true) { //alert('id');
                     updateStatus(id,'',status,url,'seller','is_deleted',smsg);
                 }
             });
@@ -778,7 +778,7 @@ required: "Status field is required."
         $.ajax({
             type: "POST",
             url: url,
-            data: { "_token": "{{csrf_token()}}", id: id, value: status,field: field, field, page: row},
+            data: { "_token": "{{csrf_token()}}", id: id, value: status,field: field, field, page: row, msg:smsg},
             success: function (data) {
                 if(field == 'is_deleted'){ window.location.reload();
                   //  $('#content_list').html(data); toastr.success(smsg);

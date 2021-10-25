@@ -151,6 +151,7 @@ class SellerController extends Controller{
         $data['assSpots']           =   AssignedSlot::where('seller_id',$id)->where('slot_type','spot')->where('is_deleted',0)->get();
         $data['assCategories']      =   StoreCategory::where('seller_id',$id)->where('is_deleted',0)->get(['category_id']);
         $data['filters']            =   $request->post();
+        // dd($data);
         if($type == 'new')          {   return view('admin.new_seller.details',$data); }else if($type == 'view'){ return view('admin.seller.view',$data); }
         return view('admin.seller.details',$data);
     }
@@ -196,6 +197,7 @@ class SellerController extends Controller{
         $store                  =   $post->store; 
         $storeSet               =   (object)$post->storeSet; 
         $images                 =   $request->file('image'); if(isset($post->filter)) { $filter = (object)$post->filter; }
+        $certificates                 =   $request->file('certificate');
         $selInfo                   =   ['fname'=>$info->director_name,'ic_number'=>$info->ic_number,'is_active'=>$storeSet->is_active];
         
      //   $store['pack_charge']   =   $storeSet->pack_charge;
@@ -232,6 +234,16 @@ class SellerController extends Controller{
             $imgData[$k]        =   $path.'/'.$imgName;
             Store::where('id',$storeId)->update($imgData);
         } }
+         if($request->file('certificate')){ 
+            $certificate              =   $request->file('certificate');
+            $crtName            =   'certificate.'.$certificate->extension();
+            $path               =   '/app/public/stores/'.$storeId.'/docs';
+            $destinationPath    =   storage_path($path);
+            $certificate->move($destinationPath, $crtName);
+            $crtData['certificate']    =   $path.'/'.$crtName;
+            Store::where('id',$storeId)->update($crtData);
+            $imgUpload          =   uploadFile($path,$crtName);
+        }
         if($post->formType      ==  'newSeller'){ 
             $sellerotp = mt_rand(100000, 999999);
             $currTime = date('Y-m-d H:i:s');

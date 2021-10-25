@@ -236,12 +236,14 @@ class Homepage extends Controller
                     {
                     $prd_list['product_type']='simple';    
                     $prd_list['price']=number_format($row->prdPrice->price,2);
+                    $prd_list['actual_price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     }
                     else
                     {
                         $prd_list['product_type']='config'; 
                      $prd_list['price']=$this->config_product_price($row->id);
+                     $prd_list['actual_price']=$this->config_product_price($row->id);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);   
                     }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
@@ -293,12 +295,14 @@ class Homepage extends Controller
                     if($row->product_type==1)
                     {
                     $d_list['product_type']='simple';    
+                    $d_list['actual_price']=number_format($row->prdPrice->price,2);
                     $d_list['price']=number_format($row->prdPrice->price,2);
                     $d_list['sale_price']=$this->get_sale_price($row->id);
                     }
                     else
                     {
-                    $d_list['product_type']='config';     
+                    $d_list['product_type']='config';   
+                    $d_list['actual_price']=$this->config_product_price($row->id);
                     $d_list['price']=$this->config_product_price($row->id);
                     $d_list['sale_price']=$this->get_sale_price($row->id); 
                     }
@@ -494,9 +498,11 @@ class Homepage extends Controller
                 $auction_list['end_date']=$rows->auct_end;
                 if($rows->Product->product_type==1){
                 $auction_list['price']=number_format($rows->Product->prdPrice->price,2);
+                $auction_list['actual_price']=number_format($rows->Product->prdPrice->price,2);
                 }
                 else{
                     $auction_list['price']=$this->config_product_price($rows->product_id);
+                    $auction_list['actual_price']=$this->config_product_price($rows->product_id);
                 }
                 $auction_list['sale_price']=$this->get_sale_price($rows->product_id);
                 $auction_list['min_bid_price']=$rows->min_bid_price;
@@ -1062,7 +1068,7 @@ class Homepage extends Controller
        $no_of_prds= count($product_collect);
        $products_page = $this->paginate($product_collect);
        $products_page_data = $products_page->items();
-       $products_page_data=array_unique($product_collect, SORT_REGULAR);
+       $products_page_data=array_unique($products_page_data, SORT_REGULAR);
         
         return ['httpcode'=>200,'status'=>'success','message'=>'search','data'=>['keyword'=>$request->keyword,'no_of_products'=>$no_of_prds,'products'=>$products_page_data]];
 
@@ -1426,7 +1432,7 @@ class Homepage extends Controller
         return $return_val;
         }
         else
-            { $return_val='';
+            { $return_val=false;
                 return $return_val; }
         }
 

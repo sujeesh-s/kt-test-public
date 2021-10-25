@@ -15,15 +15,16 @@
     $purLimit   =   ($store)?   $store->purchase_limit : '';                    $trackLink  =   ($store)?   $store->tracking_link : '';
     $active     =   ($store)?   $store->is_active : 1;                          $storeId    =   ($store)?   $store->id : 0;
     $logo       =   ($store)?   $store->logo : NULL;                            $banner     =   ($store)?   $store->banner : NULL;
-    $packOption =   ($store)?   $store->pack_option : 0;
-    $catIds     =   $assSlotIds = $assSpotIds = []; 
+    $packOption =   ($store)?   $store->pack_option : 0; $post_office        =   ($store)?   $store->post_office : '';
+    $catIds     =   $assSlotIds = $assSpotIds = []; $certificate     =   ($store)?   $store->certificate : NULL;
     $icPhoneISD    =   ($store)?   $store->incharge_isd_code : '';   $isd_code    =   ($seller)?   $seller->isd_code : ''; 
     if($storeId     >   0){ foreach($assCategories as $strCat){    $catIds[]       =   $strCat->category_id; } }
     if($assSlots    &&  count($assSlots) > 0){  foreach($assSlots as $row){ $assSlotIds[]   =   $row->slot_id;  }   }
     if($assSpots    &&  count($assSpots) > 0){  foreach($assSpots as $row){ $assSpotIds[]   =   $row->slot_id;  }   }
     if($packOption  >   0){ $packChargeY = true; $packChargeN = false; }else{ $packChargeY  =   false; $packChargeN = true; }   
-    if($logo        !=  NULL && $logo   != ''){ $logoImg    = url('storage'.$logo); }else{ $logoImg = url('storage/app/public/no-avatar.png'); }
-    if($banner      !=  NULL && $banner != ''){ $bannerImg  = url('storage'.$banner); }else{ $bannerImg = url('storage/app/public/no-banner.png'); }
+    if($logo        !=  NULL && $logo   != ''){ $logoImg    = config('app.storage_url').$logo; }else{ $logoImg = url('storage/app/public/no-avatar.png'); }
+    if($banner      !=  NULL && $banner != ''){ $bannerImg  = config('app.storage_url').$banner; }else{ $bannerImg = url('storage/app/public/no-banner.png'); }
+    if($certificate      !=  NULL && $certificate != ''){ $cert_file  = config('app.storage_url').$certificate; }else{ $cert_file = ''; }
 @endphp  <?php // echo '<pre>'; print_r($catIds); echo '</pre>'; ?>
 <div class="page-header">
     <div class="page-leftheader">

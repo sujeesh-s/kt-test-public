@@ -81,6 +81,7 @@
 
 																@if($products && count($products) > 0)
                     											@foreach($products as $row)
+                    											@if(($row->product_type ==2 && $row->visible ==0)|| ($row->product_type ==1) )
 																<tr>
 																	<td class="align-middle select-checkbox" id="moduleid" data-value="{{$row['id']}}">
 																		<label class="custom-control custom-checkbox">
@@ -108,6 +109,7 @@
 																		</div>
 																	</td>  
 																</tr>
+																@endif
 																     @endforeach
                 @endif
 																

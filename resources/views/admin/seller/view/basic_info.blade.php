@@ -22,7 +22,7 @@
     </div>
     <div class="col-lg-4 col-md-6 fl">
         <div class="form-group">
-            <div class="text-muted">Email</div><div class="font-weight-bold">{{$seller->teleEmail->value}}</div>
+            <div class="text-muted">Email Id</div><div class="font-weight-bold">{{$seller->teleEmail->value}}</div>
         </div>
     </div>
     <div class="col-lg-4 col-md-6 fl">
@@ -53,6 +53,11 @@
     <div class="col-lg-4 col-md-6 fl">
         <div class="form-group">
             <div class="text-muted">Incharge Phone</div><div class="font-weight-bold">{{$store->incharge_phone}}</div>
+        </div>
+    </div> 
+    <div class="col-lg-4 col-md-6 fl">
+        <div class="form-group">
+            <div class="text-muted">Certificate</div><div class="font-weight-bold"> @if($cert_file !="") <a href="{{$cert_file}}" download class=""> View Certificate </a>@endif </div>
         </div>
     </div> 
 </div>

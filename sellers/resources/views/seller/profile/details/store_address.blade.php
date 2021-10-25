@@ -35,6 +35,7 @@
             <span class="error"></span>
         </div>
     </div>
+    <div class="clearfix"></div>
     <div class="col-lg-6 fl">
         <div class="form-group">
             {{Form::label('latitude','Latitude',['class'=>''])}}
@@ -46,6 +47,14 @@
         <div class="form-group">
             {{Form::label('longitude','Longitude',['class'=>''])}}
             {{Form::text('store[longitude]',$zip,['id'=>'longitude','class'=>'form-control','placeholder'=>'Longitude'])}}
+            <span class="error"></span>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-lg-6 fl">
+        <div class="form-group">
+            {{Form::label('post_office','Post Office',['class'=>''])}}
+            {{Form::text('store[post_office]',$post_office,['id'=>'post_office','class'=>'form-control','placeholder'=>'Post Office'])}}
             <span class="error"></span>
         </div>
     </div>

@@ -25,7 +25,7 @@
 													</div>
                                                                                                     <input type="email" name="email" class="form-control" placeholder="Email" required="">
                                                                                                     @error('email')
-                                                                                                        <span class="invalid-feedback" role="alert">
+                                                                                                        <span class="error tac fw" role="alert">
                                                                                                             <strong>{{ $message }}</strong>
                                                                                                         </span>
                                                                                                     @enderror
@@ -38,7 +38,7 @@
 													</div>
                                                                                                     <input type="password" name="password" class="form-control" placeholder="Password" required="">
                                                                                                     @error('password')
-                                                                                                        <span class="invalid-feedback" role="alert">
+                                                                                                        <span class="error tac fw" role="alert">
                                                                                                             <strong>{{ $message }}</strong>
                                                                                                         </span>
                                                                                                     @enderror

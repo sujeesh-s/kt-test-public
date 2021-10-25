@@ -35,5 +35,10 @@
             <div class="text-muted">Longitude</div><div class="font-weight-bold">{{$store->longitude}}</div>
         </div>
     </div>
+    <div class="col-lg-4 col-md-6 fl">
+        <div class="form-group">
+            <div class="text-muted">Post Office</div><div class="font-weight-bold">{{$store->post_office}}</div>
+        </div>
+    </div>
 </div>
                         

@@ -24,6 +24,7 @@
                                     <tbody>
                                        @if($visit && count($visit) > 0) @php $n = 0; @endphp
                                             @foreach($visit as $row) @php $n++; @endphp 
+                                            @if($row->product)
                                         <tr>
                                         <td class="align-middle select-checkbox"></td>
                                         <td>{{date('d M Y',strtotime($row->created_at))}}</td>
@@ -33,6 +34,7 @@
                                         <td>{{$row->total - $row->users}}</td>
                                         <td>{{$row->total}}</td>
                                         </tr>
+                                        @endif
                                         @endforeach
                                         @endif
                                     </tbody>

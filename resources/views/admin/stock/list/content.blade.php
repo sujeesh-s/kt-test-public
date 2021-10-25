@@ -44,6 +44,7 @@
                                     <tbody>
                                         @if($products && count($products) > 0) @php $n = 0; @endphp
                                             @foreach($products as $row) @php $n++; if(isset($row->prdPrice)){ $pr_price = $row->prdPrice->price; }else { $pr_price =0; } @endphp <?php // echo '<pre>'; print_r($row->price($row->prd_id)); echo '</pre>'; die; ?>
+                                                @if(($row->product_type ==2 && $row->visible ==0)|| ($row->product_type ==1) )
                                                 <tr class="dtrow" id="dtrow-{{$row->id}}">
                                                     <td><span class="d-none">{{$n}}</span></span></td>
                                                     <td>{{$row->seller->fname}}</td> 
@@ -58,7 +59,8 @@
                                                         <button id="addPice-{{$row->id}}" data-seller="{{$row->seller->seller_id}}" data-product="{{$row->id}}" class="mr-2 btn btn-info btn-sm addPice" data-toggle="modal" data-target=".bd-example-modal"><i class="fa fa-plus mr-1"></i>Add Price</button>
                                                         <button id="viewForm-{{$row->id}}" class="mr-2 btn btn-success btn-sm viewForm"><i class="fa fa-eye mr-1"></i>View</button>
                                                     </td>
-                                            @endforeach
+                                           @endif
+                                           @endforeach
                                         @endif
                                     </tbody>
 

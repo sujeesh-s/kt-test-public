@@ -28,7 +28,7 @@
                                             <th class="wd-15p notexport"></th>
                                             <th class="wd-15p">Business Name</th>
                                             <th class="wd-15p">Store Name</th>
-                                            <th class="wd-15p">Email</th>
+                                            <th class="wd-15p">Email Id</th>
                                             <th class="wd-20p">Phone</th>
                                             <th class="wd-10p">Created On</th>
                                             <th class="wd-25p notexport">Status</th>

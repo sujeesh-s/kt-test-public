@@ -85,13 +85,15 @@ class RegisterController extends Controller
     function validateSeller(Request $request){
         $post                   =   (object)$request->post(); $error = false;
         $validator              =   Validator::make($request->post(), [
-                                        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],'phone' => 'required|numeric|digits_between:7,12',
+                                        'email' => 'required|string|email|max:255|unique:usr_seller_mst,username','phone' => 'required|numeric|digits_between:7,12',
                                     ]);
         $validator1             =   Validator::make($post->store, [
-                                        'business_name' => ['required', 'string', 'max:250'],'store_name' => ['required', 'string', 'max:250'],'address' => ['required', 'string', 'max:250'],
-                                        'zip_code' => ['required', 'numeric', 'min:5'],'country_id' => ['required'],'state_id' => ['required'],'city_id' => ['required'],
+                                        'business_name' => 'required|string|max:250','store_name' => 'required|string|max:250','address' => 'required|string|max:250',
+                                        'zip_code' => 'required|numeric|min:5','country_id' => 'required','state_id' => 'required','city_id' => 'required',
+                                        'incharge_name' => 'nullable|regex:/^[\pL\s\-]+$/u |string|max:55', 'incharge_phone' => 'nullable|numeric |digits_between:7,12'
                                     ]);
-        $validator2             =   Validator::make($post->info, ['director_name' => 'required', 'string', 'max:55']);
+        $validator2             =   Validator::make($post->info, ['director_name' => 'required|regex:/^[\pL\s\-]+$/u |string|max:55','ic_number' => 'nullable|numeric'
+                                    ]);
         $validEmail             =   SellerTelecom::ValidateUnique('email',$post->email,0); 
         $validPhone             =   SellerTelecom::ValidateUnique('phone',$post->phone,0); 
         if ($validator->fails()){   foreach($validator->messages()->getMessages() as $k=>$row){ $error[$k] = $row[0]; } }
@@ -126,6 +128,16 @@ class RegisterController extends Controller
             $imgData['logo']    =   $path.'/'.$imgName;
             Store::where('id',$storeId)->update($imgData);
             $imgUpload          =   uploadFile($path,$imgName);
+        }
+         if($request->file('certificate')){ 
+            $certificate              =   $request->file('certificate');
+            $crtName            =   'certificate.'.$certificate->extension();
+            $path               =   '/app/public/stores/'.$storeId.'/docs';
+            $destinationPath    =   storage_path($path);
+            $certificate->move($destinationPath, $crtName);
+            $crtData['certificate']    =   $path.'/'.$crtName;
+            Store::where('id',$storeId)->update($crtData);
+            $imgUpload          =   uploadFile($path,$crtName);
         }
         if($sellerId){ 
             $from       = $sellerId; 

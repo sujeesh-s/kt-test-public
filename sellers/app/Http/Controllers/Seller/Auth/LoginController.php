@@ -57,7 +57,10 @@ class LoginController extends Controller
     }
 
     public function sellerLogin(Request $request){
-        if (Auth::guard('seller')->attempt(['username' => $request->email, 'password' => '123456'])) {
+        
+        $remember_me = $request->has('remember') ? true : false;
+        
+        if (Auth::guard('seller')->attempt(['username' => $request->email, 'password' => '123456'],$remember_me)) {
             $security       =   SellerSecurity::where('seller_id',Auth::guard('seller')->user()->id)->first();
             if(Hash::check($request->password, $security->password_hash)){ }else{ Auth::guard('seller')->logout(); return back()->withInput($request->only('email', 'remember'))->with('message',' These credentials do not match our records. '); }
             if(SellerInfo::where('seller_id', Auth::guard('seller')->user()->id)->first()) {

@@ -16,7 +16,7 @@
     </div>
     <div class="col-lg-6 fl">
         <div class="form-group">
-            {{Form::label('email','Email Type',['class'=>''])}} <span class="text-red">*</span>
+            {{Form::label('email','Email Id',['class'=>''])}} <span class="text-red">*</span>
             {{Form::text('info[email]',$email,['id'=>'email', 'class'=>'form-control','placeholder'=>'Email'])}}
             <span class="error"></span>
         </div>
@@ -122,5 +122,21 @@
             </div>
         </div>
     </div> 
+    <div class="col-12 fl">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{Form::label('store_certificate','Certificate',['class'=>''])}}
+                    {{Form::file('certificate',['id'=>'store_certificate','class'=>'form-control imgup','accept'=>'.xlsx,.xls,.doc, .docx,.ppt, .pptx,.txt,.pdf'])}}
+                    <span class="error"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                   @if($cert_file !="") <a href="{{$cert_file}}" download class=" d-block mt-6"> View Certificate </a>@endif 
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
                         

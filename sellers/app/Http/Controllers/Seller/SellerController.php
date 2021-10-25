@@ -434,6 +434,16 @@ class SellerController extends Controller
             $imgUpload          =   uploadFile($path,$imgName);
             Store::where('id',$storeId)->update($imgData);
         } }
+         if($request->file('certificate')){ 
+            $certificate              =   $request->file('certificate');
+            $crtName            =   'certificate.'.$certificate->extension();
+            $path               =   '/app/public/stores/'.$storeId.'/docs';
+            $destinationPath    =   storage_path($path);
+            $certificate->move($destinationPath, $crtName);
+            $crtData['certificate']    =   $path.'/'.$crtName;
+            Store::where('id',$storeId)->update($crtData);
+            $imgUpload          =   uploadFile($path,$crtName);
+        }
       
         $data['title']          =   'Profile';
         $data['active']         =   "";

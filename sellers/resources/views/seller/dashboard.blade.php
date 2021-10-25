@@ -186,6 +186,7 @@
 												<tbody>
 													@if($prd_out_stock_soon && count($prd_out_stock_soon) > 0)
                     											@foreach($prd_out_stock_soon as $row)
+                    											@if(($row->product_type ==2 && $row->visible ==0)|| ($row->product_type ==1) )
                     											 
 													<tr>
 														
@@ -216,6 +217,7 @@
 														<td>{{ $row->prdStock($row->id) }}</td>
 														
 													</tr>
+													@endif
 													@endforeach
 													@endif
 													
