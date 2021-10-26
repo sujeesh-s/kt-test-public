@@ -45,6 +45,7 @@ class Seller_Auth extends Controller
         $rules['email']                 = 'required|nullable|email|max:255|unique:usr_seller_telecom,value';
         $rules['phone_number']          = 'required|nullable|numeric|digits_between:7,12|unique:usr_seller_telecom,value';
         $rules['address']               = 'required|string';
+        $rules['post_office']           = 'nullable';
         $rules['commission']            = 'required|numeric';
         $rules['country']               = 'required|numeric';
         $rules['state']                 = 'required|numeric';
@@ -81,6 +82,7 @@ class Seller_Auth extends Controller
                 $store['licence']       =   $request->store_licence;
                 $store['address']       =   $request->address;
                 $store['address2']      =   $request->address2;
+                $store['post_office']   =   $request->post_office;
                 $store['latitude']      =   $request->latitude;
                 $store['longitude']     =   $request->longitude;
                 $store['country_id']    =   $request->country;

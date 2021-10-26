@@ -965,7 +965,7 @@ class OrderController extends Controller
             }
 
             $prd_list['is_out_of_stock']=$prod_data->is_out_of_stock;
-            $discount_price =$prd_list['total_discount_price'];
+           // $discount_price =$prd_list['total_discount_price'];
             
             $tot_actual=$actual_price*$qty;
           

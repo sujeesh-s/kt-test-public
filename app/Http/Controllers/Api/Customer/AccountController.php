@@ -115,10 +115,18 @@ class AccountController extends Controller
                           $products = Product::where('id',$prdId)->first();
 
                          $data['id']                =   $row->id;
-                         $data['product_id']        =   $prdId;
+                         $data['product_id']        =   $prdId; 
                          $data['product_name']      =   $this->get_content($products->name_cnt_id,$lang);;
                          $data['product_rating']    =   $this->get_rates($products->id);
+                         if($products->product_type==1){
+                         $data['product_type']      =   'simple';     
                          $data['actual_price']      =   $products->prdPrice->price;
+                         }
+                         else
+                         {
+                         $data['product_type']      =   'config';         
+                         $data['actual_price']      =   false;    
+                         }
                          $data['currency']          =   getCurrency()->name;
                          $data['sale_price']        =   $this->get_sale_price($products->id);
                          $data['product_image']     =   $this->get_product_image($products->id);

@@ -12,6 +12,11 @@
         <!-- INTERNAL File Uploads css-->
         <link href="{{URL::asset('admin/assets/plugins/fileupload/css/fileupload.css')}}" rel="stylesheet" type="text/css" />
         <link href="{{URL::asset('admin/assets/css/combo-tree.css')}}" rel="stylesheet" />
+        <style type="text/css">
+        	.img {
+        		padding: 3px;
+        	}
+        </style>
 @endsection
 @section('page-header')
 						<!--Page header-->
@@ -162,8 +167,13 @@
                                                         <div class="col-lg-4 col-md-4 col-sm-12">
                                                             <label class="form-label">Subcategory Image <span class="text-red">*</span></label>
                                                             <p>(Image type .png,.jpeg)</p>
-                                                            <input type="file" class="dropify @error('subcategory_image') is-invalid @enderror" data-height="180"  accept="image/*" name="subcategory_image" data-allowed-file-extensions='["png", "jpg", "jpeg"]' />
+                                                            <input type="file" class="form-control img @error('subcategory_image') is-invalid @enderror" data-height="180"  accept="image/png, image/jpg, image/jpeg" id="category_image" name="subcategory_image" />
                                                             <p style="color: red" id="errNm1"></p>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-8 col-sm-12">
+															<div class="form-group">
+															<img src="" alt="Image" id="image_disp_id" class="no-disp" width="120px" />
+															</div>
                                                         </div>
                                                         @error('subcategory_image')
                                                                     <span class="invalid-feedback" role="alert">
@@ -220,9 +230,19 @@
         
 <script type="text/javascript">
 
+	 function readURL(input) { 
+        if (input.files && input.files[0]) { 
+            var reader = new FileReader(); 
+            reader.onload = function (e) { $('#image_disp_id').attr('src', e.target.result); $('#image_disp_id').show(); }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+
     jQuery(document).ready(function(){
 
-
+	$("body").on('change','#category_image',function(){ readURL(this); });
 $("#frontval").click(function(){
     
    

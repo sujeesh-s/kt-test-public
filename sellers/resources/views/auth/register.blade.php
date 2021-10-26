@@ -32,12 +32,12 @@
                                     <div class="row">
                                         <h4 class="col-12 mb-4 text-white">Basic Information </h4>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="business_name"><strong>Business Name</strong></label>
+                                            <label class="col-12" for="business_name"><strong>Business Name *</strong></label>
                                             <input type="text" id="business_name" name="store[business_name]" class="form-control fw" placeholder="Business Name">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="store_name"><strong>Store Name</strong></label>
+                                            <label class="col-12" for="store_name"><strong>Store Name *</strong></label>
                                             <input type="text" id="store_name" name="store[store_name]" class="form-control fw" placeholder="Store Name">
                                             <span class="error"></span>
                                         </div>
@@ -48,7 +48,7 @@
                                         <!--</div>-->
                                         
                                         <div class=" col-md-6 fl mb-2">
-                                        <label for="phone">Phone </label>
+                                        <label for="phone">Phone *</label>
                                         
                                         <div class="row">
                                         <div class="col-3 pr-0 input-group">
@@ -69,7 +69,7 @@
                                         </div>
                                         
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="Email"><strong>Email</strong></label>
+                                            <label class="col-12" for="Email"><strong>Email *</strong></label>
                                             <input type="email" id="email" name="email" class="form-control fw" placeholder="Email">
                                             <span class="error"></span>
                                         </div>
@@ -79,7 +79,7 @@
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Directer Name</strong></label>
+                                            <label class="col-12" for="phone"><strong>Directer Name *</strong></label>
                                             <input type="text" id="director_name" name="info[director_name]" class="form-control fw" placeholder="Director Name">
                                             <span class="error"></span>
                                         </div>
@@ -130,27 +130,27 @@
                                         
                                         <h4 class="col-12 mb-2 mt-4 text-white">Store Address </h4>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="address"><strong>Address Line 1</strong></label>
+                                            <label class="col-12" for="address"><strong>Address Line 1 *</strong></label>
                                             <input type="text" id="address" name="store[address]" class="form-control fw" placeholder="Address Line 1">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="address2"><strong>Address Line 2</strong></label>
+                                            <label class="col-12" for="address2"><strong>Address Line 2 </strong></label>
                                             <input type="text" id="address2" name="store[address2]" class="form-control fw" placeholder="Address Line 2">
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Country</strong></label>
+                                            <label class="col-12" for="phone"><strong>Country *</strong></label>
                                             {{Form::select('store[country_id]',countryList(),'',['id'=>'country_id','class'=>'form-control fw', 'placeholder'=>'Select Country'])}}
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>State</strong></label>
+                                            <label class="col-12" for="phone"><strong>State *</strong></label>
                                             {{Form::select('store[state_id]',[],'',['id'=>'state_id','class'=>'form-control fw', 'placeholder'=>'Select State'])}}
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>City</strong></label>
+                                            <label class="col-12" for="phone"><strong>City *</strong></label>
                                             {{Form::select('store[city_id]',[],'',['id'=>'city_id','class'=>'form-control fw', 'placeholder'=>'Select City'])}}
                                             <span class="error"></span>
                                         </div>
@@ -160,7 +160,7 @@
                                             <span class="error"></span>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Zip Code</strong></label>
+                                            <label class="col-12" for="phone"><strong>Zip Code *</strong></label>
                                             <input type="text" id="zip_code" name="store[zip_code]" class="form-control fw" placeholder="Zip Code">
                                             <span class="error"></span>
                                         </div>
@@ -195,7 +195,7 @@
                                             </div>
                                         </div>
                                         <div class="input-group col-md-6 fl mb-2">
-                                            <label class="col-12" for="phone"><strong>Store Categories</strong></label>
+                                            <label class="col-12" for="phone"><strong>Store Categories *</strong></label>
                                             {{Form::select('categories[]',categoryList(),'',['id'=>'categories','class'=>'form-control fw', 'placeholder'=>'Select Categories','multiple'=>true])}}
                                             <span class="error mlt-select"></span>
                                         </div>

@@ -29,6 +29,7 @@ use App\Models\SaleOrder;
 use App\Models\Auction;
 use App\Models\Product;
 use App\Models\PrdPrice;
+use App\Models\PrdOffer;
 use App\Models\AssociatProduct;
 
 use App\Rules\Name;
@@ -50,7 +51,7 @@ class MyProducts extends Controller
       {
         $list['product_id']=$row->id;
         $list['product_name']=$this->get_content($row->name_cnt_id);
-        $list['stock'] =$row->prdStock($row->id);
+        $list['stock'] =number_format($row->prdStock($row->id));
         $list['out_of_stock_selling'] =$row->out_of_stock_selling;
         $list['category_id']=$row->category_id;
         $list['category_name']=$this->get_content($row->category->cat_name_cid);
@@ -63,18 +64,21 @@ class MyProducts extends Controller
         }
         else
         {
-        $list['brand_id']='';
+        $list['brand_id']=0;
         $list['brand_name']='';
         }
         if($row->product_type==1)
         {
-         $list['actual_price']=$row->prdPrice->price;           
+         $list['product_type']='simple';    
+         $list['actual_price']=number_format($row->prdPrice->price,2);           
         }
         else
         {
-        $list['actual_price']=$this->config_product_price($row->id);  
+        $list['product_type']='config';    
+        $list['actual_price']=number_format($this->config_product_price($row->id),2);  
         }
-        $list['sale_price']=$this->get_sale_price($row->id);
+        $list['sale_price']=number_format($this->get_sale_price($row->id));
+        $list['currency']=getCurrency()->name;
         $list['is_active']=$row->is_active;
         $mypro[] = $list;
       }
@@ -116,12 +120,103 @@ class MyProducts extends Controller
   }
 
 
+public function add_special_offer(Request $request)
+    {
+        if(!$user = validateTokenSeller($request->post('access_token'))){ return invalidToken(); }
+        $seller_id = $user->seller_id;
+
+        $validator=  Validator::make($request->all(),[
+            'access_token'=>['required'],
+            'product_id' => ['required'],
+            'discount_value'=>['required','numeric'],
+            'discount_type'=>['required','string',Rule::in(['percentage','amount'])],
+            'qty_limit' =>['required','numeric'],
+            'valid_from'=>['required'],
+            'valid_to'=>['required'],
+            'active'=>['required','numeric',Rule::in(['0','1'])]
+        ]);
+        $input = $request->all();
+
+    if ($validator->fails()) 
+    {    
+      return ['httpcode'=>400,'status'=>'error','message'=>'Invalid parameters','data'=>['errors'=>$validator->messages()]];
+    }
+    else
+    {
+        $prd_offr = PrdOffer::where('prd_id',$input['product_id'])->where('is_deleted',0)->first();
+        if($prd_offr){
+        $update = ['discount_value'=>$input['discount_value'],
+            'discount_type'=>$input['discount_type'],
+            'quantity_limit'=>$input['qty_limit'],
+            'valid_from'=>$input['valid_from'],
+            'valid_to'=>$input['valid_to'],
+            'is_active'=>$input['active'],
+            'is_deleted'=>0,
+            'updated_by'=>$seller_id];
+        $updates=PrdOffer::where('prd_id',$input['product_id'])->update($update);
+        return ['httpcode'=>200,'status'=>'success','message'=>'Successfully inserted','data'=>['response'=>'Successfully inserted']];
+       }
+       else
+       {
+         $update = ['prd_id'=>$input['product_id'],
+            'discount_value'=>$input['discount_value'],
+            'discount_type'=>$input['discount_type'],
+            'quantity_limit'=>$input['qty_limit'],
+            'valid_from'=>$input['valid_from'],
+            'valid_to'=>$input['valid_to'],
+            'is_active'=>1,
+            'is_deleted'=>0,
+            'created_by'=>$seller_id,
+            'updated_by'=>$seller_id];
+            $updates=PrdOffer::create($update);
+        return ['httpcode'=>200,'status'=>'success','message'=>'Successfully inserted','data'=>['response'=>'Successfully inserted']];
+       }
+    }
+  
+
+  }
+
+
+  public function fetch_special_offer(Request $request)
+    {
+        if(!$user = validateTokenSeller($request->post('access_token'))){ return invalidToken(); }
+        $seller_id = $user->seller_id;
+
+        $validator=  Validator::make($request->all(),[
+            'access_token'=>['required'],
+            'product_id' => ['required','numeric']
+        ]);
+        $input = $request->all();
+
+    if ($validator->fails()) 
+    {    
+      return ['httpcode'=>400,'status'=>'error','message'=>'Invalid parameters','data'=>['errors'=>$validator->messages()]];
+    }
+
+    else
+    {
+        $prd_offr = PrdOffer::where('prd_id',$input['product_id'])->where('is_deleted',0)->first();
+        if($prd_offr){
+        $update = ['product_name'=>$this->get_content($prd_offr->product->name_cnt_id),
+            'discount_value'=>$prd_offr->discount_value,
+            'discount_type'=>$prd_offr->discount_type,
+            'qty_limit'=>$prd_offr->quantity_limit,
+            'valid_from'=>$prd_offr->valid_from,
+            'valid_to'=>$prd_offr->valid_to,
+            'is_active'=>$prd_offr->is_active];
+        
+        return ['httpcode'=>200,'status'=>'success','message'=>'Special offer','data'=>['offer'=>$update]];
+       }
+       else{
+        return ['httpcode'=>404,'status'=>'error','message'=>'Not found','data'=>['response'=>'Empty/not found']];
+       }
+    }
+
+  }
 
 
 
-
-
-
+/********************************fetch values********/
     //Product sale price
     public function get_sale_price($field_id){ 
 
@@ -132,7 +227,7 @@ class MyProducts extends Controller
         return $return_val;
         }
         else
-            { $return_val='';
+            { $return_val=0;
                 return $return_val; }
         }
 
@@ -161,7 +256,7 @@ class MyProducts extends Controller
         
         function config_product_price($prd_id)
         {
-            $val = '';
+            $val = 0;
             $prd_ass = AssociatProduct::where('prd_id',$prd_id)->where('is_deleted',0)->get(['ass_prd_id']);
             if($prd_ass){
             $join = Product::join('prd_prices', 'prd_products.id', '=', 'prd_prices.prd_id')
@@ -171,21 +266,22 @@ class MyProducts extends Controller
                     {
                         $min = $join->min_val;
                         $max = $join->max_val;
-                        if($min > 0 && $max > 0){
-                        $val = $min."-".$max;
-                        }
-                        else if($min > 0 && $max ==0)
-                        {
-                            $val = $min;
-                        }
-                        else if($min==$max)
-                        {
-                           $val = $min; 
-                        }
-                        else
-                        {
-                            $val = $max;
-                        }
+                        $val = $min;
+                        // if($min > 0 && $max > 0){
+                        // $val = $min."-".$max;
+                        // }
+                        // else if($min > 0 && $max ==0)
+                        // {
+                        //     $val = $min;
+                        // }
+                        // else if($min==$max)
+                        // {
+                        //   $val = $min; 
+                        // }
+                        // else
+                        // {
+                        //     $val = $max;
+                        // }
                     }
             }
             

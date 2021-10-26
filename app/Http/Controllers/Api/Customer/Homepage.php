@@ -35,6 +35,7 @@ use App\Models\PrdAssignedTag;
 use App\Models\PrdReview;
 use App\Models\PrdShock_Sale;
 use App\Models\PrdPrice;
+use App\Models\PrdOffer;
 use App\Models\PrdSearch_Directory;
 use App\Models\RelatedProduct;
 use App\Models\AssignedAttribute;
@@ -238,13 +239,16 @@ class Homepage extends Controller
                     $prd_list['price']=number_format($row->prdPrice->price,2);
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$row->prdPrice->price);
                     }
                     else
                     {
                         $prd_list['product_type']='config'; 
                      $prd_list['price']=$this->config_product_price($row->id);
                      $prd_list['actual_price']=$this->config_product_price($row->id);
-                    $prd_list['sale_price']=$this->get_sale_price($row->id);   
+                    $prd_list['sale_price']=$this->get_sale_price($row->id); 
+                    $c_price=$prd_list['actual_price'];
+                     $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$c_price);
                     }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
                     $prd_list['rating']=$this->get_rates($row->id);
@@ -298,6 +302,7 @@ class Homepage extends Controller
                     $d_list['actual_price']=number_format($row->prdPrice->price,2);
                     $d_list['price']=number_format($row->prdPrice->price,2);
                     $d_list['sale_price']=$this->get_sale_price($row->id);
+                    $d_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$row->prdPrice->price);
                     }
                     else
                     {
@@ -305,6 +310,8 @@ class Homepage extends Controller
                     $d_list['actual_price']=$this->config_product_price($row->id);
                     $d_list['price']=$this->config_product_price($row->id);
                     $d_list['sale_price']=$this->get_sale_price($row->id); 
+                    $c_price=$d_list['actual_price'];
+                    $d_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$c_price);
                     }
                     $d_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang_id);
                     $d_list['rating']=$this->get_rates($row->id);
@@ -421,13 +428,14 @@ class Homepage extends Controller
                     {
                        if($rows->discount_type=="percentage")
                 {
-                    $shock_list['offer']='';
-                    $shock_list['offer_price']='';
+                    $shock_list['offer']=$rows->discount_value."% OFF";
+                    $per=($rows->discount_value/100)*$actual_price;
+                    $shock_list['offer_price']=$a_price-$per;
                 }
                 else
                 {
-                    $shock_list['offer']='';
-                    $shock_list['offer_price']='';
+                    $shock_list['offer']=$rows->discount_value." OFF";
+                    $shock_list['offer_price']=$a_price-$rows->discount_value;
                 } 
                     }
                 $shock_list['rating']=$this->get_rates($shock_rows);
@@ -822,13 +830,14 @@ class Homepage extends Controller
                     {
                        if($rows->discount_type=="percentage")
                 {
-                    $shock_list['offer']='';
-                    $shock_list['offer_price']='';
+                    $shock_list['offer']=$rows->discount_value."% OFF";
+                    $per=($rows->discount_value/100)*$actual_price;
+                    $shock_list['offer_price']=$a_price-$per;
                 }
                 else
                 {
-                    $shock_list['offer']='';
-                    $shock_list['offer_price']='';
+                    $shock_list['offer']=$rows->discount_value." OFF";
+                    $shock_list['offer_price']=$a_price-$rows->discount_value;
                 } 
                     }
                 $shock_list['rating']=$this->get_rates($shock_rows);
@@ -1180,12 +1189,15 @@ class Homepage extends Controller
                     $prd_list['product_type']='simple';        
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$row->prdPrice->price);
                     }
                     else
                     {
                     $prd_list['product_type']='config';        
                     $prd_list['actual_price']=$this->config_product_price($row->id);
-                    $prd_list['sale_price']=$this->get_sale_price($row->id);    
+                    $prd_list['sale_price']=$this->get_sale_price($row->id);  
+                    $c_price=$prd_list['actual_price'];
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$c_price);
                     }
                     $prd_list['short_description']=$row->get_content($row->short_desc_cnt_id,$lang);
                     $prd_list['tag']=$this->get_product_tag($row->id,$lang);
@@ -1477,26 +1489,94 @@ class Homepage extends Controller
                     {
                         $min = $join->min_val;
                         $max = $join->max_val;
-                        if($min > 0 && $max > 0 && $min!=$max){
-                        $val = $min."-".$max;
-                        }
-                        else if($min > 0 && $max ==0)
-                        {
-                            $val = $min;
-                        }
-                        else if($min==$max)
-                        {
-                           $val = $min; 
-                        }
-                        else
-                        {
-                            $val = $max;
-                        }
+                        
+                        $val = $min;
+                        
+                        // if($min > 0 && $max > 0 && $min!=$max){
+                        // $val = $min."-".$max;
+                        // }
+                        // else if($min > 0 && $max ==0)
+                        // {
+                        //     $val = $min;
+                        // }
+                        // else if($min==$max)
+                        // {
+                        //   $val = $min; 
+                        // }
+                        // else
+                        // {
+                        //     $val = $max;
+                        // }
                     }
             }
             
             return $val;
                     
+        }
+        
+        //Product special price
+    public function get_special_ofr_price($field_id,$price){ 
+
+       $return_val=0;
+       $current_date=Carbon::now();
+       $rows = PrdOffer::where('is_deleted',0)->where('prd_id',$field_id)->whereDate('valid_from','<=',$current_date)->whereDate('valid_to','>=',$current_date)->first();        
+        if($rows){ 
+        $discount_val = $rows->discount_value;
+        $discount_typ = $rows->discount_type;
+        if($discount_typ=="percentage")
+        {
+            $dis = $price * ($discount_val/100);
+            $return_val = $price-$dis;
+        }
+        else
+        {
+            $return_val = $price - $discount_val;
+        }
+        if($return_val>0)
+        {
+            return $return_val;
+        }
+        else
+        {
+             return false;
+        }
+        
+        }
+        else
+            { $return_val=false;
+                return $return_val; }
+        }
+        
+        public function get_special_ofr_value($field_id){ 
+
+       $return_val=0;
+       $current_date=Carbon::now();
+       $rows = PrdOffer::where('is_deleted',0)->where('prd_id',$field_id)->whereDate('valid_from','<=',$current_date)->whereDate('valid_to','>=',$current_date)->where('quantity_limit','>',0)->first();        
+        if($rows){ 
+        $discount_val = $rows->discount_value;
+        $discount_typ = $rows->discount_type;
+        if($discount_typ=="percentage")
+        {
+            $dis = $price * ($discount_val/100);
+            $return_val = $dis;
+        }
+        else
+        {
+            $return_val = $discount_val;
+        }
+        if($return_val>0)
+        {
+            return $return_val;
+        }
+        else
+        {
+             return $return_val;
+        }
+        
+        }
+        else
+            { //$return_val=false;
+                return $return_val; }
         }
    
 }

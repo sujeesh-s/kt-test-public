@@ -21,7 +21,7 @@
                                             <th class="wd-15p">Customer</th>
                                             <th class="wd-15p">Requested On</th>
                                             <th class="wd-25p notexport">Total ({{$currency}})</th>
-                                            <th class="wd-25p notexport">Status</th>
+                                            <th class="wd-25p notexport">Cancel Status</th>
                                             <th class="wd-25p text-center notexport action-btn">Action</th>
                                         </tr>
                                     </thead>

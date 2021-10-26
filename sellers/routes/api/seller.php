@@ -26,3 +26,14 @@ Route::post('/seller/dashboard', [App\Http\Controllers\Api\seller\DashboardContr
 //My products
 Route::post('/seller/my-products-list', [App\Http\Controllers\Api\seller\MyProducts::class, 'list']);
 Route::post('/seller/my-products-delete', [App\Http\Controllers\Api\seller\MyProducts::class, 'delete_product']);
+Route::post('/seller/my-products/add-offer', [App\Http\Controllers\Api\seller\MyProducts::class, 'add_special_offer']);
+Route::post('/seller/my-products/fetch-offer', [App\Http\Controllers\Api\seller\MyProducts::class, 'fetch_special_offer']);
+
+
+
+
+
+//Admin Products
+Route::post('/seller/admin-products/list', [App\Http\Controllers\Api\seller\AdminProducts::class, 'list']);
+
+

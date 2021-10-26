@@ -21,7 +21,7 @@
                                     <tbody>
                                        @if($data && count($data) > 0) @php $n = 0; @endphp
                                             @foreach($data as $row) @php $n++; @endphp 
-                                            @if($row->product)
+                                             @if($row->product)
                                     <tr>    
                                         <td class="align-middle select-checkbox"></td>
                                         <td>{{$row->product->get_content($row->product->name_cnt_id)}}</td>
@@ -34,7 +34,7 @@
                                         @endphp
                                         <td>{{$count}}</td>
                                     </tr>
-                                    @endif
+                                     @endif
                                     @endforeach
                                         @endif
                                         </tbody>

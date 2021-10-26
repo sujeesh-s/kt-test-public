@@ -32,6 +32,7 @@ use App\Models\PrdShock_Sale;
 use App\Models\PrdShockingSaleProduct;
 use App\Models\PrdPrice;
 use App\Models\Prd_Recent_View;
+use App\Models\PrdOffer;
 use App\Models\Productvisitor;
 use App\Models\RelatedProduct;
 use App\Models\AssignedAttribute;
@@ -112,11 +113,14 @@ class ProductController extends Controller
                     if($row->product_type==1){
                     $prd_list['product_type']='simple';    
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$row->prdPrice->price);
                     }
                     else
                     {
                      $prd_list['product_type']='config';    
                      $prd_list['actual_price']=$this->config_product_price($row->id);
+                     $c_price=$prd_list['actual_price'];
+                     $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$c_price);
                     }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
@@ -222,11 +226,14 @@ class ProductController extends Controller
                     if($row->product_type==1){
                     $prd_list['product_type']='simple';    
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$row->prdPrice->price);
                     }
                     else
                     {
                      $prd_list['product_type']='config';    
                      $prd_list['actual_price']=$this->config_product_price($row->id);
+                     $c_price=$prd_list['actual_price'];
+                     $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$c_price);
                     }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
@@ -323,11 +330,14 @@ class ProductController extends Controller
                     if($row->product_type==1){
                     $prd_list['product_type']='simple';    
                     $prd_list['actual_price']=number_format($row->prdPrice->price,2);
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$row->prdPrice->price);
                     }
                     else
                     {
                      $prd_list['product_type']='config';    
                      $prd_list['actual_price']=$this->config_product_price($row->id);
+                     $c_price=$prd_list['actual_price'];
+                     $prd_list['special_ofr_price']=$this->get_special_ofr_price($row->id,$c_price);
                     }
                     $prd_list['sale_price']=$this->get_sale_price($row->id);
                     $prd_list['short_description']=$this->get_content($row->short_desc_cnt_id,$lang);
@@ -479,6 +489,7 @@ class ProductController extends Controller
                     $actual_price = number_format($prod_data->prdPrice->price,2);
                     $prd_list['actual_price_quote']= $actual_price;
                     $prd_list['actual_price']= $prod_data->prdPrice->price;
+                    $prd_list['special_ofr_price']=$this->get_special_ofr_price($prod_data->id,$prod_data->prdPrice->price);
                     
                     $prd_list['stock']=$prod_data->prdStock($prod_data->id);
                     if($prod_data->is_out_of_stock==0)
@@ -501,6 +512,7 @@ class ProductController extends Controller
                     }
                     else
                     {
+                        
                         $prd_list['actual_price']= $this->config_product_price($prod_data->id);
                     }
                     $sale_price =$this->get_sale_price($prod_data->id);
@@ -515,7 +527,7 @@ class ProductController extends Controller
                    
                      //ASSOCIATIVE products
                     if($prod_data->product_type == 2)
-                    {    
+                    {   $special_ofr_available=$this->get_special_ofr_value($prod_data->id); 
                         $prd_ass = AssociatProduct::where('prd_id',$prod_data->id)->where('is_deleted',0)->get();
                         if(count($prd_ass)>0)
                         {
@@ -525,7 +537,7 @@ class ProductController extends Controller
                             if($product_visibility){
                             //$associative_prd[]=$this->ass_related_product($rows->ass_prd_id,$lang);
                             
-                                $associative_prd[]=$this->ass_related_product1($product_visibility->id,$lang);
+                                $associative_prd[]=$this->ass_related_product1($product_visibility->id,$special_ofr_available,$lang);
                             
                             
                              }
@@ -822,10 +834,12 @@ class ProductController extends Controller
                 $actual_price=$real_product->prdPrice->price;
                 $shock_list['actual_price']=$real_product->prdPrice->price;
                 $shock_list['sale_price']=$this->get_sale_price($real_product->id);
+                $special_ofr_available=0;
                 if($shock->discount_type=="percentage")
                 {
                     $shock_list['offer']=$shock->discount_value."% OFF";
                     $per=($shock->discount_value/100)*$actual_price;
+                    $special_ofr_available=$per;
                     $discount=(float)$actual_price-(float)$per;
                     $round= number_format($discount, 2);
                     $shock_list['offer_price']=$round;
@@ -833,16 +847,32 @@ class ProductController extends Controller
                 else
                 {
                     $shock_list['offer']=$shock->discount_value." OFF";
+                    $special_ofr_available=$shock->discount_value;
                     $ofr_price=(float)$actual_price-(float)$shock->discount_value;
                     $shock_list['offer_price']=$ofr_price;
                 }
                 }
                 else
                 {
-                $shock_list['actual_price']=$this->config_product_price($real_product->id);;
+                    $offer='';
+                if($shock->discount_type=="percentage")
+                {
+                   
+                    $per=($shock->discount_value/100)*$actual_price;
+                    $offer=$shock->discount_value."% OFF";
+                    $special_ofr_available=$per;
+                    
+                }
+                else
+                {
+                    $special_ofr_available=$shock->discount_value;
+                    $offer=$shock->discount_value." OFF";
+                }    
+                $shock_list['actual_price']=$this->config_product_price($real_product->id);
+                $actual_price_shock=$shock_list['actual_price'];
                 $shock_list['sale_price']=$this->get_sale_price($real_product->id);;
-                $shock_list['offer']='';
-                $shock_list['offer_price']='';
+                $shock_list['offer']=$offer;
+                $shock_list['offer_price']=$actual_price_shock-$special_ofr_available;
                 }
                 
                 
@@ -864,7 +894,7 @@ class ProductController extends Controller
                             if($product_visibility){
                             //$associative_prd[]=$this->ass_related_product($rows->ass_prd_id,$lang);
                             
-                                $associative_prd[]=$this->ass_related_product1($product_visibility->id,$lang);
+                                $associative_prd[]=$this->ass_related_product1($product_visibility->id,$special_ofr_available,$lang);
                             
                             
                              }
@@ -2142,7 +2172,7 @@ class ProductController extends Controller
             else{ $data     =   []; } return $data;
         
     }
-    function ass_related_product1($prd_id,$lang){
+    function ass_related_product1($prd_id,$special_ofr_available,$lang){
         $data     =   [];
         
         $prod_data       =   AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->orderBy('attr_id','DESC')->groupBy('attr_id')->get();
@@ -2161,18 +2191,28 @@ class ProductController extends Controller
                     
                     
                     
-                    $attr_list['image']=config('app.storage_url').$row->attrValue->image;
-                    $arrt_vals['list'][] =$this->inner_attribute($prd_id,$row->attr_id,$row->id,$lang);
+                    //$attr_list['image']=config('app.storage_url').$row->attrValue->image;
+                    $arrt_vals['list'][] =$this->inner_attribute($prd_id,$row->attr_id,$special_ofr_available,$row->id,$lang);
                     
 
                     if(empty($arrt_vals['list'][0]))
                     {
+                        
                     $attr_list['sub_attributes'] = [];   
-                    $actual_price = number_format($row->prdPrice->price,2);
+                    $actual_price = $this->get_actual_price($row->prd_id);
                     $attr_list['actual_price_quote']= $actual_price;
-                    $attr_list['actual_price']= $row->prdPrice->price;
+                    $attr_list['actual_price']= $actual_price;
                     $sale_price =$this->get_sale_price($row->prd_id);
                     $attr_list['sale_price']=$sale_price;
+                    if($special_ofr_available>0)
+                        {
+                          $special_ofr_price = $actual_price - $special_ofr_available; 
+                          $attr_list['special_ofr_price']=$special_ofr_price;
+                        }
+                        else
+                        {
+                          $attr_list['special_ofr_price']=false;  
+                        }
                     $attr_list['stock']=$row->prdStock($row->prd_id);
                     $attr_list['sku']=$row->Product->sku;
                     
@@ -2196,7 +2236,7 @@ class ProductController extends Controller
                     }
                     else
                     {
-                        $attr_list['sub_attributes'] =$this->inner_attribute($prd_id,$row->attr_id,$row->id,$lang);
+                        $attr_list['sub_attributes'] =$this->inner_attribute($prd_id,$row->attr_id,$row->id,$special_ofr_available,$lang);
                     }
                     $data             =   $attr_list;
                 }
@@ -2205,7 +2245,7 @@ class ProductController extends Controller
         
     }
     
-    function inner_attribute($prd_id,$attr_id,$rowId,$lang)
+    function inner_attribute($prd_id,$attr_id,$rowId,$special_ofr_available,$lang)
     {
         $data=[];
         $rowss = AssignedAttribute::where('is_deleted',0)->where('prd_id',$prd_id)->where('attr_id','!=',$attr_id)->where('id','!=',$rowId)->first();
@@ -2219,9 +2259,18 @@ class ProductController extends Controller
                         $atr_inn['attr_name']= $this->get_content($rowss->PrdAttr->name_cnt_id,$lang);
                         $atr_inn['attr_value']= $rowss->attr_value;
                         $atr_inn['image']=config('app.storage_url').$rowss->attrValue->image;
-                        $actual_price = number_format($rowss->Product->prdPrice->price,2);
+                        $actual_price = $this->get_actual_price($rowss->prd_id);
                         $atr_inn['actual_price_quote']= $actual_price;
                         $atr_inn['actual_price']= $rowss->Product->prdPrice->price;
+                        if($special_ofr_available>0)
+                        {
+                          $special_ofr_price = $actual_price - $special_ofr_available; 
+                          $atr_inn['special_ofr_price']=$special_ofr_price;
+                        }
+                        else
+                        {
+                          $atr_inn['special_ofr_price']=false;  
+                        }
                         $sale_price =$this->get_sale_price($rowss->prd_id);
                         $atr_inn['sale_price']=$sale_price;
                         $atr_inn['stock']=$rowss->prdStock($rowss->prd_id);
@@ -2664,6 +2713,72 @@ class ProductController extends Controller
                 return $return_val; }
         }
         
+        
+        //Product special price
+    public function get_special_ofr_price($field_id,$price){ 
+
+       $return_val=0;
+       $current_date=Carbon::now();
+       $rows = PrdOffer::where('is_deleted',0)->where('prd_id',$field_id)->whereDate('valid_from','<=',$current_date)->whereDate('valid_to','>=',$current_date)->first();        
+        if($rows){ 
+        $discount_val = $rows->discount_value;
+        $discount_typ = $rows->discount_type;
+        if($discount_typ=="percentage")
+        {
+            $dis = $price * ($discount_val/100);
+            $return_val = $price-$dis;
+        }
+        else
+        {
+            $return_val = $price - $discount_val;
+        }
+        if($return_val>0)
+        {
+            return $return_val;
+        }
+        else
+        {
+             return false;
+        }
+        
+        }
+        else
+            { $return_val=false;
+                return $return_val; }
+        }
+        
+        public function get_special_ofr_value($field_id){ 
+
+       $return_val=0;
+       $current_date=Carbon::now();
+       $rows = PrdOffer::where('is_deleted',0)->where('prd_id',$field_id)->whereDate('valid_from','<=',$current_date)->whereDate('valid_to','>=',$current_date)->where('quantity_limit','>',0)->first();        
+        if($rows){ 
+        $discount_val = $rows->discount_value;
+        $discount_typ = $rows->discount_type;
+        if($discount_typ=="percentage")
+        {
+            $dis = $price * ($discount_val/100);
+            $return_val = $dis;
+        }
+        else
+        {
+            $return_val = $discount_val;
+        }
+        if($return_val>0)
+        {
+            return $return_val;
+        }
+        else
+        {
+             return $return_val;
+        }
+        
+        }
+        else
+            { //$return_val=false;
+                return $return_val; }
+        }
+        
         //Product ACTUAL price
     public function get_actual_price($field_id){ 
 
@@ -2719,7 +2834,7 @@ class ProductController extends Controller
         
         function config_product_price($prd_id)
         {
-            $val = '';
+            $val = 0;
             $prd_ass = AssociatProduct::where('prd_id',$prd_id)->where('is_deleted',0)->get(['ass_prd_id']);
             if($prd_ass){
             $join = Product::join('prd_prices', 'prd_products.id', '=', 'prd_prices.prd_id')
@@ -2729,21 +2844,23 @@ class ProductController extends Controller
                     {
                         $min = $join->min_val;
                         $max = $join->max_val;
-                        if($min > 0 && $max > 0 && $min!=$max){
-                        $val = $min."-".$max;
-                        }
-                        else if($min > 0 && $max ==0)
-                        {
-                            $val = $min;
-                        }
-                        else if($min==$max)
-                        {
-                           $val = $min; 
-                        }
-                        else
-                        {
-                            $val = $max;
-                        }
+                        
+                         $val = $min;
+                        // if($min > 0 && $max > 0 && $min!=$max){
+                        // $val = $min."-".$max;
+                        // }
+                        // else if($min > 0 && $max ==0)
+                        // {
+                        //     $val = $min;
+                        // }
+                        // else if($min==$max)
+                        // {
+                        //   $val = $min; 
+                        // }
+                        // else
+                        // {
+                        //     $val = $max;
+                        // }
                     }
             }
             

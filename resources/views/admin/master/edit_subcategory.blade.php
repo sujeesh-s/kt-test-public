@@ -12,6 +12,11 @@
         <!-- INTERNAL File Uploads css-->
         <link href="{{URL::asset('admin/assets/plugins/fileupload/css/fileupload.css')}}" rel="stylesheet" type="text/css" />
         <link href="{{URL::asset('admin/assets/css/combo-tree.css')}}" rel="stylesheet" />
+        <style type="text/css">
+            .img {
+                padding: 3px;
+            }
+        </style>
 @endsection
 @section('page-header')
 						<!--Page header-->
@@ -195,7 +200,12 @@
                                                         <div class="col-lg-4 col-md-4 col-sm-12">
                                                             <label class="form-label">Choose another Subcategory Image <span class="text-red">*</span></label>
                                                             <p>(Image type .png,.jpeg)</p>
-                                                            <input type="file" class="dropify" data-height="180"  accept="image/*"  data-allowed-file-extensions='["png", "jpg", "jpeg"]' name="subcategory_image" />
+                                                            <input type="file" class="form-control img" data-height="180"  id="category_image"   accept="image/png, image/jpg, image/jpeg" name="subcategory_image" />
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                                            <div class="form-group">
+                                                            <img src="" alt="Image" id="image_disp_id" class="no-disp" width="120px" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col d-flex justify-content-end">
@@ -248,8 +258,17 @@
 
 <script type="text/javascript">
 
+  function readURL(input) { 
+        if (input.files && input.files[0]) { 
+            var reader = new FileReader(); 
+            reader.onload = function (e) { $('#image_disp_id').attr('src', e.target.result); $('#image_disp_id').show(); }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    
     jQuery(document).ready(function(){
-
+  $("body").on('change','#category_image',function(){ readURL(this); });
 
 $("#frontval").click(function(){
     
